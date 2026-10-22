@@ -1,5 +1,5 @@
 {
- "gerado_em": "2026-10-22T17:49:53-03:00",
+ "gerado_em": "2026-10-22T19:22:03-03:00",
  "textos": {
   "AVISO": "⚠️ Sou uma IA e posso errar. Isto não é recomendação de investimento: a empresa não é analista credenciada na APIMEC nem consultora autorizada pela CVM. Rentabilidade passada não indica rentabilidade futura.",
   "RECUSA": "Não digo se você deve comprar, vender ou esperar, nem para onde o preço vai: isso seria análise ou consultoria. Mostro o que dá para saber hoje, com fonte, para você decidir.",
@@ -121,7 +121,7 @@
     ]
    }
   ],
-  "resumo": "Último dado: Selic de 13,75% (22/10/2026), IPCA de 4,58% em 12 meses (até setembro de 2026) e dólar a R$ 5,0383 (PTAX de 22/10/2026).",
+  "resumo": "Hoje, pelo dado oficial: juros básicos (Selic) de 13,75% ao ano, inflação de 4,58% em 12 meses (até setembro de 2026) e dólar a R$ 5,04 (cotação oficial de 22/10/2026).",
   "limites": []
  },
  "eleicoes": {
@@ -245,7 +245,7 @@
      ]
     }
    ],
-   "resumo": "Nos 2 segundos turnos desde 2018, o Ibovespa variou −2,24% e +1,31% no pregão seguinte; nos 3 primeiros, em que a urna surpreendeu as pesquisas, de +4,57% a +7,70%. Leitura do estudo: pesou mais a surpresa do que o nome do vencedor, mas as 3 surpresas foram a favor do mesmo campo político, então a amostra não mostra o outro lado; com 5 casos não se tira regra.",
+   "resumo": "Depois dos 2 segundos turnos desde 2018, o Ibovespa caiu 2,24% e subiu 1,31% no dia seguinte; depois dos 3 primeiros, em que a urna surpreendeu as pesquisas, subiu de 4,57% a 7,70%. Leitura do estudo: pesou mais a surpresa das urnas do que o nome de quem ganhou, mas as 3 surpresas foram a favor do mesmo campo político, e a amostra não mostra o outro lado. São só 5 casos: não dá para tirar regra.",
    "limites": [
     "São só 5 turnos, e só 3 tiveram surpresa mensurável: não dá para tirar regra.",
     "A reação é de um dia, com dado diário (o estudo não tem dado intradiário): no Ibovespa, o fechamento do pregão seguinte contra o anterior; no dólar, a PTAX de venda do Banco Central, fixada entre 10h e 13h, e não o fechamento; nos juros, a taxa de compra da manhã do Tesouro Direto."
@@ -371,7 +371,7 @@
      ]
     }
    ],
-   "resumo": "Nos 2 segundos turnos desde 2018, o dólar variou −1,05% e −1,65% no pregão seguinte; nos 3 primeiros, em que a urna surpreendeu as pesquisas, de −4,55% a −2,87%. Leitura do estudo: pesou mais a surpresa do que o nome do vencedor, mas as 3 surpresas foram a favor do mesmo campo político, então a amostra não mostra o outro lado; com 5 casos não se tira regra.",
+   "resumo": "Depois dos 2 segundos turnos desde 2018, o dólar caiu 1,05% e 1,65% no dia seguinte; depois dos 3 primeiros, em que a urna surpreendeu as pesquisas, caiu de 2,87% a 4,55%. Leitura do estudo: pesou mais a surpresa das urnas do que o nome de quem ganhou, mas as 3 surpresas foram a favor do mesmo campo político, e a amostra não mostra o outro lado. São só 5 casos: não dá para tirar regra.",
    "limites": [
     "São só 5 turnos, e só 3 tiveram surpresa mensurável: não dá para tirar regra.",
     "A reação é de um dia, com dado diário (o estudo não tem dado intradiário): no Ibovespa, o fechamento do pregão seguinte contra o anterior; no dólar, a PTAX de venda do Banco Central, fixada entre 10h e 13h, e não o fechamento; nos juros, a taxa de compra da manhã do Tesouro Direto."
@@ -497,7 +497,7 @@
      ]
     }
    ],
-   "resumo": "Nos 2 segundos turnos desde 2018, o juros de 5 anos variou −44,8 p.b. e +1,0 p.b. no pregão seguinte; nos 3 primeiros, em que a urna surpreendeu as pesquisas, de −119,9 p.b. a −31,4 p.b.. Leitura do estudo: pesou mais a surpresa do que o nome do vencedor, mas as 3 surpresas foram a favor do mesmo campo político, então a amostra não mostra o outro lado; com 5 casos não se tira regra.",
+   "resumo": "Depois dos 2 segundos turnos desde 2018, o juros de 5 anos caiu 44,8 pontos-base e subiu 1,0 pontos-base no dia seguinte; depois dos 3 primeiros, em que a urna surpreendeu as pesquisas, caiu de 31,4 pontos-base a 119,9 pontos-base. Leitura do estudo: pesou mais a surpresa das urnas do que o nome de quem ganhou, mas as 3 surpresas foram a favor do mesmo campo político, e a amostra não mostra o outro lado. São só 5 casos: não dá para tirar regra.",
    "limites": [
     "São só 5 turnos, e só 3 tiveram surpresa mensurável: não dá para tirar regra.",
     "A reação é de um dia, com dado diário (o estudo não tem dado intradiário): no Ibovespa, o fechamento do pregão seguinte contra o anterior; no dólar, a PTAX de venda do Banco Central, fixada entre 10h e 13h, e não o fechamento; nos juros, a taxa de compra da manhã do Tesouro Direto."
@@ -665,7 +665,7 @@
      ]
     }
    ],
-   "resumo": "Nos 2 segundos turnos desde 2018, o Ibovespa variou −2,24% e +1,31% no pregão seguinte; nos 3 primeiros, em que a urna surpreendeu as pesquisas, de +4,57% a +7,70%. Leitura do estudo: pesou mais a surpresa do que o nome do vencedor, mas as 3 surpresas foram a favor do mesmo campo político, então a amostra não mostra o outro lado; com 5 casos não se tira regra.",
+   "resumo": "Depois dos 2 segundos turnos desde 2018, o Ibovespa caiu 2,24% e subiu 1,31% no dia seguinte; depois dos 3 primeiros, em que a urna surpreendeu as pesquisas, subiu de 4,57% a 7,70%. Leitura do estudo: pesou mais a surpresa das urnas do que o nome de quem ganhou, mas as 3 surpresas foram a favor do mesmo campo político, e a amostra não mostra o outro lado. São só 5 casos: não dá para tirar regra.",
    "limites": [
     "São só 5 turnos, e só 3 tiveram surpresa mensurável: não dá para tirar regra.",
     "A reação é de um dia, com dado diário (o estudo não tem dado intradiário): no Ibovespa, o fechamento do pregão seguinte contra o anterior; no dólar, a PTAX de venda do Banco Central, fixada entre 10h e 13h, e não o fechamento; nos juros, a taxa de compra da manhã do Tesouro Direto."
@@ -833,7 +833,7 @@
      ]
     }
    ],
-   "resumo": "Nos 2 segundos turnos desde 2018, o Ibovespa variou −2,24% e +1,31% no pregão seguinte; nos 3 primeiros, em que a urna surpreendeu as pesquisas, de +4,57% a +7,70%. Leitura do estudo: pesou mais a surpresa do que o nome do vencedor, mas as 3 surpresas foram a favor do mesmo campo político, então a amostra não mostra o outro lado; com 5 casos não se tira regra.",
+   "resumo": "Depois dos 2 segundos turnos desde 2018, o Ibovespa caiu 2,24% e subiu 1,31% no dia seguinte; depois dos 3 primeiros, em que a urna surpreendeu as pesquisas, subiu de 4,57% a 7,70%. Leitura do estudo: pesou mais a surpresa das urnas do que o nome de quem ganhou, mas as 3 surpresas foram a favor do mesmo campo político, e a amostra não mostra o outro lado. São só 5 casos: não dá para tirar regra.",
    "limites": [
     "São só 5 turnos, e só 3 tiveram surpresa mensurável: não dá para tirar regra.",
     "A reação é de um dia, com dado diário (o estudo não tem dado intradiário): no Ibovespa, o fechamento do pregão seguinte contra o anterior; no dólar, a PTAX de venda do Banco Central, fixada entre 10h e 13h, e não o fechamento; nos juros, a taxa de compra da manhã do Tesouro Direto."
@@ -1001,7 +1001,7 @@
      ]
     }
    ],
-   "resumo": "Nos 2 segundos turnos desde 2018, o dólar variou −1,05% e −1,65% no pregão seguinte; nos 3 primeiros, em que a urna surpreendeu as pesquisas, de −4,55% a −2,87%. Leitura do estudo: pesou mais a surpresa do que o nome do vencedor, mas as 3 surpresas foram a favor do mesmo campo político, então a amostra não mostra o outro lado; com 5 casos não se tira regra.",
+   "resumo": "Depois dos 2 segundos turnos desde 2018, o dólar caiu 1,05% e 1,65% no dia seguinte; depois dos 3 primeiros, em que a urna surpreendeu as pesquisas, caiu de 2,87% a 4,55%. Leitura do estudo: pesou mais a surpresa das urnas do que o nome de quem ganhou, mas as 3 surpresas foram a favor do mesmo campo político, e a amostra não mostra o outro lado. São só 5 casos: não dá para tirar regra.",
    "limites": [
     "São só 5 turnos, e só 3 tiveram surpresa mensurável: não dá para tirar regra.",
     "A reação é de um dia, com dado diário (o estudo não tem dado intradiário): no Ibovespa, o fechamento do pregão seguinte contra o anterior; no dólar, a PTAX de venda do Banco Central, fixada entre 10h e 13h, e não o fechamento; nos juros, a taxa de compra da manhã do Tesouro Direto."
@@ -1169,7 +1169,7 @@
      ]
     }
    ],
-   "resumo": "Nos 2 segundos turnos desde 2018, o dólar variou −1,05% e −1,65% no pregão seguinte; nos 3 primeiros, em que a urna surpreendeu as pesquisas, de −4,55% a −2,87%. Leitura do estudo: pesou mais a surpresa do que o nome do vencedor, mas as 3 surpresas foram a favor do mesmo campo político, então a amostra não mostra o outro lado; com 5 casos não se tira regra.",
+   "resumo": "Depois dos 2 segundos turnos desde 2018, o dólar caiu 1,05% e 1,65% no dia seguinte; depois dos 3 primeiros, em que a urna surpreendeu as pesquisas, caiu de 2,87% a 4,55%. Leitura do estudo: pesou mais a surpresa das urnas do que o nome de quem ganhou, mas as 3 surpresas foram a favor do mesmo campo político, e a amostra não mostra o outro lado. São só 5 casos: não dá para tirar regra.",
    "limites": [
     "São só 5 turnos, e só 3 tiveram surpresa mensurável: não dá para tirar regra.",
     "A reação é de um dia, com dado diário (o estudo não tem dado intradiário): no Ibovespa, o fechamento do pregão seguinte contra o anterior; no dólar, a PTAX de venda do Banco Central, fixada entre 10h e 13h, e não o fechamento; nos juros, a taxa de compra da manhã do Tesouro Direto."
@@ -1337,7 +1337,7 @@
      ]
     }
    ],
-   "resumo": "Nos 2 segundos turnos desde 2018, o juros de 5 anos variou −44,8 p.b. e +1,0 p.b. no pregão seguinte; nos 3 primeiros, em que a urna surpreendeu as pesquisas, de −119,9 p.b. a −31,4 p.b.. Leitura do estudo: pesou mais a surpresa do que o nome do vencedor, mas as 3 surpresas foram a favor do mesmo campo político, então a amostra não mostra o outro lado; com 5 casos não se tira regra.",
+   "resumo": "Depois dos 2 segundos turnos desde 2018, o juros de 5 anos caiu 44,8 pontos-base e subiu 1,0 pontos-base no dia seguinte; depois dos 3 primeiros, em que a urna surpreendeu as pesquisas, caiu de 31,4 pontos-base a 119,9 pontos-base. Leitura do estudo: pesou mais a surpresa das urnas do que o nome de quem ganhou, mas as 3 surpresas foram a favor do mesmo campo político, e a amostra não mostra o outro lado. São só 5 casos: não dá para tirar regra.",
    "limites": [
     "São só 5 turnos, e só 3 tiveram surpresa mensurável: não dá para tirar regra.",
     "A reação é de um dia, com dado diário (o estudo não tem dado intradiário): no Ibovespa, o fechamento do pregão seguinte contra o anterior; no dólar, a PTAX de venda do Banco Central, fixada entre 10h e 13h, e não o fechamento; nos juros, a taxa de compra da manhã do Tesouro Direto."
@@ -1505,7 +1505,7 @@
      ]
     }
    ],
-   "resumo": "Nos 2 segundos turnos desde 2018, o juros de 5 anos variou −44,8 p.b. e +1,0 p.b. no pregão seguinte; nos 3 primeiros, em que a urna surpreendeu as pesquisas, de −119,9 p.b. a −31,4 p.b.. Leitura do estudo: pesou mais a surpresa do que o nome do vencedor, mas as 3 surpresas foram a favor do mesmo campo político, então a amostra não mostra o outro lado; com 5 casos não se tira regra.",
+   "resumo": "Depois dos 2 segundos turnos desde 2018, o juros de 5 anos caiu 44,8 pontos-base e subiu 1,0 pontos-base no dia seguinte; depois dos 3 primeiros, em que a urna surpreendeu as pesquisas, caiu de 31,4 pontos-base a 119,9 pontos-base. Leitura do estudo: pesou mais a surpresa das urnas do que o nome de quem ganhou, mas as 3 surpresas foram a favor do mesmo campo político, e a amostra não mostra o outro lado. São só 5 casos: não dá para tirar regra.",
    "limites": [
     "São só 5 turnos, e só 3 tiveram surpresa mensurável: não dá para tirar regra.",
     "A reação é de um dia, com dado diário (o estudo não tem dado intradiário): no Ibovespa, o fechamento do pregão seguinte contra o anterior; no dólar, a PTAX de venda do Banco Central, fixada entre 10h e 13h, e não o fechamento; nos juros, a taxa de compra da manhã do Tesouro Direto."
@@ -1715,7 +1715,7 @@
      ]
     }
    ],
-   "resumo": "Nos 2 segundos turnos desde 2018, o Ibovespa variou −2,24% e +1,31% no pregão seguinte; nos 3 primeiros, em que a urna surpreendeu as pesquisas, de +4,57% a +7,70%. Leitura do estudo: pesou mais a surpresa do que o nome do vencedor, mas as 3 surpresas foram a favor do mesmo campo político, então a amostra não mostra o outro lado; com 5 casos não se tira regra.",
+   "resumo": "Depois dos 2 segundos turnos desde 2018, o Ibovespa caiu 2,24% e subiu 1,31% no dia seguinte; depois dos 3 primeiros, em que a urna surpreendeu as pesquisas, subiu de 4,57% a 7,70%. Leitura do estudo: pesou mais a surpresa das urnas do que o nome de quem ganhou, mas as 3 surpresas foram a favor do mesmo campo político, e a amostra não mostra o outro lado. São só 5 casos: não dá para tirar regra.",
    "limites": [
     "São só 5 turnos, e só 3 tiveram surpresa mensurável: não dá para tirar regra.",
     "A reação é de um dia, com dado diário (o estudo não tem dado intradiário): no Ibovespa, o fechamento do pregão seguinte contra o anterior; no dólar, a PTAX de venda do Banco Central, fixada entre 10h e 13h, e não o fechamento; nos juros, a taxa de compra da manhã do Tesouro Direto."
@@ -1925,7 +1925,7 @@
      ]
     }
    ],
-   "resumo": "Nos 2 segundos turnos desde 2018, o Ibovespa variou −2,24% e +1,31% no pregão seguinte; nos 3 primeiros, em que a urna surpreendeu as pesquisas, de +4,57% a +7,70%. Leitura do estudo: pesou mais a surpresa do que o nome do vencedor, mas as 3 surpresas foram a favor do mesmo campo político, então a amostra não mostra o outro lado; com 5 casos não se tira regra.",
+   "resumo": "Depois dos 2 segundos turnos desde 2018, o Ibovespa caiu 2,24% e subiu 1,31% no dia seguinte; depois dos 3 primeiros, em que a urna surpreendeu as pesquisas, subiu de 4,57% a 7,70%. Leitura do estudo: pesou mais a surpresa das urnas do que o nome de quem ganhou, mas as 3 surpresas foram a favor do mesmo campo político, e a amostra não mostra o outro lado. São só 5 casos: não dá para tirar regra.",
    "limites": [
     "São só 5 turnos, e só 3 tiveram surpresa mensurável: não dá para tirar regra.",
     "A reação é de um dia, com dado diário (o estudo não tem dado intradiário): no Ibovespa, o fechamento do pregão seguinte contra o anterior; no dólar, a PTAX de venda do Banco Central, fixada entre 10h e 13h, e não o fechamento; nos juros, a taxa de compra da manhã do Tesouro Direto."
@@ -2135,7 +2135,7 @@
      ]
     }
    ],
-   "resumo": "Nos 2 segundos turnos desde 2018, o dólar variou −1,05% e −1,65% no pregão seguinte; nos 3 primeiros, em que a urna surpreendeu as pesquisas, de −4,55% a −2,87%. Leitura do estudo: pesou mais a surpresa do que o nome do vencedor, mas as 3 surpresas foram a favor do mesmo campo político, então a amostra não mostra o outro lado; com 5 casos não se tira regra.",
+   "resumo": "Depois dos 2 segundos turnos desde 2018, o dólar caiu 1,05% e 1,65% no dia seguinte; depois dos 3 primeiros, em que a urna surpreendeu as pesquisas, caiu de 2,87% a 4,55%. Leitura do estudo: pesou mais a surpresa das urnas do que o nome de quem ganhou, mas as 3 surpresas foram a favor do mesmo campo político, e a amostra não mostra o outro lado. São só 5 casos: não dá para tirar regra.",
    "limites": [
     "São só 5 turnos, e só 3 tiveram surpresa mensurável: não dá para tirar regra.",
     "A reação é de um dia, com dado diário (o estudo não tem dado intradiário): no Ibovespa, o fechamento do pregão seguinte contra o anterior; no dólar, a PTAX de venda do Banco Central, fixada entre 10h e 13h, e não o fechamento; nos juros, a taxa de compra da manhã do Tesouro Direto."
@@ -2345,7 +2345,7 @@
      ]
     }
    ],
-   "resumo": "Nos 2 segundos turnos desde 2018, o dólar variou −1,05% e −1,65% no pregão seguinte; nos 3 primeiros, em que a urna surpreendeu as pesquisas, de −4,55% a −2,87%. Leitura do estudo: pesou mais a surpresa do que o nome do vencedor, mas as 3 surpresas foram a favor do mesmo campo político, então a amostra não mostra o outro lado; com 5 casos não se tira regra.",
+   "resumo": "Depois dos 2 segundos turnos desde 2018, o dólar caiu 1,05% e 1,65% no dia seguinte; depois dos 3 primeiros, em que a urna surpreendeu as pesquisas, caiu de 2,87% a 4,55%. Leitura do estudo: pesou mais a surpresa das urnas do que o nome de quem ganhou, mas as 3 surpresas foram a favor do mesmo campo político, e a amostra não mostra o outro lado. São só 5 casos: não dá para tirar regra.",
    "limites": [
     "São só 5 turnos, e só 3 tiveram surpresa mensurável: não dá para tirar regra.",
     "A reação é de um dia, com dado diário (o estudo não tem dado intradiário): no Ibovespa, o fechamento do pregão seguinte contra o anterior; no dólar, a PTAX de venda do Banco Central, fixada entre 10h e 13h, e não o fechamento; nos juros, a taxa de compra da manhã do Tesouro Direto."
@@ -2555,7 +2555,7 @@
      ]
     }
    ],
-   "resumo": "Nos 2 segundos turnos desde 2018, o juros de 5 anos variou −44,8 p.b. e +1,0 p.b. no pregão seguinte; nos 3 primeiros, em que a urna surpreendeu as pesquisas, de −119,9 p.b. a −31,4 p.b.. Leitura do estudo: pesou mais a surpresa do que o nome do vencedor, mas as 3 surpresas foram a favor do mesmo campo político, então a amostra não mostra o outro lado; com 5 casos não se tira regra.",
+   "resumo": "Depois dos 2 segundos turnos desde 2018, o juros de 5 anos caiu 44,8 pontos-base e subiu 1,0 pontos-base no dia seguinte; depois dos 3 primeiros, em que a urna surpreendeu as pesquisas, caiu de 31,4 pontos-base a 119,9 pontos-base. Leitura do estudo: pesou mais a surpresa das urnas do que o nome de quem ganhou, mas as 3 surpresas foram a favor do mesmo campo político, e a amostra não mostra o outro lado. São só 5 casos: não dá para tirar regra.",
    "limites": [
     "São só 5 turnos, e só 3 tiveram surpresa mensurável: não dá para tirar regra.",
     "A reação é de um dia, com dado diário (o estudo não tem dado intradiário): no Ibovespa, o fechamento do pregão seguinte contra o anterior; no dólar, a PTAX de venda do Banco Central, fixada entre 10h e 13h, e não o fechamento; nos juros, a taxa de compra da manhã do Tesouro Direto."
@@ -2765,7 +2765,7 @@
      ]
     }
    ],
-   "resumo": "Nos 2 segundos turnos desde 2018, o juros de 5 anos variou −44,8 p.b. e +1,0 p.b. no pregão seguinte; nos 3 primeiros, em que a urna surpreendeu as pesquisas, de −119,9 p.b. a −31,4 p.b.. Leitura do estudo: pesou mais a surpresa do que o nome do vencedor, mas as 3 surpresas foram a favor do mesmo campo político, então a amostra não mostra o outro lado; com 5 casos não se tira regra.",
+   "resumo": "Depois dos 2 segundos turnos desde 2018, o juros de 5 anos caiu 44,8 pontos-base e subiu 1,0 pontos-base no dia seguinte; depois dos 3 primeiros, em que a urna surpreendeu as pesquisas, caiu de 31,4 pontos-base a 119,9 pontos-base. Leitura do estudo: pesou mais a surpresa das urnas do que o nome de quem ganhou, mas as 3 surpresas foram a favor do mesmo campo político, e a amostra não mostra o outro lado. São só 5 casos: não dá para tirar regra.",
    "limites": [
     "São só 5 turnos, e só 3 tiveram surpresa mensurável: não dá para tirar regra.",
     "A reação é de um dia, com dado diário (o estudo não tem dado intradiário): no Ibovespa, o fechamento do pregão seguinte contra o anterior; no dólar, a PTAX de venda do Banco Central, fixada entre 10h e 13h, e não o fechamento; nos juros, a taxa de compra da manhã do Tesouro Direto."
@@ -3061,7 +3061,7 @@
      ]
     }
    ],
-   "resumo": "Nas 86 reuniões do Copom desde 2016, a decisão foi diferente do Focus da véspera em 11 (6 abaixo, 5 acima). Nessas 11, os juros de 2 anos foram de −34,9 a +140,8 p.b. no pregão seguinte (mediana de −4,7 p.b.); em tamanho, sem o sinal, a mediana foi de 18,3 p.b., contra 8,6 p.b. nas outras 75.",
+   "resumo": "Nas 86 reuniões do Copom desde 2016, a decisão foi diferente da que os economistas esperavam (boletim Focus) em 11: 6 abaixo e 5 acima. Nelas, os juros de 2 anos foi de queda de 34,9 pontos-base a alta de 140,8 pontos-base no dia seguinte; no valor do meio, mexeram 18,3 pontos-base, contra 8,6 nas outras 75.",
    "limites": [
     "O Focus é a expectativa de economistas, não o preço de mercado.",
     "São só 11 reuniões com surpresa desde 2016.",
@@ -3344,7 +3344,7 @@
      ]
     }
    ],
-   "resumo": "No pregão seguinte ao Copom, desde 2016: nas 75 reuniões em que a decisão foi a esperada pelo Focus, o Ibovespa foi de −3,88% a +5,12% (mediana de −0,18%); nas 11 que surpreenderam, de −3,37% a +2,41% (mediana de −0,62%). Antes da reunião não se sabe se ela vai surpreender.",
+   "resumo": "Depois das reuniões do Copom desde 2016: nas 75 em que a decisão foi a que os economistas esperavam (boletim Focus), o Ibovespa foi de queda de 3,88% a alta de 5,12% no dia seguinte; nas 11 que surpreenderam, foi de queda de 3,37% a alta de 2,41%. Antes da reunião não se sabe se ela vai surpreender.",
    "limites": [
     "O Focus é a expectativa de economistas, não o preço de mercado.",
     "São só 11 reuniões com surpresa desde 2016.",
@@ -3627,7 +3627,7 @@
      ]
     }
    ],
-   "resumo": "No pregão seguinte ao Copom, desde 2016: nas 75 reuniões em que a decisão foi a esperada pelo Focus, o dólar foi de −2,56% a +1,92% (mediana de −0,08%); nas 11 que surpreenderam, de −1,95% a +2,98% (mediana de +0,66%). Antes da reunião não se sabe se ela vai surpreender.",
+   "resumo": "Depois das reuniões do Copom desde 2016: nas 75 em que a decisão foi a que os economistas esperavam (boletim Focus), o dólar foi de queda de 2,56% a alta de 1,92% no dia seguinte; nas 11 que surpreenderam, foi de queda de 1,95% a alta de 2,98%. Antes da reunião não se sabe se ela vai surpreender.",
    "limites": [
     "O Focus é a expectativa de economistas, não o preço de mercado.",
     "São só 11 reuniões com surpresa desde 2016.",
@@ -3897,7 +3897,7 @@
      ]
     }
    ],
-   "resumo": "Nas 86 reuniões do Copom desde 2016, a decisão foi diferente do Focus da véspera em 11 (6 abaixo, 5 acima). Nessas 11, os juros de 2 anos foram de −34,9 a +140,8 p.b. no pregão seguinte (mediana de −4,7 p.b.); em tamanho, sem o sinal, a mediana foi de 18,3 p.b., contra 8,6 p.b. nas outras 75.",
+   "resumo": "Nas 86 reuniões do Copom desde 2016, a decisão foi diferente da que os economistas esperavam (boletim Focus) em 11: 6 abaixo e 5 acima. Nelas, os juros de 2 anos foi de queda de 34,9 pontos-base a alta de 140,8 pontos-base no dia seguinte; no valor do meio, mexeram 18,3 pontos-base, contra 8,6 nas outras 75.",
    "limites": [
     "O Focus é a expectativa de economistas, não o preço de mercado.",
     "São só 11 reuniões com surpresa desde 2016.",
@@ -4193,7 +4193,7 @@
      ]
     }
    ],
-   "resumo": "No pregão seguinte ao Copom, desde 2016: nas 75 reuniões em que a decisão foi a esperada pelo Focus, o Ibovespa foi de −3,88% a +5,12% (mediana de −0,18%); nas 11 que surpreenderam, de −3,37% a +2,41% (mediana de −0,62%). Antes da reunião não se sabe se ela vai surpreender.",
+   "resumo": "Depois das reuniões do Copom desde 2016: nas 75 em que a decisão foi a que os economistas esperavam (boletim Focus), o Ibovespa foi de queda de 3,88% a alta de 5,12% no dia seguinte; nas 11 que surpreenderam, foi de queda de 3,37% a alta de 2,41%. Antes da reunião não se sabe se ela vai surpreender.",
    "limites": [
     "O Focus é a expectativa de economistas, não o preço de mercado.",
     "São só 11 reuniões com surpresa desde 2016.",
@@ -4476,7 +4476,7 @@
      ]
     }
    ],
-   "resumo": "No pregão seguinte ao Copom, desde 2016: nas 75 reuniões em que a decisão foi a esperada pelo Focus, o Ibovespa foi de −3,88% a +5,12% (mediana de −0,18%); nas 11 que surpreenderam, de −3,37% a +2,41% (mediana de −0,62%). Antes da reunião não se sabe se ela vai surpreender.",
+   "resumo": "Depois das reuniões do Copom desde 2016: nas 75 em que a decisão foi a que os economistas esperavam (boletim Focus), o Ibovespa foi de queda de 3,88% a alta de 5,12% no dia seguinte; nas 11 que surpreenderam, foi de queda de 3,37% a alta de 2,41%. Antes da reunião não se sabe se ela vai surpreender.",
    "limites": [
     "O Focus é a expectativa de economistas, não o preço de mercado.",
     "São só 11 reuniões com surpresa desde 2016.",
@@ -4772,7 +4772,7 @@
      ]
     }
    ],
-   "resumo": "No pregão seguinte ao Copom, desde 2016: nas 75 reuniões em que a decisão foi a esperada pelo Focus, o dólar foi de −2,56% a +1,92% (mediana de −0,08%); nas 11 que surpreenderam, de −1,95% a +2,98% (mediana de +0,66%). Antes da reunião não se sabe se ela vai surpreender.",
+   "resumo": "Depois das reuniões do Copom desde 2016: nas 75 em que a decisão foi a que os economistas esperavam (boletim Focus), o dólar foi de queda de 2,56% a alta de 1,92% no dia seguinte; nas 11 que surpreenderam, foi de queda de 1,95% a alta de 2,98%. Antes da reunião não se sabe se ela vai surpreender.",
    "limites": [
     "O Focus é a expectativa de economistas, não o preço de mercado.",
     "São só 11 reuniões com surpresa desde 2016.",
@@ -5055,7 +5055,7 @@
      ]
     }
    ],
-   "resumo": "No pregão seguinte ao Copom, desde 2016: nas 75 reuniões em que a decisão foi a esperada pelo Focus, o dólar foi de −2,56% a +1,92% (mediana de −0,08%); nas 11 que surpreenderam, de −1,95% a +2,98% (mediana de +0,66%). Antes da reunião não se sabe se ela vai surpreender.",
+   "resumo": "Depois das reuniões do Copom desde 2016: nas 75 em que a decisão foi a que os economistas esperavam (boletim Focus), o dólar foi de queda de 2,56% a alta de 1,92% no dia seguinte; nas 11 que surpreenderam, foi de queda de 1,95% a alta de 2,98%. Antes da reunião não se sabe se ela vai surpreender.",
    "limites": [
     "O Focus é a expectativa de economistas, não o preço de mercado.",
     "São só 11 reuniões com surpresa desde 2016.",
@@ -5338,7 +5338,7 @@
      ]
     }
    ],
-   "resumo": "Nas 86 reuniões do Copom desde 2016, a decisão foi diferente do Focus da véspera em 11 (6 abaixo, 5 acima). Nessas 11, os juros de 2 anos foram de −34,9 a +140,8 p.b. no pregão seguinte (mediana de −4,7 p.b.); em tamanho, sem o sinal, a mediana foi de 18,3 p.b., contra 8,6 p.b. nas outras 75.",
+   "resumo": "Nas 86 reuniões do Copom desde 2016, a decisão foi diferente da que os economistas esperavam (boletim Focus) em 11: 6 abaixo e 5 acima. Nelas, os juros de 2 anos foi de queda de 34,9 pontos-base a alta de 140,8 pontos-base no dia seguinte; no valor do meio, mexeram 18,3 pontos-base, contra 8,6 nas outras 75.",
    "limites": [
     "O Focus é a expectativa de economistas, não o preço de mercado.",
     "São só 11 reuniões com surpresa desde 2016.",
@@ -5621,7 +5621,7 @@
      ]
     }
    ],
-   "resumo": "Nas 86 reuniões do Copom desde 2016, a decisão foi diferente do Focus da véspera em 11 (6 abaixo, 5 acima). Nessas 11, os juros de 2 anos foram de −34,9 a +140,8 p.b. no pregão seguinte (mediana de −4,7 p.b.); em tamanho, sem o sinal, a mediana foi de 18,3 p.b., contra 8,6 p.b. nas outras 75.",
+   "resumo": "Nas 86 reuniões do Copom desde 2016, a decisão foi diferente da que os economistas esperavam (boletim Focus) em 11: 6 abaixo e 5 acima. Nelas, os juros de 2 anos foi de queda de 34,9 pontos-base a alta de 140,8 pontos-base no dia seguinte; no valor do meio, mexeram 18,3 pontos-base, contra 8,6 nas outras 75.",
    "limites": [
     "O Focus é a expectativa de economistas, não o preço de mercado.",
     "São só 11 reuniões com surpresa desde 2016.",
@@ -5917,7 +5917,7 @@
      ]
     }
    ],
-   "resumo": "No pregão seguinte ao Copom, desde 2016: nas 75 reuniões em que a decisão foi a esperada pelo Focus, o Ibovespa foi de −3,88% a +5,12% (mediana de −0,18%); nas 11 que surpreenderam, de −3,37% a +2,41% (mediana de −0,62%). Antes da reunião não se sabe se ela vai surpreender.",
+   "resumo": "Depois das reuniões do Copom desde 2016: nas 75 em que a decisão foi a que os economistas esperavam (boletim Focus), o Ibovespa foi de queda de 3,88% a alta de 5,12% no dia seguinte; nas 11 que surpreenderam, foi de queda de 3,37% a alta de 2,41%. Antes da reunião não se sabe se ela vai surpreender.",
    "limites": [
     "O Focus é a expectativa de economistas, não o preço de mercado.",
     "São só 11 reuniões com surpresa desde 2016.",
@@ -6213,7 +6213,7 @@
      ]
     }
    ],
-   "resumo": "No pregão seguinte ao Copom, desde 2016: nas 75 reuniões em que a decisão foi a esperada pelo Focus, o Ibovespa foi de −3,88% a +5,12% (mediana de −0,18%); nas 11 que surpreenderam, de −3,37% a +2,41% (mediana de −0,62%). Antes da reunião não se sabe se ela vai surpreender.",
+   "resumo": "Depois das reuniões do Copom desde 2016: nas 75 em que a decisão foi a que os economistas esperavam (boletim Focus), o Ibovespa foi de queda de 3,88% a alta de 5,12% no dia seguinte; nas 11 que surpreenderam, foi de queda de 3,37% a alta de 2,41%. Antes da reunião não se sabe se ela vai surpreender.",
    "limites": [
     "O Focus é a expectativa de economistas, não o preço de mercado.",
     "São só 11 reuniões com surpresa desde 2016.",
@@ -6509,7 +6509,7 @@
      ]
     }
    ],
-   "resumo": "No pregão seguinte ao Copom, desde 2016: nas 75 reuniões em que a decisão foi a esperada pelo Focus, o dólar foi de −2,56% a +1,92% (mediana de −0,08%); nas 11 que surpreenderam, de −1,95% a +2,98% (mediana de +0,66%). Antes da reunião não se sabe se ela vai surpreender.",
+   "resumo": "Depois das reuniões do Copom desde 2016: nas 75 em que a decisão foi a que os economistas esperavam (boletim Focus), o dólar foi de queda de 2,56% a alta de 1,92% no dia seguinte; nas 11 que surpreenderam, foi de queda de 1,95% a alta de 2,98%. Antes da reunião não se sabe se ela vai surpreender.",
    "limites": [
     "O Focus é a expectativa de economistas, não o preço de mercado.",
     "São só 11 reuniões com surpresa desde 2016.",
@@ -6805,7 +6805,7 @@
      ]
     }
    ],
-   "resumo": "No pregão seguinte ao Copom, desde 2016: nas 75 reuniões em que a decisão foi a esperada pelo Focus, o dólar foi de −2,56% a +1,92% (mediana de −0,08%); nas 11 que surpreenderam, de −1,95% a +2,98% (mediana de +0,66%). Antes da reunião não se sabe se ela vai surpreender.",
+   "resumo": "Depois das reuniões do Copom desde 2016: nas 75 em que a decisão foi a que os economistas esperavam (boletim Focus), o dólar foi de queda de 2,56% a alta de 1,92% no dia seguinte; nas 11 que surpreenderam, foi de queda de 1,95% a alta de 2,98%. Antes da reunião não se sabe se ela vai surpreender.",
    "limites": [
     "O Focus é a expectativa de economistas, não o preço de mercado.",
     "São só 11 reuniões com surpresa desde 2016.",
@@ -7101,7 +7101,7 @@
      ]
     }
    ],
-   "resumo": "Nas 86 reuniões do Copom desde 2016, a decisão foi diferente do Focus da véspera em 11 (6 abaixo, 5 acima). Nessas 11, os juros de 2 anos foram de −34,9 a +140,8 p.b. no pregão seguinte (mediana de −4,7 p.b.); em tamanho, sem o sinal, a mediana foi de 18,3 p.b., contra 8,6 p.b. nas outras 75.",
+   "resumo": "Nas 86 reuniões do Copom desde 2016, a decisão foi diferente da que os economistas esperavam (boletim Focus) em 11: 6 abaixo e 5 acima. Nelas, os juros de 2 anos foi de queda de 34,9 pontos-base a alta de 140,8 pontos-base no dia seguinte; no valor do meio, mexeram 18,3 pontos-base, contra 8,6 nas outras 75.",
    "limites": [
     "O Focus é a expectativa de economistas, não o preço de mercado.",
     "São só 11 reuniões com surpresa desde 2016.",
@@ -7397,7 +7397,7 @@
      ]
     }
    ],
-   "resumo": "Nas 86 reuniões do Copom desde 2016, a decisão foi diferente do Focus da véspera em 11 (6 abaixo, 5 acima). Nessas 11, os juros de 2 anos foram de −34,9 a +140,8 p.b. no pregão seguinte (mediana de −4,7 p.b.); em tamanho, sem o sinal, a mediana foi de 18,3 p.b., contra 8,6 p.b. nas outras 75.",
+   "resumo": "Nas 86 reuniões do Copom desde 2016, a decisão foi diferente da que os economistas esperavam (boletim Focus) em 11: 6 abaixo e 5 acima. Nelas, os juros de 2 anos foi de queda de 34,9 pontos-base a alta de 140,8 pontos-base no dia seguinte; no valor do meio, mexeram 18,3 pontos-base, contra 8,6 nas outras 75.",
    "limites": [
     "O Focus é a expectativa de economistas, não o preço de mercado.",
     "São só 11 reuniões com surpresa desde 2016.",
@@ -7588,7 +7588,7 @@
      ]
     }
    ],
-   "resumo": "Nos 8 casos de decisões fiscais da linha do tempo, o Ibovespa variou de −3,35% a +1,89% no pregão da reação.",
+   "resumo": "Nos 8 casos de decisões fiscais da linha do tempo (2016–2026), o Ibovespa foi de queda de 3,35% a alta de 1,89% no dia da reação.",
    "limites": [
     "Os eventos da linha do tempo foram escolhidos por terem sido marcantes, não sorteados: a amostra exagera as reações grandes."
    ]
@@ -7732,7 +7732,7 @@
      ]
     }
    ],
-   "resumo": "Nos 6 casos de votações no Congresso da linha do tempo, o Ibovespa variou de −3,57% a +0,90% no pregão da reação.",
+   "resumo": "Nos 6 casos de votações no Congresso da linha do tempo (2016–2026), o Ibovespa foi de queda de 3,57% a alta de 0,90% no dia da reação.",
    "limites": [
     "Os eventos da linha do tempo foram escolhidos por terem sido marcantes, não sorteados: a amostra exagera as reações grandes."
    ]
@@ -7834,7 +7834,7 @@
      ]
     }
    ],
-   "resumo": "Nos 4 casos de decisões da Justiça da linha do tempo, o Ibovespa variou de −3,98% a +3,72% no pregão da reação.",
+   "resumo": "Nos 4 casos de decisões da Justiça da linha do tempo (2016–2026), o Ibovespa foi de queda de 3,98% a alta de 3,72% no dia da reação.",
    "limites": [
     "Os eventos da linha do tempo foram escolhidos por terem sido marcantes, não sorteados: a amostra exagera as reações grandes."
    ]
@@ -7957,7 +7957,7 @@
      ]
     }
    ],
-   "resumo": "Nos 5 casos de geopolítica da linha do tempo, o Ibovespa variou de −0,54% a +2,09% no pregão da reação.",
+   "resumo": "Nos 5 casos de geopolítica da linha do tempo (2016–2026), o Ibovespa foi de queda de 0,54% a alta de 2,09% no dia da reação.",
    "limites": [
     "Os eventos da linha do tempo foram escolhidos por terem sido marcantes, não sorteados: a amostra exagera as reações grandes."
    ]
@@ -8038,7 +8038,7 @@
      ]
     }
    ],
-   "resumo": "Nos 3 casos de choques externos da linha do tempo, o Ibovespa variou de −12,17% a −0,04% no pregão da reação.",
+   "resumo": "Nos 3 casos de choques externos da linha do tempo (2016–2026), o Ibovespa caiu de 0,04% a 12,17% no dia da reação.",
    "limites": [
     "Os eventos da linha do tempo foram escolhidos por terem sido marcantes, não sorteados: a amostra exagera as reações grandes."
    ]
@@ -8119,7 +8119,7 @@
      ]
     }
    ],
-   "resumo": "Nos 3 casos de escândalos da linha do tempo, o Ibovespa variou de −8,80% a +6,60% no pregão da reação.",
+   "resumo": "Nos 3 casos de escândalos da linha do tempo (2016–2026), o Ibovespa foi de queda de 8,80% a alta de 6,60% no dia da reação.",
    "limites": [
     "Os eventos da linha do tempo foram escolhidos por terem sido marcantes, não sorteados: a amostra exagera as reações grandes."
    ]
@@ -8338,7 +8338,7 @@
      ]
     }
    ],
-   "resumo": "O Ibovespa: 208.296 pontos em 20/10/2026; nos 12 meses, de 144.085 pontos a 209.067 pontos.",
+   "resumo": "O Ibovespa está em 208.296 pontos (20/10/2026). No ano, subiu 29,3%. Nos últimos 12 meses, foi de 144.085 pontos a 209.067 pontos.",
    "limites": [
     "É o caminho que o preço já fez; o próximo pode ser outro."
    ]
@@ -8391,10 +8391,64 @@
      ]
     }
    ],
-   "resumo": "O dólar: R$ 5,0383 em 22/10/2026; nos 12 meses, de R$ 4,8973 a R$ 5,5739.",
+   "resumo": "O dólar está em R$ 5,04 (22/10/2026). No ano, caiu 8,4%. Nos últimos 12 meses, foi de R$ 4,90 a R$ 5,57.",
    "limites": [
     "É o caminho que o preço já fez; o próximo pode ser outro.",
     "Os números do dólar são da PTAX de venda (dólar à vista, do Banco Central), não de contrato futuro de dólar, que tem vencimento e preço próprios."
+   ]
+  },
+  "euro": {
+   "titulo": "O euro até aqui (dado oficial, só o que já aconteceu)",
+   "linhas": [
+    {
+     "texto": "Em 22/10/2026: R$ 5,6494.",
+     "fontes": [
+      {
+       "nome": "Banco Central, SGS 21619 (euro PTAX de venda)",
+       "url": "https://api.bcb.gov.br/dados/serie/bcdata.sgs.21619/dados/ultimos/1?formato=json"
+      }
+     ]
+    },
+    {
+     "texto": "Nos 12 meses até 22/10/2026, foi de R$ 5,5844 (09/10/2026) a R$ 6,5594 (29/12/2025).",
+     "fontes": [
+      {
+       "nome": "Banco Central, SGS 21619 (euro PTAX de venda)",
+       "url": "https://api.bcb.gov.br/dados/serie/bcdata.sgs.21619/dados/ultimos/1?formato=json"
+      }
+     ]
+    },
+    {
+     "texto": "No ano, do fechamento de 2025 (R$ 6,4692, 31/12/2025) a R$ 5,6494 (22/10/2026): −12,67%.",
+     "fontes": [
+      {
+       "nome": "Banco Central, SGS 21619 (euro PTAX de venda)",
+       "url": "https://api.bcb.gov.br/dados/serie/bcdata.sgs.21619/dados/ultimos/1?formato=json"
+      },
+      {
+       "nome": "Cálculo próprio: estudo de evento 2016–2026 sobre as séries oficiais (método no cofre, nota \"Estudo de evento 2016–2026\")",
+       "url": ""
+      }
+     ]
+    },
+    {
+     "texto": "Taxa-base do euro: nos 2.709 pregões de 05/01/2016 a 22/10/2026, ele subiu mais de 1% em 10,1% dos dias e caiu mais de 1% em 9,3%; a variação típica (mediana, em módulo) foi de 0,48%.",
+     "fontes": [
+      {
+       "nome": "Banco Central, SGS 21619 (euro PTAX de venda)",
+       "url": "https://api.bcb.gov.br/dados/serie/bcdata.sgs.21619/dados/ultimos/1?formato=json"
+      },
+      {
+       "nome": "Cálculo próprio: estudo de evento 2016–2026 sobre as séries oficiais (método no cofre, nota \"Estudo de evento 2016–2026\")",
+       "url": ""
+      }
+     ]
+    }
+   ],
+   "resumo": "O euro está em R$ 5,65 (22/10/2026). No ano, caiu 12,7%. Nos últimos 12 meses, foi de R$ 5,58 a R$ 6,56.",
+   "limites": [
+    "É o caminho que o preço já fez; o próximo pode ser outro.",
+    "Os números do euro são da PTAX de venda do Banco Central. Na troca de verdade (banco, corretora, app de remessa), a cotação é outra e pode haver tarifa, spread e IOF."
    ]
   },
   "juros": {
@@ -8453,7 +8507,7 @@
      ]
     }
    ],
-   "resumo": "O juro prefixado de 5 anos: 12,85% ao ano em 15/10/2026; nos 12 meses, de 12,49% ao ano a 14,90% ao ano.",
+   "resumo": "O juro prefixado de 5 anos está em 12,85% ao ano (15/10/2026). Nos últimos 12 meses, foi de 12,49% ao ano a 14,90% ao ano.",
    "limites": [
     "É o caminho que o preço já fez; o próximo pode ser outro."
    ]
@@ -8560,7 +8614,7 @@
      ]
     }
    ],
-   "resumo": "Focus de 16/10/2026 (expectativa de 133 instituições, não do Thoran): Selic de 13,25% no fim de 2026 na mediana. De 2021 a 2025, a mediana feita cerca de 12 meses antes errou a Selic de fim de ano por 0,25 a 6,25 p.p., para os dois lados.",
+   "resumo": "Os economistas que o Banco Central consulta toda semana (boletim Focus, 133 instituições em 16/10/2026) esperam os juros básicos (Selic) em 13,25% no fim de 2026. É a expectativa deles, não do Thoran, e ela já errou: de 2021 a 2025, a Selic do fim do ano ficou de 0,25 a 6,25 ponto percentual longe do esperado, para os dois lados.",
    "limites": [
     "A expectativa é a mediana das instituições que respondem ao Focus, não uma previsão do Thoran, e já errou para os dois lados.",
     "Os erros listados são de medianas feitas cerca de 12 meses antes do fim de cada ano; a de hoje é do boletim de 16/10/2026."
@@ -8644,7 +8698,7 @@
      ]
     }
    ],
-   "resumo": "Focus de 16/10/2026 (expectativa de 104 instituições, não do Thoran): R$ 5,13 para o fim de 2026 na mediana, com respostas de R$ 4,50 a R$ 5,45. De 2021 a 2025, a mediana feita cerca de 12 meses antes errou o dólar de fim de ano por R$ 0,38 a R$ 1,19, para os dois lados.",
+   "resumo": "Os economistas que o Banco Central consulta toda semana (boletim Focus, 104 instituições em 16/10/2026) esperam o dólar a R$ 5,13 no fim de 2026; as respostas vão de R$ 4,50 a R$ 5,45. É a expectativa deles, não do Thoran, e ela já errou: de 2021 a 2025, o dólar do fim do ano ficou de R$ 0,38 a R$ 1,19 longe do esperado, para os dois lados.",
    "limites": [
     "A expectativa é a mediana das instituições que respondem ao Focus, não uma previsão do Thoran, e já errou para os dois lados.",
     "Os erros listados são de medianas feitas cerca de 12 meses antes do fim de cada ano; a de hoje é do boletim de 16/10/2026."
@@ -8728,7 +8782,7 @@
      ]
     }
    ],
-   "resumo": "Focus de 16/10/2026 (expectativa de 133 instituições, não do Thoran): Selic de 13,25% no fim de 2026 na mediana. De 2021 a 2025, a mediana feita cerca de 12 meses antes errou a Selic de fim de ano por 0,25 a 6,25 p.p., para os dois lados.",
+   "resumo": "Os economistas que o Banco Central consulta toda semana (boletim Focus, 133 instituições em 16/10/2026) esperam os juros básicos (Selic) em 13,25% no fim de 2026. É a expectativa deles, não do Thoran, e ela já errou: de 2021 a 2025, a Selic do fim do ano ficou de 0,25 a 6,25 ponto percentual longe do esperado, para os dois lados.",
    "limites": [
     "A expectativa é a mediana das instituições que respondem ao Focus, não uma previsão do Thoran, e já errou para os dois lados.",
     "Os erros listados são de medianas feitas cerca de 12 meses antes do fim de cada ano; a de hoje é do boletim de 16/10/2026."
@@ -8834,7 +8888,7 @@
      ]
     }
    ],
-   "resumo": "Focus de 16/10/2026 (expectativa de 133 instituições, não do Thoran): Selic de 13,25% no fim de 2026 na mediana. De 2021 a 2025, a mediana feita cerca de 12 meses antes errou a Selic de fim de ano por 0,25 a 6,25 p.p., para os dois lados.",
+   "resumo": "Os economistas que o Banco Central consulta toda semana (boletim Focus, 133 instituições em 16/10/2026) esperam os juros básicos (Selic) em 13,25% no fim de 2026. É a expectativa deles, não do Thoran, e ela já errou: de 2021 a 2025, a Selic do fim do ano ficou de 0,25 a 6,25 ponto percentual longe do esperado, para os dois lados.",
    "limites": [
     "A expectativa é a mediana das instituições que respondem ao Focus, não uma previsão do Thoran, e já errou para os dois lados.",
     "Os erros listados são de medianas feitas cerca de 12 meses antes do fim de cada ano; a de hoje é do boletim de 16/10/2026."
@@ -8878,6 +8932,41 @@
    }
   ],
   "dolar": [
+   {
+    "tipo": "eleicao",
+    "data": "2026-10-25",
+    "curto": "2º turno da eleição presidencial em 25/10 (domingo)",
+    "fontes": [
+     {
+      "nome": "Constituição Federal, art. 77 (o 2º turno é no último domingo de outubro)",
+      "url": "https://www.planalto.gov.br/ccivil_03/constituicao/constituicao.htm"
+     }
+    ]
+   },
+   {
+    "tipo": "copom",
+    "data": "2026-11-04",
+    "curto": "decisão do Copom em 04/11 (quarta, depois das 18h30)",
+    "fontes": [
+     {
+      "nome": "Banco Central, agenda das reuniões do Copom (decisão no 2º dia, depois das 18h30)",
+      "url": "https://www.bcb.gov.br/api/servico/sitebcb/calendario/anual?lista=Reuni%C3%B5es%20do%20Copom"
+     }
+    ]
+   },
+   {
+    "tipo": "copom",
+    "data": "2026-12-09",
+    "curto": "decisão do Copom em 09/12 (quarta, depois das 18h30)",
+    "fontes": [
+     {
+      "nome": "Banco Central, agenda das reuniões do Copom (decisão no 2º dia, depois das 18h30)",
+      "url": "https://www.bcb.gov.br/api/servico/sitebcb/calendario/anual?lista=Reuni%C3%B5es%20do%20Copom"
+     }
+    ]
+   }
+  ],
+  "euro": [
    {
     "tipo": "eleicao",
     "data": "2026-10-25",
@@ -9349,7 +9438,7 @@
     ]
    }
   ],
-  "resumo": "Nas 16 pesquisas do 2º turno com votos totais e registro no TSE informado pelo instituto ou pela imprensa, a diferença Flávio Bolsonaro menos Lula vai de −1,8 a +5,0 p.p., conforme o instituto (mediana de +2,0 p.p.).",
+  "resumo": "Nas 16 pesquisas do 2º turno registradas no TSE que divulgaram os votos totais, a diferença vai de Lula 1,8 pontos à frente a Flávio Bolsonaro 5,0 pontos à frente, conforme o instituto; no meio da lista, Flávio Bolsonaro 2,0 pontos à frente. Pesquisa não é previsão.",
   "limites": [
    "Os números de registro vêm das matérias e dos relatórios dos institutos; não foram conferidos no PesqEle do TSE.",
    "A rodada do Datafolha prevista para a tarde de 22/10/2026 ainda não tinha saído quando esta base foi montada.",
@@ -19749,5 +19838,148 @@
     "url": "https://b3.com.br/pt_br/produtos-e-servicos/negociacao/moedas/futuro-mini-de-taxa-de-cambio-de-reais-por-dolar-comercial.htm"
    }
   }
- }
+ },
+ "cambio": {
+  "cotacoes": {
+   "euro": {
+    "data": "2026-10-22",
+    "valor": 5.6494,
+    "ano_data": "2025-12-31",
+    "ano_valor": 6.4692,
+    "min_data": "2026-10-09",
+    "min_valor": 5.5844,
+    "max_data": "2025-12-29",
+    "max_valor": 6.5594
+   },
+   "dolar": {
+    "data": "2026-10-22",
+    "valor": 5.0383,
+    "ano_data": "2025-12-31",
+    "ano_valor": 5.5024,
+    "min_data": "2026-05-11",
+    "min_valor": 4.8973,
+    "max_data": "2025-12-29",
+    "max_valor": 5.5739
+   }
+  },
+  "moedas": {
+   "euro": {
+    "nome": "euro",
+    "plural": "euros",
+    "fonte": {
+     "nome": "Banco Central, SGS 21619 (euro PTAX de venda)",
+     "url": "https://api.bcb.gov.br/dados/serie/bcdata.sgs.21619/dados/ultimos/1?formato=json"
+    }
+   },
+   "dolar": {
+    "nome": "dólar",
+    "plural": "dólares",
+    "fonte": {
+     "nome": "Banco Central, SGS 1 (dólar PTAX de venda)",
+     "url": "https://api.bcb.gov.br/dados/serie/bcdata.sgs.1/dados/ultimos/1?formato=json"
+    }
+   }
+  },
+  "titulo": "A conta, com os números que você contou (só a conta: não diz o que fazer)",
+  "limite_euro": "Os números do euro são da PTAX de venda do Banco Central. Na troca de verdade (banco, corretora, app de remessa), a cotação é outra e pode haver tarifa, spread e IOF."
+ },
+ "euro_turnos": {
+  "titulo": "O euro nos turnos presidenciais desde 2018 (fato)",
+  "linhas": [
+   {
+    "texto": "1º turno de 2018 (07/10/2018): no dia útil seguinte (08/10/2018), o euro caiu 3,08%, de R$ 4,4515 para R$ 4,3144; no acumulado de dois dias, caiu 3,55%.",
+    "fontes": [
+     {
+      "nome": "Banco Central, SGS 21619 (euro PTAX de venda)",
+      "url": "https://api.bcb.gov.br/dados/serie/bcdata.sgs.21619/dados/ultimos/1?formato=json"
+     },
+     {
+      "nome": "Cálculo próprio: estudo de evento 2016–2026 sobre as séries oficiais (método no cofre, nota \"Estudo de evento 2016–2026\")",
+      "url": ""
+     }
+    ]
+   },
+   {
+    "texto": "2º turno de 2018 (28/10/2018): no dia útil seguinte (29/10/2018), o euro caiu 1,05%, de R$ 4,1862 para R$ 4,1423; no acumulado de dois dias, subiu 0,49%.",
+    "fontes": [
+     {
+      "nome": "Banco Central, SGS 21619 (euro PTAX de venda)",
+      "url": "https://api.bcb.gov.br/dados/serie/bcdata.sgs.21619/dados/ultimos/1?formato=json"
+     },
+     {
+      "nome": "Cálculo próprio: estudo de evento 2016–2026 sobre as séries oficiais (método no cofre, nota \"Estudo de evento 2016–2026\")",
+      "url": ""
+     }
+    ]
+   },
+   {
+    "texto": "1º turno de 2022 (02/10/2022): no dia útil seguinte (03/10/2022), o euro caiu 3,57%, de R$ 5,2904 para R$ 5,1014; no acumulado de dois dias, caiu 3,05%.",
+    "fontes": [
+     {
+      "nome": "Banco Central, SGS 21619 (euro PTAX de venda)",
+      "url": "https://api.bcb.gov.br/dados/serie/bcdata.sgs.21619/dados/ultimos/1?formato=json"
+     },
+     {
+      "nome": "Cálculo próprio: estudo de evento 2016–2026 sobre as séries oficiais (método no cofre, nota \"Estudo de evento 2016–2026\")",
+      "url": ""
+     }
+    ]
+   },
+   {
+    "texto": "2º turno de 2022 (30/10/2022): no dia útil seguinte (31/10/2022), o euro caiu 2,14%, de R$ 5,3112 para R$ 5,1976; no acumulado de dois dias, caiu 4,26%.",
+    "fontes": [
+     {
+      "nome": "Banco Central, SGS 21619 (euro PTAX de venda)",
+      "url": "https://api.bcb.gov.br/dados/serie/bcdata.sgs.21619/dados/ultimos/1?formato=json"
+     },
+     {
+      "nome": "Cálculo próprio: estudo de evento 2016–2026 sobre as séries oficiais (método no cofre, nota \"Estudo de evento 2016–2026\")",
+      "url": ""
+     }
+    ]
+   },
+   {
+    "texto": "1º turno de 2026 (04/10/2026): no dia útil seguinte (05/10/2026), o euro caiu 4,96%, de R$ 5,8815 para R$ 5,5897; no acumulado de dois dias, caiu 4,83%.",
+    "fontes": [
+     {
+      "nome": "Banco Central, SGS 21619 (euro PTAX de venda)",
+      "url": "https://api.bcb.gov.br/dados/serie/bcdata.sgs.21619/dados/ultimos/1?formato=json"
+     },
+     {
+      "nome": "Cálculo próprio: estudo de evento 2016–2026 sobre as séries oficiais (método no cofre, nota \"Estudo de evento 2016–2026\")",
+      "url": ""
+     }
+    ]
+   },
+   {
+    "texto": "Euro no dia útil seguinte: nos 3 primeiros turnos (2018, 2022 e 2026), caiu 3,08%, 3,57% e 4,96%; nos 2 segundos turnos (2018 e 2022), caiu 1,05% e 2,14%.",
+    "fontes": [
+     {
+      "nome": "Cálculo próprio: estudo de evento 2016–2026 sobre as séries oficiais (método no cofre, nota \"Estudo de evento 2016–2026\")",
+      "url": ""
+     }
+    ]
+   },
+   {
+    "texto": "Taxa-base do euro: nos 2.709 pregões de 05/01/2016 a 22/10/2026, ele subiu mais de 1% em 10,1% dos dias e caiu mais de 1% em 9,3%; a variação típica (mediana, em módulo) foi de 0,48%.",
+    "fontes": [
+     {
+      "nome": "Banco Central, SGS 21619 (euro PTAX de venda)",
+      "url": "https://api.bcb.gov.br/dados/serie/bcdata.sgs.21619/dados/ultimos/1?formato=json"
+     },
+     {
+      "nome": "Cálculo próprio: estudo de evento 2016–2026 sobre as séries oficiais (método no cofre, nota \"Estudo de evento 2016–2026\")",
+      "url": ""
+     }
+    ]
+   }
+  ],
+  "resumo": "Depois dos 2 segundos turnos desde 2018, o euro caiu 1,05% e 2,14% no dia seguinte; depois dos 3 primeiros, caiu de 3,08% a 4,96%. São só 5 casos, e as 3 surpresas das urnas foram a favor do mesmo campo político: a amostra não mostra o outro lado. Não dá para tirar regra.",
+  "limites": [
+   "São só 5 turnos: não dá para tirar regra.",
+   "A reação é de um dia, com a cotação oficial do Banco Central (PTAX, fixada entre 10h e 13h), não o fechamento; o movimento de um dia não diz nada sobre os meses seguintes.",
+   "Os números do euro são da PTAX de venda do Banco Central. Na troca de verdade (banco, corretora, app de remessa), a cotação é outra e pode haver tarifa, spread e IOF."
+  ]
+ },
+ "resumo_hoje": "Hoje, pelo dado oficial:"
 }

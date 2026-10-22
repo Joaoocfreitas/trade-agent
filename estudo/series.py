@@ -3,8 +3,8 @@
 - Ibovespa: Ipeadata, série GM366_IBVSP366, que republica o fechamento da B3. O Ipeadata tem pontos falsos (16 fins de
   semana e 3 feriados com valor quebrado, de 2016 a 2024); `limpar_ibov` tira esses pontos. Conferência: SGS 7 do
   Banco Central (até 2019) e, quando o João mandar, os arquivos da própria B3.
-- Dólar PTAX venda (SGS 1), Selic meta (SGS 432), IPCA em 12 meses (SGS 13522) e dívida bruta do governo geral em %
-  do PIB (SGS 13762): API do Banco Central.
+- Dólar PTAX venda (SGS 1), euro PTAX venda (SGS 21619), Selic meta (SGS 432), IPCA em 12 meses (SGS 13522) e
+  dívida bruta do governo geral em % do PIB (SGS 13762): API do Banco Central.
 - Juros prefixados: CSV de taxas do Tesouro Direto (Tesouro Prefixado e Prefixado com Juros Semestrais).
 
 O Yahoo Finance foi descartado de propósito: o robots.txt de query1.finance.yahoo.com proíbe qualquer robô.
@@ -23,7 +23,7 @@ import pandas as pd
 from coletor.config import ROBO, TIMEOUT_S, USER_AGENT
 from coletor.robots import interpretar
 
-SGS = {'ptax': 1, 'selic_meta': 432, 'ibov_bcb': 7, 'ipca_12m': 13522, 'divida_bruta': 13762}
+SGS = {'ptax': 1, 'euro': 21619, 'selic_meta': 432, 'ibov_bcb': 7, 'ipca_12m': 13522, 'divida_bruta': 13762}
 IPEA_IBOV = 'GM366_IBVSP366'
 TD_CSV = ('https://www.tesourotransparente.gov.br/ckan/dataset/df56aa42-484a-4a59-8184-7676580c81e3/resource/'
           '796d2059-14e9-44e3-80c9-2d9e30b405c1/download/precotaxatesourodireto.csv')

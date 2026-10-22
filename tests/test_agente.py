@@ -264,7 +264,8 @@ def test_recusa_de_mercado_traz_historico_focus_e_datas():
     assert any(t.startswith('O que o mercado espera') for t in titulos)
     assert F.CALENDARIO['titulo'] in titulos
     # a recusa fica num parágrafo só dela, e as 3 linhas são o histórico, o Focus e as datas
-    assert r.curta[0].startswith('O dólar:') and r.curta[1].startswith('Focus de') and r.curta[2].startswith('Datas marcadas')
+    assert (r.curta[0].startswith('O dólar está em') and r.curta[1].startswith('Os economistas que o Banco Central')
+            and r.curta[2].startswith('Datas marcadas'))
     # contrato: a 3ª linha é a taxa-base da FGV, e a data marcada fica só na resposta completa
     w = montar('WDO sobe amanhã?', hoje='2026-10-22')
     assert w.violacoes == [] and any('97%' in x for x in w.curta) and not any(x.startswith('Datas marcadas') for x in w.curta)

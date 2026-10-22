@@ -33,15 +33,24 @@ class Resposta:
     violacoes: list[Violacao] = field(default_factory=list)
 
 
+def _medidos_cambio(p: Pedido) -> list[str]:
+    """Os mercados para os blocos medidos (eleições, Copom): em pergunta de câmbio, o dólar vem primeiro e o euro sai
+    (ele tem bloco próprio)."""
+    if not p.cambio:
+        return p.mercados
+    return ['dolar'] + [m for m in p.mercados if m not in ('dolar', 'euro')]
+
+
 def escolher_blocos(p: Pedido, hoje: str) -> list[F.Bloco]:
     blocos: list[F.Bloco] = []
     pede_dinheiro = 'chance_dinheiro' in p.proibidos
+    medidos_cambio = _medidos_cambio(p)
     if p.eleicao:
-        blocos += [F.candidatos(), F.economia(), F.eleicoes(p.mercados), F.pesquisas()]
+        blocos += [F.candidatos(), F.economia(), F.eleicoes(medidos_cambio), F.pesquisas()]
     if 'copom' in p.temas:
         if not p.eleicao:
             blocos.append(F.economia())
-        blocos.append(F.copom(p.mercados))
+        blocos.append(F.copom(medidos_cambio))
     for tipo in F.TIPOS:
         if tipo in p.temas:
             blocos.append(F.eventos(tipo))
@@ -58,7 +67,7 @@ def escolher_blocos(p: Pedido, hoje: str) -> list[F.Bloco]:
                if m in F.HISTORICO]
     if not tem_evento and medidos:
         blocos += [F.historico(m) for m in medidos]
-        blocos += [F.expectativas(medidos[0]), F.calendario(medidos[0], hoje)]
+        blocos += [F.expectativas('dolar' if medidos[0] == 'euro' else medidos[0]), F.calendario(medidos[0], hoje)]
     elif 'economia' in p.temas or 'copom' in p.temas:
         blocos.append(F.expectativas(medidos[0] if medidos else ''))
     if 'memecoin' in p.mercados:
@@ -76,9 +85,28 @@ def escolher_blocos(p: Pedido, hoje: str) -> list[F.Bloco]:
     if pede_dinheiro or set(DERIVATIVOS[:2]) & set(p.mercados):
         blocos.append(F.fgv())
     blocos = [b for b in blocos if b]
+    if p.cambio:
+        blocos = _cambio_primeiro(p, blocos)
     if not blocos:
         blocos.append(F.economia())
     return blocos
+
+
+def _cambio_primeiro(p: Pedido, blocos: list[F.Bloco]) -> list[F.Bloco]:
+    """Pergunta de câmbio: na frente, a conta com os números da pessoa, o euro nos turnos (se ela falou de eleição), o
+    que o mercado espera para o dólar e o caminho do euro. O resto segue na ordem de antes."""
+    titulo = lambda b: b.titulo  # noqa: E731
+    frente: list[F.Bloco] = []
+    if p.conta_cambio:
+        frente.append(F.conta_cambio(p.valor_moeda, p.moeda, p.gasto_mensal, p.gasto_moeda))
+    if 'euro' in p.mercados and p.eleicao:
+        frente.append(F.euro_turnos())
+    expectativa = next((b for b in blocos if titulo(b).startswith('O que o mercado espera')), None)
+    frente.append(expectativa or F.expectativas('dolar'))
+    if 'euro' in p.mercados:
+        frente.append(next((b for b in blocos if titulo(b) == F.historico('euro').titulo), None) or F.historico('euro'))
+    vistos = {titulo(b) for b in frente}
+    return frente + [b for b in blocos if titulo(b) not in vistos]
 
 
 def _abertura(p: Pedido, achou_repertorio: bool) -> list[str]:
@@ -105,7 +133,7 @@ def _curta(p: Pedido, blocos: list[F.Bloco], abertura: list[str]) -> list[str]:
         linhas.append('Não achei caso parecido no repertório; ele mostra o que já aconteceu, e abaixo está o que cobre.')
     resumos = [b.resumo for b in blocos if b.resumo]
     # Por último: as datas marcadas e o último dado da economia. Primeiro o que aconteceu e o que o mercado espera.
-    resumos.sort(key=lambda r: 2 if r.startswith('Último dado:') else 1 if r.startswith(F.CALENDARIO['resumo_inicio']) else 0)
+    resumos.sort(key=lambda r: 2 if r.startswith(F.RESUMO_HOJE) else 1 if r.startswith(F.CALENDARIO['resumo_inicio']) else 0)
     linhas += resumos
     return linhas[:3]
 

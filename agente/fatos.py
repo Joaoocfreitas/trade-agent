@@ -59,6 +59,41 @@ def sinal(x: float, casas: int = 1) -> str:
     return ('+' if x > 0 else '−') + s
 
 
+def juntar(xs: list[str]) -> str:
+    return xs[0] if len(xs) == 1 else ', '.join(xs[:-1]) + ' e ' + xs[-1]
+
+
+def mov(x: float, casas: int = 1, un: str = '%') -> str:
+    """Variação em palavras, para quem está começando: 'subiu 1,3%', 'caiu 2,2%'."""
+    s = num(abs(x), casas)
+    if float(s.replace('.', '').replace(',', '.')) == 0:
+        return 'ficou estável'
+    return f'{"subiu" if x > 0 else "caiu"} {s}{un}'
+
+
+def movs(xs, casas: int = 1, un: str = '%') -> str:
+    """Poucos casos, cada um em palavras: 'caiu 1,0% e 1,7%' quando foram para o mesmo lado; 'caiu 2,2% e subiu 1,3%'
+    quando não."""
+    xs = [float(x) for x in xs]
+    textos = [mov(x, casas, un) for x in xs]
+    verbos = {t.split(' ', 1)[0] for t in textos}
+    if len(verbos) == 1 and verbos != {'ficou'}:
+        return f'{verbos.pop()} ' + juntar([t.split(' ', 1)[1] for t in textos])
+    return juntar(textos)
+
+
+def faixa_mov(lo: float, hi: float, casas: int = 1, un: str = '%') -> str:
+    """De lo a hi em palavras: 'subiu de 4,6% a 7,7%', 'caiu de 0,5% a 3,2%', 'foi de queda de 2,0% a alta de 1,5%'."""
+    lo, hi = float(lo), float(hi)
+    if lo > 0:
+        return f'subiu de {num(lo, casas)}{un} a {num(hi, casas)}{un}'
+    if hi < 0:
+        return f'caiu de {num(abs(hi), casas)}{un} a {num(abs(lo), casas)}{un}'
+    ponta = lambda x: (f'queda de {num(abs(x), casas)}{un}' if x < 0 else f'alta de {num(x, casas)}{un}' if x > 0  # noqa: E731
+                       else 'estabilidade')
+    return f'foi de {ponta(lo)} a {ponta(hi)}'
+
+
 def dia(d) -> str:
     return pd.Timestamp(d).strftime('%d/%m/%Y')
 
@@ -77,6 +112,7 @@ def _sgs(codigo: int, nome: str) -> Fonte:
 
 F_SELIC = _sgs(432, 'meta da Selic')
 F_PTAX = _sgs(1, 'dólar PTAX de venda')
+F_EURO = _sgs(21619, 'euro PTAX de venda')
 F_IPCA = _sgs(13522, 'IPCA em 12 meses, do IBGE')
 F_DIVIDA = _sgs(13762, 'dívida bruta do governo geral, % do PIB')
 F_IBOV = Fonte('Ipeadata, série GM366_IBVSP366 (fechamento do Ibovespa na B3)',
@@ -139,6 +175,9 @@ def _ultimo(nome: str) -> tuple[pd.Timestamp, float]:
 
 # ---------- blocos ----------
 
+RESUMO_HOJE = 'Hoje, pelo dado oficial:'  # o resumo da economia vai por último nas 3 linhas
+
+
 def economia() -> Bloco:
     b = Bloco('A economia hoje (dado oficial, com a data de cada número)')
     copom = _csv('copom_completo.csv')
@@ -156,8 +195,8 @@ def economia() -> Bloco:
     b.add(f'Juro prefixado de 5 anos (cálculo próprio sobre as taxas do Tesouro Direto): {num(pre5, 2)}% ao ano em '
           f'{dia(d_pre5)}.', F_TESOURO, F_ESTUDO)
     b.add(f'Dívida bruta do governo geral: {num(div, 2)}% do PIB em {mes(d_div)}.', F_DIVIDA)
-    b.resumo = (f'Último dado: Selic de {num(selic, 2)}% ({dia(d_selic)}), IPCA de {num(ipca, 2)}% em 12 meses (até '
-                f'{mes(d_ipca)}) e dólar a R$ {num(ptax, 4)} (PTAX de {dia(d_ptax)}).')
+    b.resumo = (f'{RESUMO_HOJE} juros básicos (Selic) de {num(selic, 2)}% ao ano, inflação de {num(ipca, 2)}% em 12 meses '
+                f'(até {mes(d_ipca)}) e dólar a R$ {num(ptax, 2)} (cotação oficial de {dia(d_ptax)}).')
     return b
 
 
@@ -167,7 +206,8 @@ def _proximo_pregao(d) -> pd.Timestamp:
 
 
 # Taxa-base de cada mercado medido: série, limite de "dia grande" e unidade. Juros em pontos-base (p.b.).
-TAXA = {'ibovespa': ('ibov', 4.0, '%', F_IBOV), 'dolar': ('ptax', 1.0, '%', F_PTAX), 'juros': ('pre_5a', 30.0, ' p.b.', F_TESOURO)}
+TAXA = {'ibovespa': ('ibov', 4.0, '%', F_IBOV), 'dolar': ('ptax', 1.0, '%', F_PTAX), 'euro': ('euro', 1.0, '%', F_EURO),
+        'juros': ('pre_5a', 30.0, ' p.b.', F_TESOURO)}
 
 
 def _variacoes(nome: str) -> pd.Series:
@@ -199,6 +239,7 @@ MEDIDA = {
 HISTORICO = {
     'ibovespa': ('o Ibovespa', 'ibov', F_IBOV, lambda v: f'{num(v, 0)} pontos'),
     'dolar': ('o dólar', 'ptax', F_PTAX, lambda v: f'R$ {num(v, 4)}'),
+    'euro': ('o euro', 'euro', F_EURO, lambda v: f'R$ {num(v, 4)}'),
     'juros': ('o juro prefixado de 5 anos', 'pre_5a', F_TESOURO, lambda v: f'{num(v, 2)}% ao ano'),
 }
 
@@ -228,8 +269,21 @@ def historico(mercado: str) -> Bloco:
     if mercado == 'dolar':
         b.limites.append('Os números do dólar são da PTAX de venda (dólar à vista, do Banco Central), não de contrato futuro '
                          'de dólar, que tem vencimento e preço próprios.')
-    b.resumo = f'{nome[0].upper() + nome[1:]}: {fmt(fim)} em {dia(d_fim)}; nos 12 meses, de {fmt(float(doze[d_lo]))} a {fmt(float(doze[d_hi]))}.'
+    if mercado == 'euro':
+        b.limites.append(LIMITE_PTAX_EURO)
+    # Para quem está começando: o nível arredondado, o ano em palavras e a faixa dos 12 meses.
+    curto = (lambda v: f'R$ {num(v, 2)}') if mercado in ('dolar', 'euro') else fmt
+    nome_cap = nome[0].upper() + nome[1:]
+    ano = ''
+    if len(antes) and not juros:
+        ano = f' No ano, {mov(var, 1)}.'
+    b.resumo = (f'{nome_cap} está em {curto(fim)} ({dia(d_fim)}).{ano} Nos últimos 12 meses, foi de '
+                f'{curto(float(doze[d_lo]))} a {curto(float(doze[d_hi]))}.')
     return b
+
+
+LIMITE_PTAX_EURO = ('Os números do euro são da PTAX de venda do Banco Central. Na troca de verdade (banco, corretora, '
+                    'app de remessa), a cotação é outra e pode haver tarifa, spread e IOF.')
 
 
 # ---------- o que o mercado espera (Focus) e as datas marcadas ----------
@@ -313,18 +367,20 @@ def expectativas(mercado: str) -> Bloco:
                      f'boletim de {dia(data)}.')
     periodo = f'de {anos[0]} a {anos[-1]}'
     lados = lambda ind: ', para os dois lados' if dois_lados_de(ind) else ''  # noqa: E731
+    # Para quem está começando: quem são, o que esperam e quanto já erraram, sem sigla.
+    quem = lambda n: (f'Os economistas que o Banco Central consulta toda semana (boletim Focus, {n} instituições '  # noqa: E731
+                      f'em {dia(data)})')
     if mercado == 'dolar':
         e = [abs(x) for x in erros['Câmbio']]
-        b.resumo = (f'Focus de {dia(data)} (expectativa de {c0["respondentes"]} instituições, não do Thoran): R$ '
-                    f'{num(c0["mediana"], 2)} para o fim de {ano} na mediana, com respostas de R$ {num(c0["minimo"], 2)} a '
-                    f'R$ {num(c0["maximo"], 2)}. {periodo[0].upper() + periodo[1:]}, a mediana feita cerca de 12 meses antes errou '
-                    f'o dólar de fim de ano por R$ {num(min(e), 2)} a R$ {num(max(e), 2)}{lados("Câmbio")}.')
+        b.resumo = (f'{quem(c0["respondentes"])} esperam o dólar a R$ {num(c0["mediana"], 2)} no fim de {ano}; as respostas '
+                    f'vão de R$ {num(c0["minimo"], 2)} a R$ {num(c0["maximo"], 2)}. É a expectativa deles, não do Thoran, e '
+                    f'ela já errou: {periodo}, o dólar do fim do ano ficou de R$ {num(min(e), 2)} a R$ {num(max(e), 2)} longe '
+                    f'do esperado{lados("Câmbio")}.')
     else:
         e = [abs(x) for x in erros['Selic']]
-        b.resumo = (f'Focus de {dia(data)} (expectativa de {s0["respondentes"]} instituições, não do Thoran): Selic de '
-                    f'{num(s0["mediana"], 2)}% no fim de {ano} na mediana. {periodo[0].upper() + periodo[1:]}, a mediana feita '
-                    f'cerca de 12 meses antes errou a Selic de fim de ano por {num(min(e), 2)} a {num(max(e), 2)} p.p.'
-                    f'{lados("Selic")}.')
+        b.resumo = (f'{quem(s0["respondentes"])} esperam os juros básicos (Selic) em {num(s0["mediana"], 2)}% no fim de '
+                    f'{ano}. É a expectativa deles, não do Thoran, e ela já errou: {periodo}, a Selic do fim do ano ficou de '
+                    f'{num(min(e), 2)} a {num(max(e), 2)} ponto percentual longe do esperado{lados("Selic")}.')
     return b
 
 
@@ -432,14 +488,15 @@ def eleicoes(mercados: list[str]) -> Bloco:
     v = (tab[col] * k).round(casas)
     surpresa_nos_primeiros = bool(tab[~segundo].surpresa_mensuravel.all() and not tab[segundo].surpresa_mensuravel.any())
     um_lado = len({1 if x > 0 else -1 for x in med.surpresa_pp}) == 1
-    b.resumo = (f'Nos {segundo.sum()} segundos turnos desde 2018, o {nome} variou {_valores(v[segundo], un, casas)} no pregão '
-                f'seguinte; nos {(~segundo).sum()} primeiros'
+    un_txt = ' pontos-base' if un.strip() == 'p.b.' else un
+    b.resumo = (f'Depois dos {segundo.sum()} segundos turnos desde 2018, o {nome} {movs(v[segundo], casas, un_txt)} no dia '
+                f'seguinte; depois dos {(~segundo).sum()} primeiros'
                 + (', em que a urna surpreendeu as pesquisas' if surpresa_nos_primeiros else '')
-                + f', de {sinal(v[~segundo].min(), casas)}{un} a {sinal(v[~segundo].max(), casas)}{un}. Leitura do estudo: '
-                f'pesou mais a surpresa do que o nome do vencedor'
-                + (f', mas as {len(med)} surpresas foram a favor do mesmo campo político, então a amostra não mostra o outro '
-                   f'lado' if um_lado else '')
-                + f'; com {len(tab)} casos não se tira regra.')
+                + f', {faixa_mov(v[~segundo].min(), v[~segundo].max(), casas, un_txt)}. Leitura do estudo: pesou mais a '
+                f'surpresa das urnas do que o nome de quem ganhou'
+                + (f', mas as {len(med)} surpresas foram a favor do mesmo campo político, e a amostra não mostra o outro lado'
+                   if um_lado else '')
+                + f'. São só {len(tab)} casos: não dá para tirar regra.')
     b.limites += [f'São só {len(tab)} turnos, e só {len(med)} tiveram surpresa mensurável: não dá para tirar regra.',
                   'A reação é de um dia, com dado diário (o estudo não tem dado intradiário): no Ibovespa, o fechamento do '
                   'pregão seguinte contra o anterior; no dólar, a PTAX de venda do Banco Central, fixada entre 10h e 13h, e '
@@ -518,9 +575,11 @@ def pesquisas() -> Bloco | None:
     b.limites += dados.get('limites', [])
     if difs:
         mediana = float(pd.Series(difs).median())
-        b.resumo = (f'Nas {len(difs)} pesquisas do 2º turno com votos totais e registro no TSE informado pelo instituto ou pela '
-                    f'imprensa, a diferença Flávio Bolsonaro menos Lula vai de {sinal(min(difs), 1)} a {sinal(max(difs), 1)} '
-                    f'p.p., conforme o instituto (mediana de {sinal(mediana, 1)} p.p.).')
+        frente = lambda d: (f'Flávio Bolsonaro {num(d, 1)} pontos à frente' if d > 0  # noqa: E731
+                            else f'Lula {num(-d, 1)} pontos à frente' if d < 0 else 'empate')
+        b.resumo = (f'Nas {len(difs)} pesquisas do 2º turno registradas no TSE que divulgaram os votos totais, a diferença '
+                    f'vai de {frente(min(difs))} a {frente(max(difs))}, conforme o instituto; no meio da lista, '
+                    f'{frente(mediana)}. Pesquisa não é previsão.')
         # A 1ª fonte desta linha é a pesquisa do meio, não um extremo: é ela que a versão curta mostra.
         fonte = lambda p: Fonte(f'Pesquisa {p["instituto"]}, registro {p["registro_tse"]}', p['fonte_url'])  # noqa: E731
         meio = min(range(len(difs)), key=lambda i: abs(difs[i] - mediana))
@@ -573,18 +632,18 @@ def copom(mercados: list[str] | None = None) -> Bloco:
     if mercados and alvo[0] in ('ibovespa', 'dolar'):
         col, nome = ('ibov_d0', 'Ibovespa') if alvo[0] == 'ibovespa' else ('ptax_d0', 'dólar')
         v, w = com[col].round(2), sem_s[col].round(2)
-        b.resumo = (f'No pregão seguinte ao Copom, desde 2016: nas {len(sem_s)} reuniões em que a decisão foi a esperada pelo '
-                    f'Focus, o {nome} foi de {sinal(w.min(), 2)}% a {sinal(w.max(), 2)}% (mediana de {sinal(w.median(), 2)}%); '
-                    f'nas {len(com)} que surpreenderam, de {sinal(v.min(), 2)}% a {sinal(v.max(), 2)}% (mediana de '
-                    f'{sinal(v.median(), 2)}%). Antes da reunião não se sabe se ela vai surpreender.')
+        b.resumo = (f'Depois das reuniões do Copom desde 2016: nas {len(sem_s)} em que a decisão foi a que os economistas '
+                    f'esperavam (boletim Focus), o {nome} {faixa_mov(w.min(), w.max(), 2)} no dia seguinte; nas {len(com)} '
+                    f'que surpreenderam, {faixa_mov(v.min(), v.max(), 2)}. Antes da reunião não se sabe se ela vai '
+                    f'surpreender.')
     else:
         v = com.pre2_d0_pb.round(1)
         abaixo, acima = int((com.surpresa_pb < 0).sum()), int((com.surpresa_pb > 0).sum())
-        b.resumo = (f'Nas {todas["n"]} reuniões do Copom desde 2016, a decisão foi diferente do Focus da véspera em '
-                    f'{todas["com_surpresa"]} ({abaixo} abaixo, {acima} acima). Nessas {len(com)}, os juros de 2 anos foram de '
-                    f'{sinal(v.min(), 1)} a {sinal(v.max(), 1)} p.b. no pregão seguinte (mediana de {sinal(v.median(), 1)} p.b.); '
-                    f'em tamanho, sem o sinal, a mediana foi de {num(todas["juros2a_mediana_abs_com_pb"], 1)} p.b., contra '
-                    f'{num(todas["juros2a_mediana_abs_sem_pb"], 1)} p.b. nas outras {todas["sem_surpresa"]}.')
+        b.resumo = (f'Nas {todas["n"]} reuniões do Copom desde 2016, a decisão foi diferente da que os economistas '
+                    f'esperavam (boletim Focus) em {todas["com_surpresa"]}: {abaixo} abaixo e {acima} acima. Nelas, os juros '
+                    f'de 2 anos {faixa_mov(v.min(), v.max(), 1, " pontos-base")} no dia seguinte; no valor do meio, '
+                    f'mexeram {num(todas["juros2a_mediana_abs_com_pb"], 1)} pontos-base, contra '
+                    f'{num(todas["juros2a_mediana_abs_sem_pb"], 1)} nas outras {todas["sem_surpresa"]}.')
     b.limites += ['O Focus é a expectativa de economistas, não o preço de mercado.',
                   f'São só {len(com)} reuniões com surpresa desde 2016.',
                   'A surpresa só se conhece depois da decisão; antes da reunião, o que existe é a expectativa do Focus.',
@@ -609,8 +668,8 @@ def eventos(tipo: str) -> Bloco:
     v = sel.ibov_d0.round(2)
     if len(v):
         b.add(f'Ibovespa nos {len(v)} casos: de {sinal(v.min(), 2)}% a {sinal(v.max(), 2)}%, mediana de {sinal(v.median(), 2)}%.', F_ESTUDO)
-        b.resumo = (f'Nos {len(v)} casos de {TIPOS[tipo]} da linha do tempo, o Ibovespa variou de {sinal(v.min(), 2)}% a '
-                    f'{sinal(v.max(), 2)}% no pregão da reação.')
+        b.resumo = (f'Nos {len(v)} casos de {TIPOS[tipo]} da linha do tempo (2016–2026), o Ibovespa '
+                    f'{faixa_mov(v.min(), v.max(), 2)} no dia da reação.')
     b.limites.append('Os eventos da linha do tempo foram escolhidos por terem sido marcantes, não sorteados: a amostra '
                      'exagera as reações grandes.')
     return b
@@ -663,6 +722,124 @@ def conta(pontos: float, contratos: int, chave: str) -> Bloco:
     b.add(f'{num(pontos, 0)} pontos × R$ {num(valor, 2)} × {contratos} contrato(s) de {nome} = R$ {num(total, 2)}, para ganho '
           f'ou para perda. É só a conta: não diz se isso faz sentido para você.', fonte)
     b.resumo = f'{num(pontos, 0)} pontos no {nome} valem R$ {num(total, 2)} com {contratos} contrato(s), para ganho ou para perda.'
+    return b
+
+
+# ---------- câmbio: o euro nos turnos e a conta com os números da pessoa ----------
+
+def _reacao_eleicoes(nome: str) -> pd.DataFrame:
+    """A reação de uma série de preço nos turnos do estudo, pelo mesmo método do estudo (dia 0 = 1º pregão depois da
+    eleição, no calendário do Ibovespa). Com a PTAX, reproduz a coluna ptax_d0 de eleicoes_surpresa.csv."""
+    from estudo.eleicoes import RODADA_PARA_EVENTO
+    from estudo.janelas import calendario, dia_zero, medir_preco, no_calendario
+    cal = calendario(serie('ibov'))
+    s = no_calendario(serie(nome), cal)
+    linhas = []
+    for _, r in _csv('eleicoes_surpresa.csv').iterrows():
+        i0 = dia_zero(RODADA_PARA_EVENTO[r.rodada], cal)
+        m = medir_preco(s, i0) if i0 is not None else {}
+        if m:
+            linhas.append({'rodada': r.rodada, 'turno': r.turno, 'd0_data': cal[i0], 'antes': float(s.iloc[i0 - 1]),
+                           'depois': float(s.iloc[i0]), 'd0': m['d0'] * 100, 'd01': m['d01'] * 100,
+                           'surpresa_mensuravel': bool(r.surpresa_mensuravel), 'surpresa_pp': float(r.surpresa_pp)})
+    return pd.DataFrame(linhas)
+
+
+TITULO_EURO_TURNOS = 'O euro nos turnos presidenciais desde 2018 (fato)'
+
+
+def euro_turnos() -> Bloco:
+    b = Bloco(TITULO_EURO_TURNOS)
+    t = _reacao_eleicoes('euro')
+    datas = {x['id']: x['data'] for x in _json('fontes/pesquisas_eleicoes.json')}
+    for _, r in t.iterrows():
+        b.add(f'{r.turno[0].upper() + r.turno[1:]} ({dia(datas[r.rodada])}): no dia útil seguinte ({dia(r.d0_data)}), o '
+              f'euro {mov(r.d0, 2)}, de R$ {num(r.antes, 4)} para R$ {num(r.depois, 4)}; no acumulado de dois dias, '
+              f'{mov(r.d01, 2)}.', F_EURO, F_ESTUDO)
+    segundo = t.turno.str.startswith('2º')
+    v = t.d0.round(2)
+    b.add(f'Euro no dia útil seguinte: nos {(~segundo).sum()} primeiros turnos ({_anos(t[~segundo])}), '
+          f'{movs(v[~segundo], 2)}; nos {segundo.sum()} segundos turnos ({_anos(t[segundo])}), {movs(v[segundo], 2)}.',
+          F_ESTUDO)
+    b.linhas.append(taxa_base('euro', 'euro'))
+    med = t[t.surpresa_mensuravel]
+    um_lado = len({1 if x > 0 else -1 for x in med.surpresa_pp}) == 1  # o mesmo critério do bloco das eleições
+    # Com as mesmas 2 casas das linhas: arredondar 1,05 para 1,1 não bate com o número dos fatos (o filtro, D8, barra).
+    b.resumo = (f'Depois dos {segundo.sum()} segundos turnos desde 2018, o euro {movs(v[segundo], 2)} no dia seguinte; '
+                f'depois dos {(~segundo).sum()} primeiros, {faixa_mov(v[~segundo].min(), v[~segundo].max(), 2)}. São só '
+                f'{len(t)} casos'
+                + (f', e as {len(med)} surpresas das urnas foram a favor do mesmo campo político: a amostra não mostra o '
+                   f'outro lado' if um_lado and len(med) else '')
+                + '. Não dá para tirar regra.')
+    b.limites += [f'São só {len(t)} turnos: não dá para tirar regra.',
+                  'A reação é de um dia, com a cotação oficial do Banco Central (PTAX, fixada entre 10h e 13h), não o '
+                  'fechamento; o movimento de um dia não diz nada sobre os meses seguintes.',
+                  LIMITE_PTAX_EURO]
+    return b
+
+
+MOEDAS = {'euro': ('euro', 'euros', 'euro', F_EURO), 'dolar': ('dólar', 'dólares', 'ptax', F_PTAX)}
+TITULO_CONTA_CAMBIO = 'A conta, com os números que você contou (só a conta: não diz o que fazer)'
+
+
+def cotacoes(moeda: str) -> dict:
+    """Os números da conta de câmbio: a PTAX de hoje, a do fim do ano passado e a menor e a maior dos 12 meses."""
+    s = serie(MOEDAS[moeda][2])
+    d_fim = s.index[-1]
+    doze = s[s.index > d_fim - pd.DateOffset(years=1)]
+    antes = s[s.index.year < d_fim.year]
+    return {'data': str(d_fim.date()), 'valor': float(s.iloc[-1]),
+            'ano_data': str(antes.index[-1].date()), 'ano_valor': float(antes.iloc[-1]),
+            'min_data': str(doze.idxmin().date()), 'min_valor': float(doze.min()),
+            'max_data': str(doze.idxmax().date()), 'max_valor': float(doze.max())}
+
+
+def _meses(m: float) -> str:
+    """Meses inteiros, sem arredondar para cima, e os anos quando passa de 2."""
+    n = int(m)
+    if n < 1:
+        return 'menos de 1 mês'
+    return f'{num(n, 0)} {"mês" if n == 1 else "meses"}' + (f' (cerca de {num(n // 12, 0)} anos)' if n >= 24 else '')
+
+
+def conta_cambio(valor: float, moeda: str, gasto: float | None = None, gasto_moeda: str | None = None,
+                 c: dict | None = None) -> Bloco:
+    """P4 de câmbio: o dinheiro em moeda estrangeira que a pessoa contou, em reais, pela cotação oficial. Só a conta, sem
+    dizer o que fazer, quando trocar nem quanto (N1, N4, N5). `gasto`: o gasto por mês que ela contou, em reais (ou na
+    própria moeda, se `gasto_moeda` for a mesma)."""
+    nome, plural, _, fonte = MOEDAS[moeda]
+    c = c or cotacoes(moeda)
+    hoje_r = valor * c['valor']
+    ano_r = valor * c['ano_valor']
+    b = Bloco(TITULO_CONTA_CAMBIO)
+    b.add(f'{num(valor, 0)} {plural} × R$ {num(c["valor"], 4)} (cotação oficial do {nome} em {dia(c["data"])}) = '
+          f'R$ {num(hoje_r, 0)}.', fonte)
+    b.add(f'Cada R$ 0,10 que o {nome} sobe ou desce muda esse valor em R$ {num(valor * 0.1, 0)}.', fonte)
+    dif = ano_r - hoje_r
+    b.add(f'No fim de {c["ano_data"][:4]} ({dia(c["ano_data"])}), 1 {nome} valia R$ {num(c["ano_valor"], 4)}: os mesmos '
+          f'{num(valor, 0)} {plural} davam R$ {num(ano_r, 0)}, '
+          + (f'R$ {num(abs(dif), 0)} {"a mais" if dif > 0 else "a menos"} do que hoje.' if num(abs(dif), 0) != '0'
+             else 'o mesmo que hoje.'),
+          fonte)
+    b.add(f'Nos últimos 12 meses, 1 {nome} foi de R$ {num(c["min_valor"], 4)} ({dia(c["min_data"])}) a '
+          f'R$ {num(c["max_valor"], 4)} ({dia(c["max_data"])}): nesses dois extremos, os mesmos {plural} dariam de '
+          f'R$ {num(valor * c["min_valor"], 0)} a R$ {num(valor * c["max_valor"], 0)}.', fonte)
+    cobre = ''
+    if gasto:
+        if gasto_moeda == moeda:
+            meses = valor / gasto
+            b.add(f'Com gasto de {num(gasto, 0)} {plural} por mês, os {num(valor, 0)} {plural} cobrem {_meses(meses)}, sem '
+                  f'contar rendimento, imposto nem custo da troca.')
+        else:
+            meses = hoje_r / gasto
+            b.add(f'Com gasto de R$ {num(gasto, 0)} por mês, R$ {num(hoje_r, 0)} cobrem {_meses(meses)}, sem contar '
+                  f'rendimento, imposto nem custo da troca. Com o {nome} na menor cotação dos 12 meses, seriam '
+                  f'{_meses(valor * c["min_valor"] / gasto)}; na maior, {_meses(valor * c["max_valor"] / gasto)}.', fonte)
+        cobre = f'; com o seu gasto por mês, cobrem {_meses(meses)}'
+    b.add('É só a conta com os números que você contou: não diz o que fazer com o dinheiro, nem quando trocar, nem quanto.')
+    b.limites.append(LIMITE_PTAX_EURO.replace('do euro', f'do {nome}') if moeda != 'euro' else LIMITE_PTAX_EURO)
+    b.resumo = (f'Seus {num(valor, 0)} {plural} valem R$ {num(hoje_r, 0)} pela cotação oficial de {dia(c["data"])}; cada '
+                f'R$ 0,10 no {nome} muda isso em R$ {num(valor * 0.1, 0)}{cobre}.')
     return b
 
 

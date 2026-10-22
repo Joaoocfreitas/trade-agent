@@ -18,10 +18,12 @@ import pandas as pd
 
 # faixa absoluta; salto máximo entre pontos seguidos (em % ou em unidade da série); revisão aceita nos últimos dias.
 # Calibrado contra 2016–2026 (22/10/2026): segura só dias extremos de verdade, como 18/05/2017 (Joesley), março de 2020
-# (covid), 19 e 20/12/2024 (juros) e 05/10/2026 (dólar −4,55% depois do 1º turno). Nesses dias, a pessoa confere na
+# (covid), 19 e 20/12/2024 (juros) e 05/10/2026 (dólar −4,55% depois do 1º turno). No euro, o mesmo limite de 4% segura
+# 18/05/2017, 16/03/2020, 09/11/2020, 10/11/2022 e 05/10/2026 (−4,96%). Nesses dias, a pessoa confere na
 # fonte e libera rodando a rodada à mão com a série em ACEITAR.
 TRAVAS = {
     'ptax': {'faixa': (2.0, 15.0), 'salto_pct': 4.0, 'revisao_dias': 7},
+    'euro': {'faixa': (2.0, 15.0), 'salto_pct': 4.0, 'revisao_dias': 7},
     'selic_meta': {'faixa': (2.0, 30.0), 'salto_abs': 1.5, 'multiplo': 0.25, 'revisao_dias': 7},
     'ipca_12m': {'faixa': (-5.0, 30.0), 'salto_abs': 1.5, 'revisao_dias': 100},
     'divida_bruta': {'faixa': (40.0, 150.0), 'salto_abs': 3.0, 'revisao_dias': 100},

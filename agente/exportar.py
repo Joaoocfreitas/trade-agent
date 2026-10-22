@@ -84,6 +84,14 @@ def base() -> dict:
         },
         'conta': {'mini_indice': {'valor': 0.20, 'nome': 'mini-índice', 'fonte': _fonte(F.F_B3_WIN)},
                   'mini_dolar': {'valor': 10.0, 'nome': 'mini-dólar', 'fonte': _fonte(F.F_B3_WDO)}},
+        # P4 de câmbio: a conta é feita na hora com o número da pessoa; aqui vão as cotações e os textos fixos.
+        'cambio': {
+            'cotacoes': {m: F.cotacoes(m) for m in F.MOEDAS},
+            'moedas': {m: {'nome': v[0], 'plural': v[1], 'fonte': _fonte(v[3])} for m, v in F.MOEDAS.items()},
+            'titulo': F.TITULO_CONTA_CAMBIO, 'limite_euro': F.LIMITE_PTAX_EURO,
+        },
+        'euro_turnos': _bloco(F.euro_turnos()),
+        'resumo_hoje': F.RESUMO_HOJE,
     }
 
 
@@ -105,12 +113,23 @@ EXTRAS = [
     # 22/10/2026, do teste no site: a recusa tem de trazer o que dá para saber hoje.
     'devo comprar dolar hoje?', 'mas que que eu faço? preciso tomar uma decisão', 'Como está o dólar?',
     'O Ibovespa está caro?', 'Vendo meus títulos prefixados agora?', 'WDO sobe amanhã?',
+    # 22/10/2026: câmbio, euro e a conta com os números da pessoa (P4 de câmbio).
+    'to com uns 150 mil euros na espanha aplicados e faco trasnferencia internacional pela wise todo o mes oara pagar '
+    'minha facuyldade aqui no brasil mas agora com o crescimento da ibovespa e a reducao do poder do euro em relacao ao '
+    'crecimento no valor do real to perdendo poder de compra.Queria saber se agora com o segundo turno o real vai '
+    'continuar a valorizar ou nao? e se deveria trazer esse dinheiro para o brasil',
+    'Tenho €150.000 na Espanha e gasto 5 mil reais por mês com a faculdade. Como está o euro?',
+    'tenho US$ 20 mil e pago 3 mil dólares por mês de aluguel', 'mensalidade de R$ 4.500, tenho 1,2 milhão de euros',
+    'tenho 150k euros, quanto eu trago pro brasil?', 'Como está o euro?', 'o euro vai cair depois do 2º turno?',
+    'O que aconteceu com o euro nas eleições?', 'EUR 80.000 parados no banco, e o Copom?', 'gasto 2 mil euros por mês',
+    'paguei 1 euro no café', 'tenho 50 mil em dólares e gasto R$ 3.000 por mês. E a eleição?',
 ]
 
 
 def _pedido(p) -> dict:
     return {'mercados': p.mercados, 'candidatos': p.candidatos, 'temas': p.temas, 'proibidos': p.proibidos,
-            'voto_informado': p.voto_informado, 'pontos': p.pontos, 'contratos': p.contratos}
+            'voto_informado': p.voto_informado, 'pontos': p.pontos, 'contratos': p.contratos,
+            'valor_moeda': p.valor_moeda, 'moeda': p.moeda, 'gasto_mensal': p.gasto_mensal, 'gasto_moeda': p.gasto_moeda}
 
 
 def paridade() -> dict:
@@ -154,7 +173,9 @@ def _frases_de_registro() -> list[str]:
     outras = ['Tenho R$ 5 mil e voto no Lula, sou petista.', 'Tenho 5k pra investir', 'tenho cinco mil reais', 'R$5.000,00 na conta',
               'uns 3 paus', 'meu salário é 4 mil', 'ganho 8000 por mês', 'votei 22', 'sou bolsonarista raiz', 'fiz o L',
               'eu apoio o Lula', 'odeio o PT', 'o mito vai ganhar', 'voto no Flávio Bolsonaro', 'Ele votou contra o arcabouço?',
-              'Tenho 22 anos e 3 contratos de WIN', 'Minha reserva de 2026 é de 15 mil']
+              'Tenho 22 anos e 3 contratos de WIN', 'Minha reserva de 2026 é de 15 mil',
+              'Tenho €150.000 e gasto 5 mil reais por mês', 'tenho US$ 20 mil', '150k euros na Espanha',
+              'mensalidade de R$ 4.500, tenho 1,2 milhão de euros', 'EUR 80.000 parados no banco']
     return list(dict.fromkeys(VOTOS + VALORES + FICAM + outras))
 
 
