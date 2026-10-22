@@ -244,8 +244,7 @@ PASSO_A_PASSO = [
     'com o link da fonte primária e a data da conferência na descrição.',
     '5. Uma segunda pessoa confere cada número contra a fonte primária e aprova o PR. Sem a segunda conferência, '
     'não tem merge.',
-    '6. Depois do merge, siga o README: `.venv/bin/python -m agente.exportar`, os testes dos dois lados e a '
-    'publicação da função.',
+    '6. O merge publica sozinho: a Action Publicar exporta a base, roda os testes dos dois lados e põe a função no ar.',
 ]
 
 
