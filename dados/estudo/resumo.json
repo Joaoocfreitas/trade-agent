@@ -1,0 +1,776 @@
+{
+ "gerado_em": "2026-10-21T20:28:08-03:00",
+ "eventos": 50,
+ "medidos": 50,
+ "ibov_pontos_falsos_retirados": [],
+ "conferencia_ibov_ipea_x_bcb": {
+  "dias_comparados": 1170,
+  "de": "2015-01-02",
+  "ate": "2019-09-30",
+  "dif_max_pct": 4.9093,
+  "dias_dif_acima_0_1pct": [
+   "2016-10-21",
+   "2018-02-28",
+   "2019-02-18",
+   "2019-02-27"
+  ]
+ },
+ "por_surpresa": [
+  {
+   "surpresa": "alta",
+   "n": 19,
+   "ibov_abs_d0_media": 0.042,
+   "ibov_abs_z0_mediana": 3.7159,
+   "pct_z_acima_2": 0.7368,
+   "pct_continuou": 0.3684,
+   "depois_vs_d0_mediana": -0.0357,
+   "ptax_abs_d01_media": 0.0272,
+   "pre5_abs_d01_pb_media": 54.1238
+  },
+  {
+   "surpresa": "media",
+   "n": 16,
+   "ibov_abs_d0_media": 0.0231,
+   "ibov_abs_z0_mediana": 2.2032,
+   "pct_z_acima_2": 0.5,
+   "pct_continuou": 0.375,
+   "depois_vs_d0_mediana": 0.0652,
+   "ptax_abs_d01_media": 0.0209,
+   "pre5_abs_d01_pb_media": 33.6569
+  },
+  {
+   "surpresa": "baixa",
+   "n": 8,
+   "ibov_abs_d0_media": 0.0111,
+   "ibov_abs_z0_mediana": 0.8181,
+   "pct_z_acima_2": 0.125,
+   "pct_continuou": 0.625,
+   "depois_vs_d0_mediana": 0.4904,
+   "ptax_abs_d01_media": 0.0117,
+   "pre5_abs_d01_pb_media": 13.5667
+  },
+  {
+   "surpresa": "nenhuma",
+   "n": 7,
+   "ibov_abs_d0_media": 0.0075,
+   "ibov_abs_z0_mediana": 0.627,
+   "pct_z_acima_2": 0.0,
+   "pct_continuou": 0.4286,
+   "depois_vs_d0_mediana": -2.5917,
+   "ptax_abs_d01_media": 0.0094,
+   "pre5_abs_d01_pb_media": 8.7021
+  }
+ ],
+ "por_tipo": [
+  {
+   "tipo": "eleicao",
+   "n": 8,
+   "ibov_abs_d0_media": 0.0344,
+   "ibov_abs_z0_mediana": 2.9108,
+   "pct_z_acima_2": 0.5,
+   "pct_continuou": 0.125,
+   "depois_vs_d0_mediana": -0.0615,
+   "ptax_abs_d01_media": 0.0269,
+   "pre5_abs_d01_pb_media": 45.8137
+  },
+  {
+   "tipo": "fiscal",
+   "n": 8,
+   "ibov_abs_d0_media": 0.0224,
+   "ibov_abs_z0_mediana": 2.5584,
+   "pct_z_acima_2": 0.625,
+   "pct_continuou": 0.25,
+   "depois_vs_d0_mediana": -0.4778,
+   "ptax_abs_d01_media": 0.0167,
+   "pre5_abs_d01_pb_media": 50.1613
+  },
+  {
+   "tipo": "monetario",
+   "n": 8,
+   "ibov_abs_d0_media": 0.016,
+   "ibov_abs_z0_mediana": 1.2475,
+   "pct_z_acima_2": 0.25,
+   "pct_continuou": 0.75,
+   "depois_vs_d0_mediana": 1.324,
+   "ptax_abs_d01_media": 0.0174,
+   "pre5_abs_d01_pb_media": 22.3631
+  },
+  {
+   "tipo": "legislativo",
+   "n": 6,
+   "ibov_abs_d0_media": 0.0117,
+   "ibov_abs_z0_mediana": 0.5602,
+   "pct_z_acima_2": 0.1667,
+   "pct_continuou": 0.3333,
+   "depois_vs_d0_mediana": -0.6789,
+   "ptax_abs_d01_media": 0.0121,
+   "pre5_abs_d01_pb_media": 11.9554
+  },
+  {
+   "tipo": "geopolitico",
+   "n": 5,
+   "ibov_abs_d0_media": 0.0085,
+   "ibov_abs_z0_mediana": 0.7167,
+   "pct_z_acima_2": 0.2,
+   "pct_continuou": 0.6,
+   "depois_vs_d0_mediana": 0.4295,
+   "ptax_abs_d01_media": 0.0184,
+   "pre5_abs_d01_pb_media": 16.4819
+  },
+  {
+   "tipo": "outro",
+   "n": 5,
+   "ibov_abs_d0_media": 0.0341,
+   "ibov_abs_z0_mediana": 2.8283,
+   "pct_z_acima_2": 0.8,
+   "pct_continuou": 0.2,
+   "depois_vs_d0_mediana": -0.3801,
+   "ptax_abs_d01_media": 0.0178,
+   "pre5_abs_d01_pb_media": 27.1068
+  },
+  {
+   "tipo": "judicial",
+   "n": 4,
+   "ibov_abs_d0_media": 0.0246,
+   "ibov_abs_z0_mediana": 1.8389,
+   "pct_z_acima_2": 0.5,
+   "pct_continuou": 0.75,
+   "depois_vs_d0_mediana": 0.4601,
+   "ptax_abs_d01_media": 0.0181,
+   "pre5_abs_d01_pb_media": 16.8933
+  },
+  {
+   "tipo": "choque_externo",
+   "n": 3,
+   "ibov_abs_d0_media": 0.0454,
+   "ibov_abs_z0_mediana": 1.0308,
+   "pct_z_acima_2": 0.3333,
+   "pct_continuou": 1.0,
+   "depois_vs_d0_mediana": 3.9307,
+   "ptax_abs_d01_media": 0.0179,
+   "pre5_abs_d01_pb_media": 17.2057
+  },
+  {
+   "tipo": "escandalo",
+   "n": 3,
+   "ibov_abs_d0_media": 0.0695,
+   "ibov_abs_z0_mediana": 4.9472,
+   "pct_z_acima_2": 1.0,
+   "pct_continuou": 0.0,
+   "depois_vs_d0_mediana": -0.3742,
+   "ptax_abs_d01_media": 0.0478,
+   "pre5_abs_d01_pb_media": 126.9132
+  }
+ ],
+ "coerencia_do_rotulo_posterior": {
+  "leia_assim": "Os rótulos de surpresa foram dados por quem já sabia como o mercado reagiu. Este teste mede se o rótulo acompanha o tamanho da reação, NÃO prova que a surpresa causa a reação. Prova exige surpresa medida antes: ver copom_completo e eleicoes_surpresa_ex_ante.",
+  "media_abs_z0_alta": 3.927,
+  "media_abs_z0_baixa_nenhuma": 0.873,
+  "n_alta": 19,
+  "n_baixa_nenhuma": 15,
+  "p_valor_permutacao": "< 0.00005"
+ },
+ "depois_do_dia_zero": {
+  "surpresa alta": {
+   "n": 19,
+   "media": 0.0034698132449417773,
+   "mediana": -0.0016618733531953422,
+   "ic95": [
+    -0.013289995289787655,
+    0.023326379694161403
+   ],
+   "continuou": 7,
+   "devolveu": 12,
+   "evento_que_mais_pesa": "COVID e guerra do petróleo: 1º circuit breaker de março de 2020",
+   "media_sem_ele": -0.003867163839559392
+  },
+  "surpresa média": {
+   "n": 16,
+   "media": 0.0027048672896408735,
+   "mediana": 0.0019508641569778162,
+   "ic95": [
+    -0.006694685169622477,
+    0.012015766525098143
+   ],
+   "continuou": 8,
+   "devolveu": 8,
+   "evento_que_mais_pesa": "Liberation Day: tarifas recíprocas de Trump (Brasil com 10%)",
+   "media_sem_ele": 0.00045400389193398134
+  },
+  "baixa ou nenhuma": {
+   "n": 15,
+   "media": -0.004249078992253597,
+   "mediana": 0.004028622943430316,
+   "ic95": [
+    -0.020043291355534194,
+    0.01062160463232338
+   ],
+   "continuou": 9,
+   "devolveu": 6,
+   "evento_que_mais_pesa": "Prazo de desincompatibilização das eleições de 2026",
+   "media_sem_ele": -0.008287588058658535
+  }
+ },
+ "caminho_mediano_alinhado": {
+  "surpresa alta": [
+   0.0003548973181415338,
+   -0.003098999562097804,
+   -0.010707376105397515,
+   -0.01210996361498029,
+   0.0,
+   0.03984305828023815,
+   0.038119618621394125,
+   0.02717432634540795,
+   0.03777210188821922,
+   0.03992381708880188,
+   0.039654125578376664
+  ],
+  "surpresa média": [
+   -0.01065393132070902,
+   -0.007704949304615072,
+   0.0063652254121592255,
+   -9.373936309020614e-05,
+   0.0,
+   0.022544051291874867,
+   0.020103053348393518,
+   0.015669141980175327,
+   0.02312551167436122,
+   0.020095928884568903,
+   0.0240582365905479
+  ],
+  "baixa ou nenhuma": [
+   0.0014349043397107186,
+   0.0020442714736317313,
+   -0.0007710613465283789,
+   0.0008905263709304556,
+   0.0,
+   0.006341136112344881,
+   -0.0005409240669059789,
+   0.008415935482511294,
+   0.012033804241687651,
+   0.018531993914021383,
+   0.010395305102204766
+  ]
+ },
+ "caminho_medio_alinhado": {
+  "surpresa alta": [
+   -0.0031712679507858808,
+   -0.004410261323835754,
+   -0.004911615859444545,
+   -0.006355093880754725,
+   0.0,
+   0.04198010106372512,
+   0.035542150507378245,
+   0.0392555673403566,
+   0.04270841523148395,
+   0.038460903032386626,
+   0.04603793409606102
+  ],
+  "surpresa média": [
+   -0.013218911124451505,
+   -0.009739432622013211,
+   0.0007312550448094896,
+   -4.371439439895819e-05,
+   0.0,
+   0.02307458396798341,
+   0.02170700461207252,
+   0.01756921944886248,
+   0.01961632961199586,
+   0.019799136967226037,
+   0.02573744957282835
+  ],
+  "baixa ou nenhuma": [
+   0.004412957065490216,
+   -0.0010465645705909725,
+   -0.0016374218406789728,
+   0.0031388281625797246,
+   0.0,
+   0.00943077860317958,
+   0.0002465616614337381,
+   0.004562575762765937,
+   0.005964402138852816,
+   0.005981114683298583,
+   0.00504880075382681
+  ]
+ },
+ "copom_so_os_da_linha_do_tempo": {
+  "leia_assim": "Só as 7 reuniões que a pesquisa escolheu por terem sido notícia, com janela de 2 dias. NÃO tire conclusão daqui: a análise válida é copom_completo (86 reuniões).",
+  "reunioes": [
+   {
+    "data": "2017-01-12",
+    "evento": "Copom acelera e corta a Selic em 0,75 p.p.",
+    "rotulo_posterior": "media",
+    "reuniao": "R1/2017",
+    "pesquisa_em": "2017-01-10",
+    "selic_antes": 13.75,
+    "selic_depois": 13.0,
+    "focus_mediana": 13.25,
+    "surpresa_pb": -25,
+    "focus_desvio_pb": 8,
+    "ibov_z0": 1.735,
+    "pre2_d01_pb": -33.901
+   },
+   {
+    "data": "2018-05-17",
+    "evento": "Copom interrompe cortes e mantém a Selic em 6,50%",
+    "rotulo_posterior": "alta",
+    "reuniao": "R3/2018",
+    "pesquisa_em": "2018-05-15",
+    "selic_antes": 6.5,
+    "selic_depois": 6.5,
+    "focus_mediana": 6.25,
+    "surpresa_pb": 25,
+    "focus_desvio_pb": 6,
+    "ibov_z0": -3.842,
+    "pre2_d01_pb": 35.12
+   },
+   {
+    "data": "2021-03-18",
+    "evento": "Copom sobe a Selic em 0,75 p.p. e inicia o aperto",
+    "rotulo_posterior": "media",
+    "reuniao": "R2/2021",
+    "pesquisa_em": "2021-03-16",
+    "selic_antes": 2.0,
+    "selic_depois": 2.75,
+    "focus_mediana": 2.5,
+    "surpresa_pb": 25,
+    "focus_desvio_pb": 16,
+    "ibov_z0": -0.79,
+    "pre2_d01_pb": 9.189
+   },
+   {
+    "data": "2023-08-03",
+    "evento": "Copom inicia os cortes com 0,50 p.p. em placar 5 a 4",
+    "rotulo_posterior": "baixa",
+    "reuniao": "R5/2023",
+    "pesquisa_em": "2023-08-01",
+    "selic_antes": 13.75,
+    "selic_depois": 13.25,
+    "focus_mediana": 13.5,
+    "surpresa_pb": -25,
+    "focus_desvio_pb": 12,
+    "ibov_z0": -0.198,
+    "pre2_d01_pb": -11.732
+   },
+   {
+    "data": "2024-05-09",
+    "evento": "Copom racha 5 a 4 por linha de indicação",
+    "rotulo_posterior": "media",
+    "reuniao": "R3/2024",
+    "pesquisa_em": "2024-05-07",
+    "selic_antes": 10.75,
+    "selic_depois": 10.5,
+    "focus_mediana": 10.5,
+    "surpresa_pb": 0,
+    "focus_desvio_pb": 12,
+    "ibov_z0": -1.078,
+    "pre2_d01_pb": 3.67
+   },
+   {
+    "data": "2024-12-12",
+    "evento": "Copom sobe a Selic em 1 p.p. e sinaliza mais 2 p.p.",
+    "rotulo_posterior": "alta",
+    "reuniao": "R8/2024",
+    "pesquisa_em": "2024-12-10",
+    "selic_antes": 11.25,
+    "selic_depois": 12.25,
+    "focus_mediana": 12.0,
+    "surpresa_pb": 25,
+    "focus_desvio_pb": 13,
+    "ibov_z0": -3.716,
+    "pre2_d01_pb": 28.071
+   },
+   {
+    "data": "2026-03-19",
+    "evento": "Copom inicia cortes: Selic de 15% para 14,75%",
+    "rotulo_posterior": "baixa",
+    "reuniao": "R2/2026",
+    "pesquisa_em": "2026-03-17",
+    "selic_antes": 15.0,
+    "selic_depois": 14.75,
+    "focus_mediana": 14.75,
+    "surpresa_pb": 0,
+    "focus_desvio_pb": 14,
+    "ibov_z0": 0.449,
+    "pre2_d01_pb": 15.287
+   }
+  ]
+ },
+ "alertas": [
+  {
+   "data": "2021-02-22",
+   "evento": "Bolsonaro troca o presidente da Petrobras",
+   "alerta": "Ibovespa medido -5.12% x linha do tempo -4.87%"
+  },
+  {
+   "data": "2022-12-08",
+   "evento": "Senado aprova a PEC da Transição (R$ 145 bi acima do teto)",
+   "alerta": "Ibovespa medido -1.93% x linha do tempo -1.67%"
+  },
+  {
+   "data": "2023-01-02",
+   "evento": "Posse de Lula e primeiras medidas",
+   "alerta": "Ibovespa medido -3.32% x linha do tempo -3.06%"
+  },
+  {
+   "data": "2023-01-09",
+   "evento": "Ataques de 8 de janeiro em Brasília",
+   "alerta": "Ibovespa medido +0.36% x linha do tempo +0.15%"
+  }
+ ],
+ "eleicoes_surpresa_ex_ante": [
+  {
+   "rodada": "2018-1",
+   "turno": "1º turno de 2018",
+   "a": "Jair Bolsonaro",
+   "b": "Fernando Haddad",
+   "margem_tse_pp": 16.75,
+   "margem_pesquisas_media_pp": 13.55,
+   "margem_pesquisas_mediana_pp": 14.8,
+   "margem_pesquisas_min_max_pp": [
+    6.0,
+    28.0
+   ],
+   "n_pesquisas": 11,
+   "institutos": [
+    "Datafolha",
+    "Ibope",
+    "MDA (Pesquisa CNT/MDA, rodada 140)",
+    "Ipespe (XP/Ipespe)",
+    "Real Time Big Data",
+    "DataPoder360 (PoderData)",
+    "Paraná Pesquisas",
+    "Vox Populi (Vox/Brasil 247)",
+    "Amostra Instituto de Pesquisa",
+    "FSB Pesquisa (rodada FS6)",
+    "Instituto Veritá"
+   ],
+   "surpresa_pp": 3.2,
+   "surpresa_pela_mediana_pp": 1.95,
+   "erro_padrao_entre_institutos_pp": 1.81,
+   "erro_a_pp": 5.97,
+   "erro_b_pp": 2.77,
+   "pesquisas_que_erraram_o_vencedor": 0,
+   "surpresa_mensuravel": true,
+   "sensibilidade_janela": {
+    "7_dias": {
+     "media": 3.2,
+     "mediana": 1.95,
+     "n": 11
+    },
+    "5_dias": {
+     "media": 2.64,
+     "mediana": 1.85,
+     "n": 10
+    },
+    "3_dias": {
+     "media": 2.07,
+     "mediana": 1.75,
+     "n": 9
+    },
+    "sinal_estavel": true
+   },
+   "ibov_d0": 0.0456985981876048,
+   "ibov_z0": 3.978423173863622,
+   "ptax_d0": -0.028708752164138596,
+   "pre5_d0_pb": -31.382694938440636
+  },
+  {
+   "rodada": "2018-2",
+   "turno": "2º turno de 2018",
+   "a": "Jair Bolsonaro",
+   "b": "Fernando Haddad",
+   "margem_tse_pp": 10.26,
+   "margem_pesquisas_media_pp": 12.35,
+   "margem_pesquisas_mediana_pp": 11.8,
+   "margem_pesquisas_min_max_pp": [
+    0.0,
+    21.2
+   ],
+   "n_pesquisas": 8,
+   "institutos": [
+    "Datafolha",
+    "Ibope",
+    "MDA (CNT/MDA, 142ª rodada)",
+    "RealTime Big Data",
+    "Vox Populi",
+    "Paraná Pesquisas",
+    "Ipespe (XP/Ipespe)",
+    "FSB Pesquisa (BTG Pactual/FSB, rodada FS8)"
+   ],
+   "surpresa_pp": -2.09,
+   "surpresa_pela_mediana_pp": -1.54,
+   "erro_padrao_entre_institutos_pp": 2.44,
+   "erro_a_pp": -1.04,
+   "erro_b_pp": 1.04,
+   "pesquisas_que_erraram_o_vencedor": 0,
+   "surpresa_mensuravel": false,
+   "sensibilidade_janela": {
+    "7_dias": {
+     "media": -2.09,
+     "mediana": -1.54,
+     "n": 8
+    },
+    "5_dias": {
+     "media": -1.0,
+     "mediana": 0.26,
+     "n": 7
+    },
+    "3_dias": {
+     "media": -0.21,
+     "mediana": 0.26,
+     "n": 6
+    },
+    "sinal_estavel": false
+   },
+   "ibov_d0": -0.02243350443303782,
+   "ibov_z0": -1.84312878660925,
+   "ptax_d0": -0.010475335346774362,
+   "pre5_d0_pb": -44.82250341997265
+  },
+  {
+   "rodada": "2022-1",
+   "turno": "1º turno de 2022",
+   "a": "Jair Bolsonaro",
+   "b": "Luiz Inácio Lula da Silva",
+   "margem_tse_pp": -5.23,
+   "margem_pesquisas_media_pp": -7.2,
+   "margem_pesquisas_mediana_pp": -10.0,
+   "margem_pesquisas_min_max_pp": [
+    -14.0,
+    16.27
+   ],
+   "n_pesquisas": 13,
+   "institutos": [
+    "Datafolha",
+    "Ipec",
+    "Quaest (Genial/Quaest)",
+    "Ipespe",
+    "AtlasIntel",
+    "MDA",
+    "Paraná Pesquisas",
+    "Instituto Veritá",
+    "Brasmarket",
+    "Futura (Modalmais/Futura)",
+    "Ideia",
+    "PoderData",
+    "FSB"
+   ],
+   "surpresa_pp": 1.97,
+   "surpresa_pela_mediana_pp": 4.77,
+   "erro_padrao_entre_institutos_pp": 2.36,
+   "erro_a_pp": 3.43,
+   "erro_b_pp": 1.46,
+   "pesquisas_que_erraram_o_vencedor": 2,
+   "surpresa_mensuravel": true,
+   "sensibilidade_janela": {
+    "7_dias": {
+     "media": 1.97,
+     "mediana": 4.77,
+     "n": 13
+    },
+    "5_dias": {
+     "media": 1.66,
+     "mediana": 4.37,
+     "n": 12
+    },
+    "3_dias": {
+     "media": 4.12,
+     "mediana": 4.87,
+     "n": 8
+    },
+    "sinal_estavel": true
+   },
+   "ibov_d0": 0.05540863527722495,
+   "ibov_z0": 4.820606260493022,
+   "ptax_d0": -0.038175563200532725,
+   "pre5_d0_pb": -38.71614227086191
+  },
+  {
+   "rodada": "2022-2",
+   "turno": "2º turno de 2022",
+   "a": "Jair Bolsonaro",
+   "b": "Luiz Inácio Lula da Silva",
+   "margem_tse_pp": -1.8,
+   "margem_pesquisas_media_pp": -2.1,
+   "margem_pesquisas_mediana_pp": -3.1,
+   "margem_pesquisas_min_max_pp": [
+    -8.0,
+    6.0
+   ],
+   "n_pesquisas": 12,
+   "institutos": [
+    "Datafolha",
+    "Quaest (Genial/Quaest)",
+    "Ipec",
+    "AtlasIntel",
+    "MDA",
+    "Paraná Pesquisas",
+    "Instituto Veritá",
+    "Brasmarket",
+    "Futura (Modalmais/Futura)",
+    "Gerp",
+    "PoderData",
+    "Ipespe (Abrapel/Ipespe)"
+   ],
+   "surpresa_pp": 0.3,
+   "surpresa_pela_mediana_pp": 1.3,
+   "erro_padrao_entre_institutos_pp": 1.3,
+   "erro_a_pp": 0.15,
+   "erro_b_pp": -0.15,
+   "pesquisas_que_erraram_o_vencedor": 4,
+   "surpresa_mensuravel": false,
+   "sensibilidade_janela": {
+    "7_dias": {
+     "media": 0.3,
+     "mediana": 1.3,
+     "n": 12
+    },
+    "5_dias": {
+     "media": -0.05,
+     "mediana": 0.4,
+     "n": 11
+    },
+    "3_dias": {
+     "media": 0.43,
+     "mediana": 1.3,
+     "n": 8
+    },
+    "sinal_estavel": false
+   },
+   "ibov_d0": 0.013078514741703628,
+   "ibov_z0": 1.1429356889642963,
+   "ptax_d0": -0.016537583716840665,
+   "pre5_d0_pb": 1.0492476060193212
+  },
+  {
+   "rodada": "2026-1",
+   "turno": "1º turno de 2026",
+   "a": "Flávio Bolsonaro",
+   "b": "Luiz Inácio Lula da Silva",
+   "margem_tse_pp": 1.87,
+   "margem_pesquisas_media_pp": -1.62,
+   "margem_pesquisas_mediana_pp": -2.09,
+   "margem_pesquisas_min_max_pp": [
+    -5.88,
+    4.0
+   ],
+   "n_pesquisas": 16,
+   "institutos": [
+    "Datafolha",
+    "Quaest",
+    "Gerp (Gerp Mercadologia)",
+    "Futura Inteligência",
+    "PoderData",
+    "MDA Pesquisa (CNT/MDA, 171ª rodada)",
+    "AtlasIntel",
+    "Palver",
+    "Veritá",
+    "Vox Brasil",
+    "Instituto França (IFP)",
+    "DataTrends",
+    "Real Time Big Data",
+    "Indexa",
+    "Ideia (Meio/Ideia)",
+    "Nexus (BTG/Nexus, 16ª rodada)"
+   ],
+   "surpresa_pp": 3.49,
+   "surpresa_pela_mediana_pp": 3.96,
+   "erro_padrao_entre_institutos_pp": 0.78,
+   "erro_a_pp": 3.97,
+   "erro_b_pp": 0.47,
+   "pesquisas_que_erraram_o_vencedor": 11,
+   "surpresa_mensuravel": true,
+   "sensibilidade_janela": {
+    "7_dias": {
+     "media": 3.49,
+     "mediana": 3.96,
+     "n": 16
+    },
+    "5_dias": {
+     "media": 3.3,
+     "mediana": 3.96,
+     "n": 14
+    },
+    "3_dias": {
+     "media": 2.5,
+     "mediana": 2.87,
+     "n": 11
+    },
+    "sinal_estavel": true
+   },
+   "ibov_d0": 0.07702157561876999,
+   "ibov_z0": 8.923511676081596,
+   "ptax_d0": -0.045541559784065155,
+   "pre5_d0_pb": -119.93424657534231
+  }
+ ],
+ "copom_completo": {
+  "leia_assim": "Surpresa contra a mediana (ou a média) do Focus, que não é o preço de mercado. A janela dos juros vai da manhã do dia da decisão à manhã seguinte e inclui o pregão inteiro antes do anúncio. Compare as versões: o sinal da inclinação depende de mar/2020 (pânico da COVID).",
+  "reunioes": 86,
+  "mercado_dividido": 12,
+  "reuniao_que_mais_pesa": "R2/2020 (2020-03-18)",
+  "versoes": {
+   "todas": {
+    "n": 86,
+    "com_surpresa": 11,
+    "sem_surpresa": 75,
+    "inclinacao_pb_por_pb": 0.26,
+    "ic95": [
+     -0.181,
+     0.692
+    ],
+    "juros2a_mediana_abs_com_pb": 18.3,
+    "juros2a_mediana_abs_sem_pb": 8.6,
+    "p_juros_com_x_sem": "0.0043",
+    "na_direcao_da_surpresa": "7 de 11",
+    "spearman_surpresa_x_ibov": -0.284
+   },
+   "sem_a_que_mais_pesa": {
+    "n": 85,
+    "com_surpresa": 10,
+    "sem_surpresa": 75,
+    "inclinacao_pb_por_pb": 0.346,
+    "ic95": [
+     0.014,
+     0.821
+    ],
+    "juros2a_mediana_abs_com_pb": 13.4,
+    "juros2a_mediana_abs_sem_pb": 8.6,
+    "p_juros_com_x_sem": "0.0368",
+    "na_direcao_da_surpresa": "7 de 10",
+    "spearman_surpresa_x_ibov": -0.249
+   },
+   "so_focus_fresco_desde_mar2021": {
+    "n": 44,
+    "com_surpresa": 4,
+    "sem_surpresa": 40,
+    "inclinacao_pb_por_pb": -0.029,
+    "ic95": [
+     -0.838,
+     0.76
+    ],
+    "juros2a_mediana_abs_com_pb": 11.8,
+    "juros2a_mediana_abs_sem_pb": 9.3,
+    "p_juros_com_x_sem": "0.4048",
+    "na_direcao_da_surpresa": "1 de 4",
+    "spearman_surpresa_x_ibov": -0.219
+   },
+   "surpresa_continua_pela_media": {
+    "n": 86,
+    "com_surpresa": 11,
+    "sem_surpresa": 75,
+    "inclinacao_pb_por_pb": 0.103,
+    "ic95": [
+     -0.976,
+     0.787
+    ],
+    "juros2a_mediana_abs_com_pb": 18.3,
+    "juros2a_mediana_abs_sem_pb": 8.6,
+    "p_juros_com_x_sem": "0.0043",
+    "na_direcao_da_surpresa": "7 de 11",
+    "spearman_surpresa_x_ibov": -0.18
+   }
+  }
+ }
+}

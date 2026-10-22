@@ -1,0 +1,7 @@
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+dados/coleta/
+dados/*.log
+dados/series/brutos/

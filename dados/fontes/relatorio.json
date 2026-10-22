@@ -1,0 +1,42 @@
+{
+ "fontes": 342,
+ "por_acesso": {
+  "eu_busco": 135,
+  "misto": 137,
+  "api_gratis": 42,
+  "voce_me_passa": 28
+ },
+ "por_pasta": {
+  "1 Pessoas": 111,
+  "2 Imprensa": 56,
+  "3 Programas e podcasts": 35,
+  "4 Dados e ferramentas": 46,
+  "5 Política e eleições": 39,
+  "6 Mercados de previsão": 16,
+  "7 Ciência e regras": 39
+ },
+ "eventos": 50,
+ "duplicatas_fundidas": [
+  "Christopher Garman (pessoas_global) fundido em Christopher Garman (pessoas_br_politica)",
+  "Brazil Journal (pessoas_br_politica) fundido em Brazil Journal (imprensa_br)",
+  "Lauro Jardim (pessoas_br_politica) fundido em Lauro Jardim (imprensa_br)",
+  "Revista Oeste (pessoas_br_politica) fundido em Revista Oeste (imprensa_br)",
+  "Nick Timiraos (imprensa_global) fundido em Nick Timiraos (pessoas_global)",
+  "Robin Brooks (imprensa_global) fundido em Robin Brooks (pessoas_global)",
+  "Brian Winter (imprensa_global) fundido em Brian Winter (pessoas_global)",
+  "The Brazilian Report (imprensa_global) fundido em The Brazilian Report (imprensa_br)",
+  "Bloomberg Línea (imprensa_global) fundido em Bloomberg Línea (imprensa_br)",
+  "Os Pingos nos Is (pessoas_br_politica) fundido em Os Pingos nos Is (programas)",
+  "Odd Lots (pessoas_global) fundido em Odd Lots (programas)",
+  "Bloomberg Terminal (dados) fundido em Bloomberg Terminal (imprensa_global)",
+  "TSE — Dados Abertos (politica) fundido em TSE — Dados Abertos (dados)",
+  "Câmara dos Deputados — Dados Abertos (politica) fundido em Câmara dos Deputados — Dados Abertos (dados)",
+  "Relatório Bimestral de Receitas e Despesas (politica) fundido em Relatório Bimestral de Receitas e Despesas (programas)",
+  "Polymarket (mercados_previsao) fundido em Polymarket (dados)"
+ ],
+ "escritos": 404,
+ "removidos_obsoletos": [],
+ "mantidos_com_contexto": [],
+ "entradas_ausentes (limpeza pulada)": [],
+ "pulados_manuais": []
+}

@@ -1,0 +1,8 @@
+data,evento,rotulo_posterior,reuniao,pesquisa_em,selic_antes,selic_depois,focus_mediana,surpresa_pb,focus_desvio_pb,ibov_z0,pre2_d01_pb
+2017-01-12,"Copom acelera e corta a Selic em 0,75 p.p.",media,R1/2017,2017-01-10,13.75,13.0,13.25,-25,8,1.7345836655481375,-33.90082079343362
+2018-05-17,"Copom interrompe cortes e mantém a Selic em 6,50%",alta,R3/2018,2018-05-15,6.5,6.5,6.25,25,6,-3.842213068267091,35.12021857923493
+2021-03-18,"Copom sobe a Selic em 0,75 p.p. e inicia o aperto",media,R2/2021,2021-03-16,2.0,2.75,2.5,25,16,-0.7895223322696742,9.189213893967096
+2023-08-03,"Copom inicia os cortes com 0,50 p.p. em placar 5 a 4",baixa,R5/2023,2023-08-01,13.75,13.25,13.5,-25,12,-0.19849423745601652,-11.73150684931521
+2024-05-09,Copom racha 5 a 4 por linha de indicação,media,R3/2024,2024-05-07,10.75,10.5,10.5,0,12,-1.0781209818545683,3.66986301369856
+2024-12-12,Copom sobe a Selic em 1 p.p. e sinaliza mais 2 p.p.,alta,R8/2024,2024-12-10,11.25,12.25,12.0,25,13,-3.7158519118328246,28.071232876712138
+2026-03-19,"Copom inicia cortes: Selic de 15% para 14,75%",baixa,R2/2026,2026-03-17,15.0,14.75,14.75,0,14,0.4490763719524557,15.286885245901694
