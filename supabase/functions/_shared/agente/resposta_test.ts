@@ -33,8 +33,8 @@ Deno.test('calendário: depois do 2º turno e do Copom, as datas somem sozinhas'
   const datas = (dia: string) => montar(q, undefined, dia).texto
   assertEquals(datas('2026-10-22').includes('2º turno da eleição presidencial em 25/10'), true)
   assertEquals(datas('2026-10-26').includes('2º turno da eleição presidencial em 25/10'), false)
-  assertEquals(datas('2026-10-26').includes('decisão do Copom em 04/11'), true)
-  assertEquals(datas('2026-11-05').includes('decisão do Copom em 04/11'), false)
-  assertEquals(datas('2026-11-05').includes('decisão do Copom em 09/12'), true)
+  assertEquals(datas('2026-10-26').includes('decisão do Copom (o comitê do Banco Central que define a Selic) em 04/11'), true)
+  assertEquals(datas('2026-11-05').includes('decisão do Copom (o comitê do Banco Central que define a Selic) em 04/11'), false)
+  assertEquals(datas('2026-11-05').includes('decisão do Copom (o comitê do Banco Central que define a Selic) em 09/12'), true)
   assertEquals(datas('2028-01-01').includes('Datas marcadas no calendário oficial'), false)
 })

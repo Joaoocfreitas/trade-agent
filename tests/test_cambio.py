@@ -269,3 +269,9 @@ def test_euro_no_copom_diz_que_o_estudo_mede_o_dolar():
 def test_o_real_sem_verbo_de_valorizar_e_cambio():
     assert 'dolar' in analisar('como o real reagiu à eleição?').mercados
     assert 'dolar' in analisar('como o real reage ao copom?').mercados
+
+
+def test_cumprimento_e_o_real_adjetivo_nao_viram_recusa_nem_cambio():
+    assert analisar('e aí?').proibidos == [] and analisar('E aí, tudo bem?').proibidos == []
+    assert 'dica' in analisar('tenho 60 mil euros e o Copom é dia 4, e aí?').proibidos
+    assert 'dolar' not in analisar('o real problema está na inflação').mercados

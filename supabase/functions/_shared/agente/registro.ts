@@ -9,6 +9,8 @@
 // desse \w e o re.I também casa İ e ı com i; no JavaScript, \w e \b são ASCII, \s é outro conjunto e a flag i não casa
 // İ nem ı (e, com u, faz o \p{L} casar o U+0345). Por isso os padrões abaixo são cópias literais do Python, e py() os
 // traduz para o que o re do Python faria.
+// O roteador só importa texto.ts: daqui para lá não há ciclo.
+import { cambio, normalizar } from './roteador.ts'
 import { type Pedido, simples } from './texto.ts'
 
 const r = String.raw
@@ -102,8 +104,12 @@ function semVoto(texto: string): [string, boolean] {
 }
 
 export function semDadoPessoal(texto: string): string {
+  // Se o roteador acha dinheiro em moeda estrangeira ou gasto por mês, todo número solto sai, em qualquer formato
+  // ("EUR 80.000", "80.000€", "20 mil USD"): o registro nunca guarda o que entra na conta de câmbio.
+  const [valor, , gasto] = cambio(normalizar(texto))
   texto = semVoto(texto)[0]
   texto = texto.replace(VALOR, '[valor omitido]')
+  if (valor !== null || gasto !== null) return texto.replace(NUMERO_SOLTO, '[valor omitido]')
   const partes = texto.split(ORACOES)
   for (let i = 0; i < partes.length; i += 2) {
     if (DINHEIRO.test(partes[i])) partes[i] = partes[i].replace(NUMERO_SOLTO, '[valor omitido]')
