@@ -5,7 +5,7 @@
 // soma à das palavras-chave. Na dúvida, mais recusa, nunca menos (ataque de 22/10/2026, ver o README do projeto).
 import Anthropic from 'npm:@anthropic-ai/sdk@0.132.1'
 import { BASE, montar } from './resposta.ts'
-import { iaSemVoto, leituraSemVoto, semDadoPessoal } from './registro.ts'
+import { iaSemVoto, leituraSemVoto, semDadoPessoal, violacoesSemDinheiro } from './registro.ts'
 import { CANDIDATOS, MERCADOS, PROIBIDOS, TEMAS, analisar, somar } from './roteador.ts'
 import type { Pedido, Violacao } from './texto.ts'
 
@@ -40,6 +40,8 @@ export type Saida = {
   violacoes: Violacao[]
   ia: Ia | null
   uso: Record<string, unknown>
+  /** A resposta tem a conta de câmbio com o dinheiro da pessoa: quem grava não guarda o texto. */
+  conta_cambio: boolean
 }
 
 /** O cliente da API, se houver chave; prazo curto e uma repetição só, porque classificar leva poucos segundos. */
@@ -91,6 +93,11 @@ export async function entender(pergunta: string, cliente: Anthropic): Promise<{ 
     voto_informado: o.voto_informado === true,
     pontos: null,
     contratos: 1,
+    // a IA só classifica: o dinheiro da conta de câmbio vem só das palavras (somar fica com a 1ª leitura)
+    valor_moeda: null,
+    moeda: null,
+    gasto_mensal: null,
+    gasto_moeda: null,
   }
   return { leitura, uso, erro: null }
 }
@@ -124,8 +131,9 @@ export async function responderPergunta(pergunta: string, cliente: Anthropic | n
     texto_curto: resposta.texto_curto,
     modo,
     roteador: leituraSemVoto(resposta.pedido, pergunta),
-    violacoes: resposta.violacoes,
+    violacoes: violacoesSemDinheiro(resposta.violacoes, resposta.pedido),
     ia: iaSemVoto(ia, resposta.pedido, pergunta) as Ia | null,
     uso,
+    conta_cambio: resposta.pedido.valor_moeda !== null && ['euro', 'dolar'].includes(resposta.pedido.moeda ?? ''),
   }
 }

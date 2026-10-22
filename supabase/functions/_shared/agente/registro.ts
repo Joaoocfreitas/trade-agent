@@ -9,6 +9,8 @@
 // desse \w e o re.I também casa İ e ı com i; no JavaScript, \w e \b são ASCII, \s é outro conjunto e a flag i não casa
 // İ nem ı (e, com u, faz o \p{L} casar o U+0345). Por isso os padrões abaixo são cópias literais do Python, e py() os
 // traduz para o que o re do Python faria.
+// O roteador só importa texto.ts: daqui para lá não há ciclo.
+import { cambio, normalizar } from './roteador.ts'
 import { type Pedido, simples } from './texto.ts'
 
 const r = String.raw
@@ -102,8 +104,12 @@ function semVoto(texto: string): [string, boolean] {
 }
 
 export function semDadoPessoal(texto: string): string {
+  // Se o roteador acha dinheiro em moeda estrangeira ou gasto por mês, todo número solto sai, em qualquer formato
+  // ("EUR 80.000", "80.000€", "20 mil USD"): o registro nunca guarda o que entra na conta de câmbio.
+  const [valor, , gasto] = cambio(normalizar(texto))
   texto = semVoto(texto)[0]
   texto = texto.replace(VALOR, '[valor omitido]')
+  if (valor !== null || gasto !== null) return texto.replace(NUMERO_SOLTO, '[valor omitido]')
   const partes = texto.split(ORACOES)
   for (let i = 0; i < partes.length; i += 2) {
     if (DINHEIRO.test(partes[i])) partes[i] = partes[i].replace(NUMERO_SOLTO, '[valor omitido]')
@@ -122,6 +128,13 @@ export type LeituraSemVoto = { mercados: string[]; candidatos: string[]; temas: 
 export type IaRegistrada = { leitura?: Record<string, unknown> | null; [chave: string]: unknown }
 
 /** O que o roteador leu, sem o candidato quando a pessoa contou o voto (senão dá para reconstruir o voto). */
+/** registro.violacoes_sem_dinheiro do Python: com a conta de câmbio, o trecho de uma violação pode trazer o valor
+ * calculado a partir do dinheiro da pessoa ("R$ 847.410"); os dígitos saem. */
+export function violacoesSemDinheiro<V extends { trecho: string }>(violacoes: V[], p: Pedido): V[] {
+  const conta = p.valor_moeda !== null && (p.moeda === 'euro' || p.moeda === 'dolar')
+  return violacoes.map((v) => conta ? { ...v, trecho: v.trecho.replace(/\d/g, '#') } : v)
+}
+
 export function leituraSemVoto(p: PedidoLido, pergunta: string): LeituraSemVoto {
   const voto = p.voto_informado || falouDeVoto(pergunta)
   return { mercados: p.mercados, candidatos: voto ? [] : p.candidatos, temas: p.temas, proibidos: p.proibidos }

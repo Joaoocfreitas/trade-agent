@@ -17,7 +17,10 @@ function ehListaDeTextos(x: unknown): x is string[] {
 function ehEsperado(x: unknown): x is Esperado {
   return ehObjeto(x) && ehListaDeTextos(x.mercados) && ehListaDeTextos(x.candidatos) && ehListaDeTextos(x.temas) &&
     ehListaDeTextos(x.proibidos) && typeof x.voto_informado === 'boolean' &&
-    (x.pontos === null || typeof x.pontos === 'number') && typeof x.contratos === 'number'
+    (x.pontos === null || typeof x.pontos === 'number') && typeof x.contratos === 'number' &&
+    (x.valor_moeda === null || typeof x.valor_moeda === 'number') && (x.moeda === null || typeof x.moeda === 'string') &&
+    (x.gasto_mensal === null || typeof x.gasto_mensal === 'number') &&
+    (x.gasto_moeda === null || typeof x.gasto_moeda === 'string')
 }
 
 async function casos(): Promise<Caso[]> {
@@ -34,6 +37,7 @@ function semPergunta(p: Pedido): Esperado {
   return {
     mercados: p.mercados, candidatos: p.candidatos, temas: p.temas, proibidos: p.proibidos,
     voto_informado: p.voto_informado, pontos: p.pontos, contratos: p.contratos,
+    valor_moeda: p.valor_moeda, moeda: p.moeda, gasto_mensal: p.gasto_mensal, gasto_moeda: p.gasto_moeda,
   }
 }
 
@@ -66,7 +70,10 @@ Deno.test('normalizar: emoji, acento e abreviação', () => {
 Deno.test('o "." do Python casa \\r e o \\s inclui \\x1c-\\x1f', () => {
   igual(semPergunta(analisar('melhor\rx ou y')).proibidos, ['comparar'], '\\r no meio do .{0,40}')
   igual(semPergunta(analisar('mini indice 1.000\x1cpontos 2 contratos')),
-    { mercados: ['mini_indice', 'ibovespa'], candidatos: [], temas: [], proibidos: [], voto_informado: false, pontos: 1000, contratos: 2 },
+    {
+      mercados: ['mini_indice', 'ibovespa'], candidatos: [], temas: [], proibidos: [], voto_informado: false, pontos: 1000, contratos: 2,
+      valor_moeda: null, moeda: null, gasto_mensal: null, gasto_moeda: null,
+    },
     '\\x1c antes de pontos')
   igual(semPergunta(analisar('a\x1fb\x1cc\x1dd\x1ee sobe')).proibidos, [], 'split() do Python conta \\x1c-\\x1f como espaço')
 })
@@ -85,13 +92,14 @@ Deno.test('somar, ehEleicao, temConta e resumo', () => {
   const palavras = analisar('Eu voto no Lula. E o dólar?')
   const ia: Pedido = {
     pergunta: 'outra', mercados: ['ibovespa', 'dolar'], candidatos: ['flavio'], temas: ['copom'], proibidos: ['dica', 'direcao'],
-    voto_informado: false, pontos: 20, contratos: 3,
+    voto_informado: false, pontos: 20, contratos: 3, valor_moeda: 9, moeda: 'euro', gasto_mensal: 1, gasto_moeda: 'real',
   }
   const soma = somar(palavras, ia)
   igual(soma, {
     pergunta: 'Eu voto no Lula. E o dólar?', mercados: ['dolar', 'ibovespa'], candidatos: ['lula', 'flavio'],
     temas: ['eleicao', 'copom'], proibidos: ['dica', 'direcao'], voto_informado: true, pontos: 20, contratos: 1,
-  }, 'somar')
+    valor_moeda: null, moeda: null, gasto_mensal: null, gasto_moeda: null,
+  }, 'somar: o dinheiro do câmbio vem só da 1ª leitura, como no Python')
   igual(resumo(soma), 'mercados: dolar, ibovespa; candidatos: lula, flavio; temas: eleicao, copom; ' +
     'pedidos que pedem recusa: dica, direcao; a pessoa contou o próprio voto (não usar)', 'resumo')
   igual(resumo(analisar('oi')), 'mercados: nenhum; candidatos: nenhum; temas: nenhum; pedidos que pedem recusa: nenhum', 'resumo vazio')

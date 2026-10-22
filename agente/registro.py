@@ -12,7 +12,7 @@ from pathlib import Path
 
 from coletor.config import FUSO
 from .fatos import AGENTE
-from .roteador import simples
+from .roteador import cambio, normalizar, simples
 
 # TRADE_AGENTE_REGISTRO aponta outro arquivo (testes e ataques não sujam o registro de verdade).
 ARQUIVO = Path(os.environ.get('TRADE_AGENTE_REGISTRO') or AGENTE / 'conversas.jsonl')
@@ -49,8 +49,13 @@ def _sem_voto(texto: str) -> tuple[str, bool]:
 
 
 def sem_dado_pessoal(texto: str) -> str:
+    # Se o roteador acha dinheiro em moeda estrangeira ou gasto por mês, todo número solto sai, em qualquer formato
+    # ("EUR 80.000", "80.000€", "20 mil USD"): o registro nunca guarda o que entra na conta de câmbio.
+    valor, _, gasto, _ = cambio(normalizar(texto))
     texto, _ = _sem_voto(texto)
     texto = VALOR.sub('[valor omitido]', texto)
+    if valor is not None or gasto is not None:
+        return NUMERO_SOLTO.sub('[valor omitido]', texto)
     partes = ORACOES.split(texto)
     for i in range(0, len(partes), 2):
         if DINHEIRO.search(partes[i]):
@@ -78,6 +83,13 @@ def ia_sem_voto(ia: dict | None, p, pergunta: str) -> dict | None:
     return {**ia, 'leitura': leitura}
 
 
+def violacoes_sem_dinheiro(violacoes, p) -> list[dict]:
+    """Com a conta de câmbio, o trecho de uma violação pode trazer o valor calculado a partir do dinheiro da pessoa
+    ("R$ 847.410"): os dígitos saem."""
+    conta = getattr(p, 'conta_cambio', False)
+    return [{**asdict(v), 'trecho': re.sub(r'\d', '#', v.trecho) if conta else v.trecho} for v in violacoes]
+
+
 def registrar(resposta, ia: dict | None = None, uso: dict | None = None, arquivo=ARQUIVO) -> dict:
     p = resposta.pedido
     linha = {
@@ -85,8 +97,9 @@ def registrar(resposta, ia: dict | None = None, uso: dict | None = None, arquivo
         'modo': resposta.modo,
         'pergunta': sem_dado_pessoal(resposta.pergunta),
         'roteador': leitura_sem_voto(p, resposta.pergunta),
-        'resposta': resposta.texto,
-        'violacoes_na_resposta': [asdict(v) for v in resposta.violacoes],
+        # A conta de câmbio leva o dinheiro da pessoa ("Seus 150.000 euros valem..."): essa resposta não fica guardada.
+        'resposta': None if p.conta_cambio else resposta.texto,
+        'violacoes_na_resposta': violacoes_sem_dinheiro(resposta.violacoes, p),
         'ia': ia_sem_voto(ia, p, resposta.pergunta),
         'uso': uso or {},
     }

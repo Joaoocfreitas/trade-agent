@@ -11,6 +11,8 @@ import re
 import unicodedata
 from dataclasses import dataclass, field
 
+# Símbolo de moeda que o simples() apagaria: vira palavra antes ("€150.000" → "euros 150.000").
+SIMBOLOS = {'€': ' euros '}
 EMOJI = {'📈': ' sobe ', '📉': ' cai ', '🚀': ' dispara ', '🔥': ' dispara ', '💰': ' lucro ', '🤑': ' lucro ',
          '⬆️': ' sobe ', '⬇️': ' cai ', '⬆': ' sobe ', '⬇': ' cai '}
 # Abreviações e erros de digitação comuns do público (internetês).
@@ -25,7 +27,9 @@ def simples(s: str) -> str:
 
 
 def normalizar(pergunta: str) -> str:
-    """Emoji vira palavra, sai o acento, e a abreviação vira a palavra inteira."""
+    """Emoji e símbolo de moeda viram palavra, sai o acento, e a abreviação vira a palavra inteira."""
+    for e, palavra in SIMBOLOS.items():
+        pergunta = pergunta.replace(e, palavra)
     for e, palavra in EMOJI.items():
         pergunta = pergunta.replace(e, palavra)
     t = simples(pergunta)
@@ -36,8 +40,17 @@ MERCADOS = {
     'mini_indice': r'\bmini[- ]?indices?\b|\bwin\b|\bwin[fghjkmnquvxz]\d\d\b|\bindice futuro\b',
     'mini_dolar': r'\bmini[- ]?dolar\b|\bwdo\b',
     'ibovespa': r'\bibov\w*|\bbolsa\b|\bacoes\b|\bacao\b|\bbova11\b|\bb3\b|\bbovespa\b|\bstocks?\b|\bindice\b',
-    'dolar': r'\bdolar\b|\bdollar\b|\bcambio\b|\b(brazilian )?real (sobe|cai|valoriza|desvaloriza|go up|go down)\b'
-             r'|\bbrazilian real\b',
+    'dolar': r'\bdolar(es)?\b|\bdollars?\b|\bus\$|\bcambio\b|\b(brazilian )?real (sobe|cai|valoriza|desvaloriza|go up|go down)\b'
+             r'|\bbrazilian real\b'
+             # o real contra as outras moedas, e mandar ou trazer dinheiro de fora: é câmbio
+             r'|\breal\b[^.?!]{0,30}\b(valoriz\w*|desvaloriz\w*|fortalec\w*|enfraquec\w*)|\b(valorizacao|desvalorizacao) do real\b'
+             # o verbo logo depois de "real": "o real problema está..." não é câmbio
+             r'|\b(o|do|no|pro|pelo|com o) real (reag\w*|esta|ta|caiu|cai|subiu|sobe|fic\w*|contra|frente|diante|depois|antes'
+             r'|vai|vem)\b|\breal brasileiro\b'
+             r'|\bmoeda (brasileira|estrangeira)\b|\bremessas?\b|\btransferencias? internaciona\w*|\bconvert\w* (para|pra|em) reais\b'
+             r'|\b(trazer|traz|trago|mandar|mando|enviar|envio|levar|transferir)\b[^.?!]{0,30}\b(pro brasil|para o brasil|pra fora'
+             r'|para fora|do exterior|de fora|para o exterior|pro exterior)\b',
+    'euro': r'\beuros?\b|\beur\b',
     'juros': r'\bjuros\b|\bdi1?\b|\bdi futuro\b|\bselic\b|\brenda fixa\b|\btesouro\b|\bprefixad\w*',
     'cripto': r'\bcripto\w*|\bbitcoin\b|\bbtc\b|\bethereum\b|\bexchanges?\b|\bstablecoins?\b|\bsolana\b',
     'memecoin': r'\bmeme ?coins?\b|\bmemecoins?\b|\$trump\b|\$libra\b|\$melania\b|\btokens?\b|\bmoeda do candidato\b',
@@ -74,7 +87,10 @@ PROIBIDOS = {
             r'|\be agora(\?|\W*$)'
             r'|\bse fosse (voce|eu)\b|\bo que (voce )?faria\b|\brecomenda\w*|\bconselho\w*|\bsugest\w*|\bdica\w*'
             r'|\bfico (comprado|vendido|de fora)\b|\bcomo (eu )?(abordo|opero|ganho)\b|\bestrategia\b|\bposicion\w*'
-            r'|\bexposicao\b|\baplicar\b|\binvestir\b|\bbuy\b|\bsell\b|\bshould i\b|\bwould you\b',
+            r'|\bexposicao\b|\baplicar\b|\binvestir\b|\bbuy\b|\bsell\b|\bshould i\b|\bwould you\b'
+            # mover o dinheiro, na 1ª pessoa ("trago o dinheiro?", "troco?"), menos "como mando dinheiro pra fora?" (P5)
+            r'|(?<!como )(?<!como eu )\b(troco|trago|mando|envio|converto|transfiro|remeto)\b|\bdeixo (la|aqui|parado|onde esta)\b'
+            r'|(?<=.{10})\be ai(\?|\W*$)|\bconviene\b|\b(debo|deberia) (cambiar|traer|mandar|enviar)\b',
     'direcao': r'\bvai (subir|cair|disparar|despencar|bombar|valorizar|explodir|fechar|abrir)\b|\bvao (subir|cair)\b|\bchances?\b'
                r'|\bprobabilidad\w*|\bde 0 a 100\b|\bum numero\b|\btendencia\b|\bpode (subir|cair|disparar)\b'
                r'|\bsobe ou (cai|desce|nao)\b|\balavanc(ar|a)\b|\bpotencial\b|\bprevisao\b|\bprever\b|\bdisparar\b',
@@ -158,7 +174,7 @@ HORA = r'\bagora\b|\bneste momento\b|\bhoje no pregao\b|\bao vivo\b'
 EM_CURSO = r'\b(esta|estao|ta|tao|segue|seguem|continua|continuam)( \w+)? (despencando|disparando|caindo|subindo|derretendo)\b'
 # Sem contrato, "agora" com ordem é pedido de momento ("compro agora?") e com movimento é de direção ("a bolsa está
 # caindo agora"): a recusa continua, com a linha certa, e sem falar de contrato.
-ORDEM = r'\b(entro|compro|vendo|opero|zero)\b'
+ORDEM = r'\b(entro|compro|vendo|opero|zero|troco|trago|mando|envio|converto|transfiro)\b'
 MOVIMENTO = r'\b(despencando|disparando|caindo|subindo|derretendo)\b'
 VOTO_INFORMADO = (r'\b(eu )?vot(o|ei|arei|aria|ando) (\d+|no|na|em)\b|\bsou (\w+ )?(petista|bolsonarista|lulista|de direita|'
                   r'de esquerda|progressista)\b|\bodeio (o |a )?(pt|pl|lula|flavio|bolsonaro|esquerda|direita)\b|\b(o )?mito\b'
@@ -167,6 +183,102 @@ VOTO_INFORMADO = (r'\b(eu )?vot(o|ei|arei|aria|ando) (\d+|no|na|em)\b|\bsou (\w+
 ALOCACAO = (r'\bquanto (eu )?(coloco|ponho|invisto|aplico|boto|devia ter|deveria ter)\b|\bquantos contratos\b|\bquanto investir\b'
             r'|\br\$ ?\d|\b\d+ ?mil\b|\b\d+ ?k\b|\btenho \d')
 CANDIDATO_OU_VITORIA = r'\b(flavio|bolsonaro|lula|vence|vencer|ganha|ganhar|reeleit\w*|favorit\w*|eurasia|frente)\b'
+
+# P4 de câmbio: o dinheiro em moeda estrangeira que a pessoa contou e o gasto por mês, só para a conta (nunca para dizer
+# o que fazer). "150 mil euros", "€150.000", "150k euros", "US$ 20 mil", "20 mil dólares"; "gasto 5 mil reais por mês".
+MOEDA = {'euro': r'euros?|eur', 'dolar': r'dolares|dolar|dollars?|usd|us\$|u\$'}
+# Antes do número, só o símbolo ou o código ("€" vira "euros" no normalizar): "o euro 2 dias depois" não é dinheiro.
+MOEDA_ANTES = r'euros|eur|usd|us\$|u\$'
+_NUM = r'(?<![\d.,])(\d[\d.,]{0,15})'
+_MULT = r'(?: ?(mil|k|milhao|milhoes|mi)\b)?'
+# Depois do número, o que não é quantia de dinheiro: "2 dias", "1o turno", "3%", "5 pontos", "3 vezes".
+_NAO_QUANTIA = r'(?!\s*(%|o turno|a reuniao|dias?\b|anos?\b|mes\b|meses\b|vezes\b|semanas?\b|horas?\b|pontos?\b|turnos?\b))'
+# "R$ 100 mil em euros" é real, não euro: o número logo depois de "r$" nunca é moeda estrangeira.
+VALOR_DEPOIS = re.compile(r'(?<!r\$)(?<!r\$ )' + _NUM + _MULT + r' ?(?:de |em )?(' + '|'.join(MOEDA.values()) + r')(?![\w$])')
+VALOR_ANTES = re.compile(r'(?<![\w$])(' + MOEDA_ANTES + r') ?' + _NUM + _MULT + _NAO_QUANTIA)
+POR_MES = r'(por mes|ao mes|mensais|mensal|todo mes|cada mes|/ ?mes|a month|per month|monthly)\b'
+# O gasto precisa de verbo de gasto antes ("gasto", "pago", "custa", "aluguel"): "rendendo 1% ao mês" e "ganho 10 mil
+# por mês" não são gasto (renda é dado que o agente não usa, N5).
+GASTO_DEPOIS = re.compile(r'\b(gast\w*|pag\w*|cust\w*|despes\w*|aluguel|mensalidade|preciso de|vivo com|uso|tiro|saco|spend\w*|pay\w*)\b'
+                          r'[^.!?\d]{0,25}?(?:r\$ ?)?' + _NUM + _MULT + r'(?!\s*%)(?: ?(reais|' + '|'.join(MOEDA.values())
+                          + r'))?[^.\d!?%]{0,25}?\b' + POR_MES)
+GASTO_ANTES = re.compile(r'\b(mensalidade|gasto mensal|custo mensal|despesa mensal)( (de|e|eh))? (?:r\$ ?)?' + _NUM + _MULT
+                         + r'(?: ?(reais|' + '|'.join(MOEDA.values()) + r'))?')
+# Mover o dinheiro de lugar: quando, se e quanto mover é o que o agente não diz (N1, N4, N5).
+# Sem "traz" (3ª pessoa: "o que a eleição traz para o dólar depois?") e sem "passo" ("passo a passo").
+TROCA = (r'(trago|trazer|troco|trocar|converto|converter|mando|mandar|envio|enviar|transfiro|transferir|remeto|remeter|'
+         r'traer\w*|cambiar|bring|convert|exchange|move)')
+EVENTO = r'(o |a |do |da |de |the )?(segundo turno|2o turno|primeiro turno|turno|eleicao|election|domingo|copom|reuniao|resultado)'
+# Quando mover: "troco hoje?", "trago depois do 2º turno?", "antes ou depois?", "qual o melhor momento pra trocar?".
+MOMENTO_TROCA = (r'\b' + TROCA + r'\b[^.?!]{0,40}\b(agora|ahora|antes|depois|hoje|ja|amanha|now|before|after)\b'
+                 r'|\b(quando|cuando|hoje|agora|ahora|antes|depois)\b[^.?!]{0,20}\b(troco|trocar|trago|trazer|traer\w*|mando|mandar'
+                 r'|envio|enviar|converto|converter|transfiro|transferir|cambiar|cambio a)\b'
+                 r'|\b(antes|depois|before|after) ' + EVENTO + r'\b[^.?!]{0,20}\bou (espero|esperar|depois|antes|nao)\b'
+                 r'|\bantes ou depois\b|\bagora ou (depois|espero|mais tarde)\b|\bou espero\b'
+                 r'|\b(momento|hora|dia|epoca|data)\b[^.?!]{0,20}\b(trocar|trazer|converter|mandar|enviar|transferir|cambiar)\b')
+# Quanto mover, ou que parte: alocação (N5). Aí o valor não entra na conta, e vale a recusa do capital.
+QUANTO_TROCAR = (r'\bquanto (\w+ ){0,4}?(coloco|ponho|invisto|aplico|boto|trago|troco|converto|mando|envio|remeto|mantenho|'
+                 r'deixo|tiro|passo|devia|deveria|trazer|trocar|converter|mandar|enviar|remeter|manter|deixar|tirar|passar)\b'
+                 r'|\bquanto investir\b|\bquantos contratos\b|\b(que|qual|quanto) (parte|porcentagem|percentual|fatia|pedaco)\b'
+                 r'|\bquanto disso\b|\b(' + TROCA[1:-1] + r'|deixo|mantenho)\b[^.?!]{0,25}\b(tudo|metade|um terco|uma parte|parte'
+                 r'|o resto|aos poucos|de uma vez|em (parcelas|etapas)|\d+ ?%|half|all)\b'
+                 r'|\b(tudo|metade|parte) ou (tudo|metade|parte|nada)\b|\bhow much\b|\b(what|which) (part|portion|percentage|share)\b'
+                 r'|\ball or (half|part)\b')
+MULTIPLICA = {'mil': 1e3, 'k': 1e3, 'milhao': 1e6, 'milhoes': 1e6, 'mi': 1e6}
+
+
+def _moeda(rotulo: str | None) -> str | None:
+    if not rotulo:
+        return None
+    if rotulo == 'reais':
+        return 'real'
+    return next(k for k, rx in MOEDA.items() if re.fullmatch(rx, rotulo))
+
+
+def _quantia(numero: str, mult: str | None) -> float | None:
+    """A quantia em qualquer formato que um brasileiro ou um estrangeiro escreve: '150.000' e '150,5' (Brasil), '50,000' e
+    '1.5' (inglês, com até 2 casas depois do ponto), '1,5' + 'milhao' → 1.500.000. Número quebrado ('1,2,3') ou absurdo
+    não vale. A pontuação colada no fim ("4.500," / "150.000.") não é parte do número."""
+    numero = numero.rstrip('.,')
+    if re.fullmatch(r'\d{1,3}(\.\d{3})+(,\d+)?', numero):  # 150.000 / 150.000,50
+        texto = numero.replace('.', '').replace(',', '.')
+    elif re.fullmatch(r'\d{1,3}(,\d{3})+(\.\d+)?', numero):  # 50,000 / 2,000.50
+        texto = numero.replace(',', '')
+    elif re.fullmatch(r'\d+,\d+', numero):  # 1,5
+        texto = numero.replace(',', '.')
+    elif re.fullmatch(r'\d+\.\d{1,2}', numero):  # 1.5 / 1.25
+        texto = numero
+    elif re.fullmatch(r'\d+', numero):
+        texto = numero
+    else:
+        return None
+    v = float(texto) * MULTIPLICA.get(mult or '', 1)
+    return v if 0 < v < 1e10 else None
+
+
+def cambio(t: str) -> tuple[float | None, str | None, float | None, str | None]:
+    """(valor, moeda, gasto por mês, moeda do gasto) do texto já normalizado. O gasto sem moeda é em reais."""
+    gasto = gasto_moeda = None
+    g = GASTO_DEPOIS.search(t)
+    if g:
+        gasto, gasto_moeda = _quantia(g.group(2), g.group(3)), _moeda(g.group(4)) or 'real'
+    else:
+        g = GASTO_ANTES.search(t)
+        if g:
+            gasto, gasto_moeda = _quantia(g.group(4), g.group(5)), _moeda(g.group(6)) or 'real'
+    if gasto is None:
+        g = gasto_moeda = None
+    # O valor é o 1º dinheiro em moeda estrangeira do texto que não seja o próprio gasto ("pago 3 mil dólares por mês").
+    achados = sorted([(m.start(), m.group(1), m.group(2), m.group(3)) for m in VALOR_DEPOIS.finditer(t)]
+                     + [(m.start(), m.group(2), m.group(3), m.group(1)) for m in VALOR_ANTES.finditer(t)])
+    for inicio, numero, mult, rotulo in achados:
+        if g and g.start() <= inicio < g.end():
+            continue
+        valor = _quantia(numero, mult)
+        if valor is not None:
+            return valor, _moeda(rotulo), gasto, gasto_moeda
+    return None, None, gasto, gasto_moeda
+
 
 # Os mercados que o histórico das eleições, do Copom e da linha do tempo mede.
 MEDIDOS = ('ibovespa', 'dolar', 'juros')
@@ -182,6 +294,10 @@ class Pedido:
     voto_informado: bool = False
     pontos: float | None = None
     contratos: int = 1
+    valor_moeda: float | None = None  # P4 de câmbio: só para a conta; o registro nunca guarda (registro.py)
+    moeda: str | None = None
+    gasto_mensal: float | None = None
+    gasto_moeda: str | None = None
 
     @property
     def eleicao(self) -> bool:
@@ -191,13 +307,27 @@ class Pedido:
     def conta(self) -> bool:
         return self.pontos is not None and bool({'mini_indice', 'mini_dolar'} & set(self.mercados))
 
+    @property
+    def conta_cambio(self) -> bool:
+        return self.valor_moeda is not None and self.moeda in ('euro', 'dolar')
+
+    @property
+    def cambio(self) -> bool:
+        """Pergunta de câmbio: fala de euro, ou contou dinheiro em moeda estrangeira."""
+        return 'euro' in self.mercados or self.conta_cambio
+
     def somar(self, outro: 'Pedido') -> 'Pedido':
         """Junta duas leituras da mesma pergunta (a das palavras e a da IA): o que uma achou, vale."""
         junta = lambda a, b: a + [x for x in b if x not in a]  # noqa: E731
+        proibidos = junta(self.proibidos, outro.proibidos)
+        # A IA viu pedido de capital que as palavras não pegaram: vale a leitura dela, e a conta de câmbio sai (senão a
+        # resposta diria "não uso o valor que você tem" e logo depois usaria).
+        cambio_ = (self.valor_moeda, self.moeda, self.gasto_mensal, self.gasto_moeda)
+        if 'capital' in proibidos:
+            cambio_ = (None, None, None, None)
         return Pedido(self.pergunta, junta(self.mercados, outro.mercados), junta(self.candidatos, outro.candidatos),
-                      junta(self.temas, outro.temas), junta(self.proibidos, outro.proibidos),
-                      self.voto_informado or outro.voto_informado,
-                      self.pontos if self.pontos is not None else outro.pontos, self.contratos)
+                      junta(self.temas, outro.temas), proibidos, self.voto_informado or outro.voto_informado,
+                      self.pontos if self.pontos is not None else outro.pontos, self.contratos, *cambio_)
 
     def resumo(self) -> str:
         partes = [f'mercados: {", ".join(self.mercados) or "nenhum"}', f'candidatos: {", ".join(self.candidatos) or "nenhum"}',
@@ -266,4 +396,30 @@ def analisar(pergunta: str) -> Pedido:
                 p.proibidos.remove('direcao')
             if 'dica' in p.proibidos and not re.search(r'\b(compr\w*|vend\w*|devo|vale|compens\w*|entrar|bora)\b', t):
                 p.proibidos.remove('dica')
+    # Quando mover o dinheiro de lugar ("troco hoje?", "trago depois do 2º turno?"): momento (N4) e a recusa padrão.
+    momento_troca = bool(re.search(MOMENTO_TROCA, t))
+    if momento_troca:
+        for codigo in ('momento', 'dica'):
+            if codigo not in p.proibidos:
+                p.proibidos.append(codigo)
+        if 'comparar' in p.proibidos:
+            p.proibidos.remove('comparar')  # "antes ou depois de domingo" não compara classes de ativos
+    quanto = bool(re.search(QUANTO_TROCAR, t))
+    if quanto and 'capital' not in p.proibidos:
+        p.proibidos.append('capital')
+    # Conta neutra de câmbio com o dinheiro que a pessoa contou (P4): o valor em reais, quanto muda a cada R$ 0,10 e
+    # quantos meses de gasto cobre. Não entra quando ela pergunta quanto mover (alocação, N5) nem quando mover (N4): ao
+    # lado da reação nos turnos, o valor dela viraria indicação de momento. Pergunta de contrato (mini-dólar) também não.
+    valor, moeda, gasto, gasto_moeda = cambio(t)
+    contrato_futuro = bool({'mini_indice', 'mini_dolar'} & set(p.mercados) or re.search(CONTRATO, t))
+    if valor is not None and not contrato_futuro:
+        if quanto or momento_troca:
+            if 'capital' not in p.proibidos:
+                p.proibidos.append('capital')  # a pessoa contou o valor e ele não é usado: a linha do capital diz por quê
+        else:
+            p.valor_moeda, p.moeda, p.gasto_mensal, p.gasto_moeda = valor, moeda, gasto, gasto_moeda
+            if moeda not in p.mercados:
+                p.mercados.append(moeda)
+            if 'capital' in p.proibidos:
+                p.proibidos.remove('capital')
     return p

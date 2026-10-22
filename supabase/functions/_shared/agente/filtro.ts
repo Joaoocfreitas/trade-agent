@@ -47,7 +47,7 @@ const AMBAS = new RegExp(
 const INEXISTENTE = /\bnao (existe|ha|tem)\b/
 const ORACAO = /[.!?;:\n]|\b(mas|porem|contudo|entretanto|so que)\b/g
 
-const SUJ = String.raw`(o |a |os |as )?(ibovespa|ibov|bolsa|indice|mini-indice|mini indice|dolar|real|juros|di1?|bitcoin|cripto|` +
+const SUJ = String.raw`(o |a |os |as )?(ibovespa|ibov|bolsa|indice|mini-indice|mini indice|dolar|euro|real|juros|di1?|bitcoin|cripto|` +
   String.raw`token|memecoin|win|wdo|bova11|acoes|mercado)`
 const DIR = String.raw`(sobe|sobem|subira|subiria|subir|suba|cai|caem|caira|cairia|cair|caia|dispara|disparar|despenca|despencar|` +
   String.raw`derrete|derreter|valoriza|valorizar|desvaloriza|desvalorizar|aprecia|apreciar|se apreciar|recua|recuar|cede|` +

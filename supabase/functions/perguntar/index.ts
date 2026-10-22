@@ -103,8 +103,9 @@ Deno.serve(async (req) => {
     .update({
       status: 'respondida',
       pergunta: agente.pergunta,
-      resposta: agente.texto,
-      resposta_curta: agente.texto_curto,
+      // A conta de câmbio leva o dinheiro da pessoa ("Seus 150.000 euros valem..."): essa resposta não fica guardada.
+      resposta: agente.conta_cambio ? null : agente.texto,
+      resposta_curta: agente.conta_cambio ? null : agente.texto_curto,
       modo: agente.modo,
     })
     .eq('id', id)

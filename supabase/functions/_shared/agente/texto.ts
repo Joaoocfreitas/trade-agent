@@ -17,6 +17,12 @@ export type Pedido = {
   voto_informado: boolean
   pontos: number | null
   contratos: number
+  /** P4 de câmbio: o dinheiro em moeda estrangeira que a pessoa contou, só para a conta. O registro nunca guarda
+   * (leituraSemVoto em registro.ts só leva mercados, candidatos, temas e proibidos). */
+  valor_moeda: number | null
+  moeda: string | null
+  gasto_mensal: number | null
+  gasto_moeda: string | null
 }
 
 export type Violacao = { regra: string; trecho: string }

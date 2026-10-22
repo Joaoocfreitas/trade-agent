@@ -21,6 +21,8 @@ const rx = (...partes: string[]): RegExp => new RegExp(partes.join(''))
 const ESPACO = r`[\t\n\v\f\r\x1c-\x1f ]`
 const PALAVRAS = new RegExp(`${ESPACO}+`)
 
+// Símbolo de moeda que o simples() apagaria: vira palavra antes ("€150.000" → "euros 150.000").
+const SIMBOLOS: ReadonlyArray<readonly [string, string]> = [['€', ' euros ']]
 // A ordem importa: o "⬆️" (com o seletor de variação U+FE0F) sai antes do "⬆" sozinho.
 const EMOJI: ReadonlyArray<readonly [string, string]> = [
   ['📈', ' sobe '], ['📉', ' cai '], ['🚀', ' dispara '], ['🔥', ' dispara '], ['💰', ' lucro '], ['🤑', ' lucro '],
@@ -33,8 +35,9 @@ const ABREVIACOES: ReadonlyMap<string, string> = new Map([
   ['subi', 'subir'], ['chace', 'chance'], ['chanse', 'chance'], ['ibov', 'ibovespa'], ['msm', 'mesmo'],
 ])
 
-/** Emoji vira palavra, sai o acento, e a abreviação vira a palavra inteira. */
+/** Emoji e símbolo de moeda viram palavra, sai o acento, e a abreviação vira a palavra inteira. */
 export function normalizar(pergunta: string): string {
+  for (const [e, palavra] of SIMBOLOS) pergunta = pergunta.replaceAll(e, palavra)
   for (const [e, palavra] of EMOJI) pergunta = pergunta.replaceAll(e, palavra)
   const t = simples(pergunta)
   return t.replace(/\b\w+\b/g, (m) => ABREVIACOES.get(m) ?? m)
@@ -45,9 +48,19 @@ export const MERCADOS = {
   mini_dolar: rx(r`\bmini[- ]?dolar\b|\bwdo\b`),
   ibovespa: rx(r`\bibov\w*|\bbolsa\b|\bacoes\b|\bacao\b|\bbova11\b|\bb3\b|\bbovespa\b|\bstocks?\b|\bindice\b`),
   dolar: rx(
-    r`\bdolar\b|\bdollar\b|\bcambio\b|\b(brazilian )?real (sobe|cai|valoriza|desvaloriza|go up|go down)\b`,
+    r`\bdolar(es)?\b|\bdollars?\b|\bus\$|\bcambio\b|\b(brazilian )?real (sobe|cai|valoriza|desvaloriza|go up|go down)\b`,
     r`|\bbrazilian real\b`,
+    // o real contra as outras moedas, e mandar ou trazer dinheiro de fora: é câmbio
+    r`|\breal\b[^.?!]{0,30}\b(valoriz\w*|desvaloriz\w*|fortalec\w*|enfraquec\w*)|\b(valorizacao|desvalorizacao) do real\b`,
+    // o verbo logo depois de "real": "o real problema está..." não é câmbio
+    r`|\b(o|do|no|pro|pelo|com o) real (reag\w*|esta|ta|caiu|cai|subiu|sobe|fic\w*|contra|frente|diante|depois|antes`,
+    r`|vai|vem)\b|\breal brasileiro\b`,
+    r`|\bmoeda (brasileira|estrangeira)\b|\bremessas?\b|\btransferencias? internaciona\w*|\bconvert\w* (para|pra|em) reais\b`,
+    r`|\b(trazer|traz|trago|mandar|mando|enviar|envio|levar|transferir)\b[^.?!]{0,30}\b(pro brasil|para o brasil|pra fora`,
+    r`|para fora|do exterior|de fora|para o exterior|pro exterior)\b`,
   ),
+  // Logo depois do dólar: a ordem das chaves é a ordem de p.mercados, como no dict do Python.
+  euro: rx(r`\beuros?\b|\beur\b`),
   juros: rx(r`\bjuros\b|\bdi1?\b|\bdi futuro\b|\bselic\b|\brenda fixa\b|\btesouro\b|\bprefixad\w*`),
   cripto: rx(r`\bcripto\w*|\bbitcoin\b|\bbtc\b|\bethereum\b|\bexchanges?\b|\bstablecoins?\b|\bsolana\b`),
   memecoin: rx(r`\bmeme ?coins?\b|\bmemecoins?\b|\$trump\b|\$libra\b|\$melania\b|\btokens?\b|\bmoeda do candidato\b`),
@@ -91,6 +104,10 @@ export const PROIBIDOS = {
     r`|\bse fosse (voce|eu)\b|\bo que (voce )?faria\b|\brecomenda\w*|\bconselho\w*|\bsugest\w*|\bdica\w*`,
     r`|\bfico (comprado|vendido|de fora)\b|\bcomo (eu )?(abordo|opero|ganho)\b|\bestrategia\b|\bposicion\w*`,
     r`|\bexposicao\b|\baplicar\b|\binvestir\b|\bbuy\b|\bsell\b|\bshould i\b|\bwould you\b`,
+    // mover o dinheiro, na 1ª pessoa ("trago o dinheiro?", "troco?"), menos "como mando dinheiro pra fora?" (P5)
+    r`|(?<!como )(?<!como eu )\b(troco|trago|mando|envio|converto|transfiro|remeto)\b|\bdeixo (la|aqui|parado|onde esta)\b`,
+    // como no "e agora", o \W* guloso come o \n final que o $ do Python aceitaria
+    r`|(?<=.{10})\be ai(\?|\W*$)|\bconviene\b|\b(debo|deberia) (cambiar|traer|mandar|enviar)\b`,
   ),
   direcao: rx(
     r`\bvai (subir|cair|disparar|despencar|bombar|valorizar|explodir|fechar|abrir)\b|\bvao (subir|cair)\b|\bchances?\b`,
@@ -202,12 +219,12 @@ const SOBRE_JUROS = rx(r`\b(copom|bc|banco central|taxas?|cortes?|reuniao|reunio
 
 // Comentário de pregão (N6): só quando a pergunta cita um contrato (WIN, WDO, DI, mini) e o pregão ("agora", "neste
 // momento") ou o movimento em curso ("está caindo"). Os mercados mini_indice e mini_dolar também contam como contrato.
-const CONTRATO = rx(r`\bwdo[fghjkmnquvxz]\d\d\b|\bdi1?\b|\bdi1[fghjkmnquvxz]\d\d\b|\bdi futuro\b|\bdolar futuro\b`)
+export const CONTRATO = rx(r`\bwdo[fghjkmnquvxz]\d\d\b|\bdi1?\b|\bdi1[fghjkmnquvxz]\d\d\b|\bdi futuro\b|\bdolar futuro\b`)
 const HORA = rx(r`\bagora\b|\bneste momento\b|\bhoje no pregao\b|\bao vivo\b`)
 const EM_CURSO = rx(r`\b(esta|estao|ta|tao|segue|seguem|continua|continuam)( \w+)? (despencando|disparando|caindo|subindo|derretendo)\b`)
 // Sem contrato, "agora" com ordem é pedido de momento ("compro agora?") e com movimento é de direção ("a bolsa está
 // caindo agora"): a recusa continua, com a linha certa, e sem falar de contrato.
-const ORDEM = rx(r`\b(entro|compro|vendo|opero|zero)\b`)
+const ORDEM = rx(r`\b(entro|compro|vendo|opero|zero|troco|trago|mando|envio|converto|transfiro)\b`)
 const MOVIMENTO = rx(r`\b(despencando|disparando|caindo|subindo|derretendo)\b`)
 const VOTO_INFORMADO = rx(
   r`\b(eu )?vot(o|ei|arei|aria|ando) (\d+|no|na|em)\b|\bsou (\w+ )?(petista|bolsonarista|lulista|de direita|`,
@@ -226,6 +243,62 @@ const CONTRATOS = rx(r`(?<![\d.,])(\d{1,6})`, ESPACO, r`*contratos?\b`)
 const DIRECAO_NA_CONTA = rx(r`\b(sobe|cai|vai|chance|probabilidad\w*|tendencia)\b`)
 const DICA_NA_CONTA = rx(r`\b(compr\w*|vend\w*|devo|vale|compens\w*|entrar|bora)\b`)
 
+// P4 de câmbio: o dinheiro em moeda estrangeira que a pessoa contou e o gasto por mês, só para a conta (nunca para dizer
+// o que fazer). "150 mil euros", "€150.000", "150k euros", "US$ 20 mil", "20 mil dólares"; "gasto 5 mil reais por mês".
+const MOEDA: ReadonlyArray<readonly [string, string]> = [['euro', r`euros?|eur`], ['dolar', r`dolares|dolar|dollars?|usd|us\$|u\$`]]
+const ROTULOS = MOEDA.map(([, padrao]) => padrao).join('|')
+const MOEDA_INTEIRA = MOEDA.map(([k, padrao]) => [k, new RegExp(`^(?:${padrao})$`)] as const) // re.fullmatch do Python
+// Antes do número, só o símbolo ou o código ("€" vira "euros" no normalizar): "o euro 2 dias depois" não é dinheiro.
+const MOEDA_ANTES = r`euros|eur|usd|us\$|u\$`
+const NUM = r`(?<![\d.,])(\d[\d.,]{0,15})`
+const MULT = r`(?: ?(mil|k|milhao|milhoes|mi)\b)?`
+// Depois do número, o que não é quantia de dinheiro: "2 dias", "1o turno", "3%", "5 pontos", "3 vezes". O \s do Python
+// inclui \x1c-\x1f: ESPACO.
+const NAO_QUANTIA = `(?!${ESPACO}*` +
+  r`(%|o turno|a reuniao|dias?\b|anos?\b|mes\b|meses\b|vezes\b|semanas?\b|horas?\b|pontos?\b|turnos?\b))`
+// "R$ 100 mil em euros" é real, não euro: o número logo depois de "r$" nunca é moeda estrangeira.
+// Com flag g, só para matchAll (o finditer do Python), que copia o padrão e não guarda estado.
+const VALOR_DEPOIS = new RegExp(r`(?<!r\$)(?<!r\$ )` + NUM + MULT + r` ?(?:de |em )?(` + ROTULOS + r`)(?![\w$])`, 'g')
+const VALOR_ANTES = new RegExp(r`(?<![\w$])(` + MOEDA_ANTES + r`) ?` + NUM + MULT + NAO_QUANTIA, 'g')
+const POR_MES = r`(por mes|ao mes|mensais|mensal|todo mes|cada mes|/ ?mes|a month|per month|monthly)\b`
+// O gasto precisa de verbo de gasto antes ("gasto", "pago", "custa", "aluguel"): "rendendo 1% ao mês" e "ganho 10 mil
+// por mês" não são gasto (renda é dado que o agente não usa, N5). Grupos: 2 número, 3 multiplicador, 4 moeda.
+const GASTO_DEPOIS = rx(
+  r`\b(gast\w*|pag\w*|cust\w*|despes\w*|aluguel|mensalidade|preciso de|vivo com|uso|tiro|saco|spend\w*|pay\w*)\b`,
+  r`[^.!?\d]{0,25}?(?:r\$ ?)?`, NUM, MULT, `(?!${ESPACO}*%)`, r`(?: ?(reais|`, ROTULOS, r`))?[^.\d!?%]{0,25}?\b`, POR_MES,
+)
+const GASTO_ANTES = rx(
+  r`\b(mensalidade|gasto mensal|custo mensal|despesa mensal)( (de|e|eh))? (?:r\$ ?)?`, NUM, MULT,
+  r`(?: ?(reais|`, ROTULOS, r`))?`,
+)
+// Mover o dinheiro de lugar: quando, se e quanto mover é o que o agente não diz (N1, N4, N5).
+// Sem "traz" (3ª pessoa: "o que a eleição traz para o dólar depois?") e sem "passo" ("passo a passo").
+// TROCA_VERBOS é o TROCA[1:-1] do Python (sem os parênteses).
+const TROCA_VERBOS = r`trago|trazer|troco|trocar|converto|converter|mando|mandar|envio|enviar|transfiro|transferir|remeto|remeter|` +
+  r`traer\w*|cambiar|bring|convert|exchange|move`
+const TROCA = `(${TROCA_VERBOS})`
+const EVENTO = r`(o |a |do |da |de |the )?(segundo turno|2o turno|primeiro turno|turno|eleicao|election|domingo|copom|reuniao|resultado)`
+// Quando mover: "troco hoje?", "trago depois do 2º turno?", "antes ou depois?", "qual o melhor momento pra trocar?".
+const MOMENTO_TROCA = rx(
+  r`\b`, TROCA, r`\b[^.?!]{0,40}\b(agora|ahora|antes|depois|hoje|ja|amanha|now|before|after)\b`,
+  r`|\b(quando|cuando|hoje|agora|ahora|antes|depois)\b[^.?!]{0,20}\b(troco|trocar|trago|trazer|traer\w*|mando|mandar`,
+  r`|envio|enviar|converto|converter|transfiro|transferir|cambiar|cambio a)\b`,
+  r`|\b(antes|depois|before|after) `, EVENTO, r`\b[^.?!]{0,20}\bou (espero|esperar|depois|antes|nao)\b`,
+  r`|\bantes ou depois\b|\bagora ou (depois|espero|mais tarde)\b|\bou espero\b`,
+  r`|\b(momento|hora|dia|epoca|data)\b[^.?!]{0,20}\b(trocar|trazer|converter|mandar|enviar|transferir|cambiar)\b`,
+)
+// Quanto mover, ou que parte: alocação (N5). Aí o valor não entra na conta, e vale a recusa do capital.
+const QUANTO_TROCAR = rx(
+  r`\bquanto (\w+ ){0,4}?(coloco|ponho|invisto|aplico|boto|trago|troco|converto|mando|envio|remeto|mantenho|`,
+  r`deixo|tiro|passo|devia|deveria|trazer|trocar|converter|mandar|enviar|remeter|manter|deixar|tirar|passar)\b`,
+  r`|\bquanto investir\b|\bquantos contratos\b|\b(que|qual|quanto) (parte|porcentagem|percentual|fatia|pedaco)\b`,
+  r`|\bquanto disso\b|\b(`, TROCA_VERBOS, r`|deixo|mantenho)\b[^.?!]{0,25}\b(tudo|metade|um terco|uma parte|parte`,
+  r`|o resto|aos poucos|de uma vez|em (parcelas|etapas)|\d+ ?%|half|all)\b`,
+  r`|\b(tudo|metade|parte) ou (tudo|metade|parte|nada)\b|\bhow much\b|\b(what|which) (part|portion|percentage|share)\b`,
+  r`|\ball or (half|part)\b`,
+)
+const MULTIPLICA: ReadonlyMap<string, number> = new Map([['mil', 1e3], ['k', 1e3], ['milhao', 1e6], ['milhoes', 1e6], ['mi', 1e6]])
+
 // Os mercados que o histórico das eleições, do Copom e da linha do tempo mede.
 export const MEDIDOS = ['ibovespa', 'dolar', 'juros'] as const
 
@@ -240,18 +313,37 @@ export function temConta(p: Pedido): boolean {
   return p.pontos !== null && p.mercados.some((m) => m === 'mini_indice' || m === 'mini_dolar')
 }
 
+/** Pedido.conta_cambio do Python: a pessoa contou dinheiro em euro ou em dólar. */
+export function temContaCambio(p: Pedido): boolean {
+  return typeof p.valor_moeda === 'number' && (p.moeda === 'euro' || p.moeda === 'dolar')
+}
+
+/** Pedido.cambio do Python: pergunta de câmbio, que fala de euro ou contou dinheiro em moeda estrangeira. */
+export function ehCambio(p: Pedido): boolean {
+  return p.mercados.includes('euro') || temContaCambio(p)
+}
+
 /** Junta duas leituras da mesma pergunta (a das palavras e a da IA): o que uma achou, vale. */
 export function somar(a: Pedido, b: Pedido): Pedido {
   const junta = (x: string[], y: string[]): string[] => [...x, ...y.filter((v) => !x.includes(v))]
+  const proibidos = junta(a.proibidos, b.proibidos)
+  // A IA viu pedido de capital que as palavras não pegaram: vale a leitura dela, e a conta de câmbio sai (senão a resposta
+  // diria "não uso o valor que você tem" e logo depois usaria).
+  const semConta = proibidos.includes('capital')
   return {
     pergunta: a.pergunta,
     mercados: junta(a.mercados, b.mercados),
     candidatos: junta(a.candidatos, b.candidatos),
     temas: junta(a.temas, b.temas),
-    proibidos: junta(a.proibidos, b.proibidos),
+    proibidos,
     voto_informado: a.voto_informado || b.voto_informado,
     pontos: a.pontos !== null ? a.pontos : b.pontos,
     contratos: a.contratos,
+    // os quatro do câmbio vêm da primeira leitura (a das palavras), como no Python
+    valor_moeda: semConta ? null : a.valor_moeda,
+    moeda: semConta ? null : a.moeda,
+    gasto_mensal: semConta ? null : a.gasto_mensal,
+    gasto_moeda: semConta ? null : a.gasto_moeda,
   }
 }
 
@@ -276,6 +368,66 @@ function tirar(xs: string[], x: string): void {
   if (i >= 0) xs.splice(i, 1)
 }
 
+/** _moeda do Python: o rótulo que o padrão achou vira a chave da moeda; "reais" é o real. */
+function moedaDe(rotulo: string | undefined): string | null {
+  if (!rotulo) return null
+  if (rotulo === 'reais') return 'real'
+  const achada = MOEDA_INTEIRA.find(([, padrao]) => padrao.test(rotulo))
+  // o next() do Python levanta StopIteration; não acontece, porque o rótulo saiu do mesmo padrão
+  if (!achada) throw new Error(`moeda desconhecida: ${rotulo}`)
+  return achada[0]
+}
+
+/** _quantia do Python: a quantia em qualquer formato que um brasileiro ou um estrangeiro escreve: '150.000' e '150,5'
+ * (Brasil), '50,000' e '1.5' (inglês, com até 2 casas depois do ponto), '1,5' + 'milhao' → 1.500.000. Número quebrado
+ * ('1,2,3') ou absurdo não vale. A pontuação colada no fim ("4.500," / "150.000.") não é parte do número. */
+function quantia(bruto: string, mult: string | undefined): number | null {
+  const numero = bruto.replace(/[.,]+$/, '') // rstrip('.,')
+  let texto: string
+  if (/^\d{1,3}(\.\d{3})+(,\d+)?$/.test(numero)) texto = numero.replaceAll('.', '').replaceAll(',', '.') // 150.000 / 150.000,50
+  else if (/^\d{1,3}(,\d{3})+(\.\d+)?$/.test(numero)) texto = numero.replaceAll(',', '') // 50,000 / 2,000.50
+  else if (/^\d+,\d+$/.test(numero)) texto = numero.replace(',', '.') // 1,5
+  else if (/^\d+\.\d{1,2}$/.test(numero) || /^\d+$/.test(numero)) texto = numero // 1.5 / 1.25 / 150
+  else return null
+  const v = Number(texto) * (MULTIPLICA.get(mult ?? '') ?? 1)
+  return 0 < v && v < 1e10 ? v : null
+}
+
+export type Cambio = [valor: number | null, moeda: string | null, gasto: number | null, gasto_moeda: string | null]
+
+/** cambio() do Python: (valor, moeda, gasto por mês, moeda do gasto) do texto já normalizado. O gasto sem moeda é em reais. */
+export function cambio(t: string): Cambio {
+  let gasto: number | null = null
+  let gastoMoeda: string | null = null
+  let g = GASTO_DEPOIS.exec(t)
+  if (g) {
+    gasto = quantia(g[2], g[3])
+    gastoMoeda = moedaDe(g[4]) ?? 'real'
+  } else {
+    g = GASTO_ANTES.exec(t)
+    if (g) {
+      gasto = quantia(g[4], g[5])
+      gastoMoeda = moedaDe(g[6]) ?? 'real'
+    }
+  }
+  if (gasto === null) {
+    g = null
+    gastoMoeda = null
+  }
+  // O valor é o 1º dinheiro em moeda estrangeira do texto que não seja o próprio gasto ("pago 3 mil dólares por mês").
+  // Os dois padrões nunca começam na mesma posição (um começa por dígito, o outro por letra): ordenar pelo início basta.
+  const achados: [number, string, string | undefined, string][] = [
+    ...[...t.matchAll(VALOR_DEPOIS)].map((m): [number, string, string | undefined, string] => [m.index, m[1], m[2], m[3]]),
+    ...[...t.matchAll(VALOR_ANTES)].map((m): [number, string, string | undefined, string] => [m.index, m[2], m[3], m[1]]),
+  ].sort((a, b) => a[0] - b[0])
+  for (const [inicio, texto, mult, rotulo] of achados) {
+    if (g && g.index <= inicio && inicio < g.index + g[0].length) continue
+    const valor = quantia(texto, mult)
+    if (valor !== null) return [valor, moedaDe(rotulo), gasto, gastoMoeda]
+  }
+  return [null, null, gasto, gastoMoeda]
+}
+
 export function analisar(pergunta: string): Pedido {
   const t = normalizar(pergunta)
   const achou = (padroes: Record<string, RegExp>): string[] =>
@@ -283,6 +435,7 @@ export function analisar(pergunta: string): Pedido {
   const p: Pedido = {
     pergunta, mercados: achou(MERCADOS), candidatos: achou(CANDIDATOS), temas: achou(TEMAS), proibidos: achou(PROIBIDOS),
     voto_informado: VOTO_INFORMADO.test(t), pontos: null, contratos: 1,
+    valor_moeda: null, moeda: null, gasto_mensal: null, gasto_moeda: null,
   }
   if (p.voto_informado && !p.temas.includes('eleicao')) p.temas.push('eleicao')
   // Conceito de derivativo (margem, ajuste diário, alavancagem): a explicação está no bloco do mini-índice.
@@ -325,6 +478,32 @@ export function analisar(pergunta: string): Pedido {
       if (p.proibidos.includes('capital') && !ALOCACAO.test(t)) tirar(p.proibidos, 'capital')
       if (p.proibidos.includes('direcao') && !DIRECAO_NA_CONTA.test(t)) tirar(p.proibidos, 'direcao')
       if (p.proibidos.includes('dica') && !DICA_NA_CONTA.test(t)) tirar(p.proibidos, 'dica')
+    }
+  }
+  // Quando mover o dinheiro de lugar ("troco hoje?", "trago depois do 2º turno?"): momento (N4) e a recusa padrão.
+  const momentoTroca = MOMENTO_TROCA.test(t)
+  if (momentoTroca) {
+    for (const codigo of ['momento', 'dica']) if (!p.proibidos.includes(codigo)) p.proibidos.push(codigo)
+    tirar(p.proibidos, 'comparar') // "antes ou depois de domingo" não compara classes de ativos
+  }
+  const quanto = QUANTO_TROCAR.test(t)
+  if (quanto && !p.proibidos.includes('capital')) p.proibidos.push('capital')
+  // Conta neutra de câmbio com o dinheiro que a pessoa contou (P4): o valor em reais, quanto muda a cada R$ 0,10 e
+  // quantos meses de gasto cobre. Não entra quando ela pergunta quanto mover (alocação, N5) nem quando mover (N4): ao
+  // lado da reação nos turnos, o valor dela viraria indicação de momento. Pergunta de contrato (mini-dólar) também não.
+  const [valor, moeda, gasto, gastoMoeda] = cambio(t)
+  const contratoFuturo = p.mercados.some((x) => x === 'mini_indice' || x === 'mini_dolar') || CONTRATO.test(t)
+  if (valor !== null && moeda !== null && !contratoFuturo) {
+    if (quanto || momentoTroca) {
+      // a pessoa contou o valor e ele não é usado: a linha do capital diz por quê
+      if (!p.proibidos.includes('capital')) p.proibidos.push('capital')
+    } else {
+      p.valor_moeda = valor
+      p.moeda = moeda
+      p.gasto_mensal = gasto
+      p.gasto_moeda = gastoMoeda
+      if (!p.mercados.includes(moeda)) p.mercados.push(moeda)
+      tirar(p.proibidos, 'capital')
     }
   }
   return p
