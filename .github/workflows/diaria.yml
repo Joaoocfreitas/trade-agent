@@ -19,6 +19,8 @@ on:
         required: false
         default: ''
 
+# Um por vez com o Publicar. O GitHub guarda só uma rodada esperando por grupo: se outra chega, a que esperava é
+# cancelada (sem aviso), e o dado entra na rodada seguinte.
 concurrency:
   group: analyze-thoran
   cancel-in-progress: false

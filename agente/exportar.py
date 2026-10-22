@@ -183,8 +183,16 @@ def resumos(gabarito: dict) -> list[str]:
     return saida
 
 
+def _sem_carimbo(b: dict) -> dict:
+    return {k: v for k, v in b.items() if k != 'gerado_em'}
+
+
 def main() -> None:
-    BASE.write_text(json.dumps(base(), ensure_ascii=False, indent=1), encoding='utf-8')
+    nova = base()
+    # base igual à de antes fica byte a byte a de antes: só o carimbo mudaria, e o Actions faria commit à toa
+    velha = json.loads(BASE.read_text(encoding='utf-8')) if BASE.exists() else None
+    if velha is None or _sem_carimbo(velha) != _sem_carimbo(nova):
+        BASE.write_text(json.dumps(nova, ensure_ascii=False, indent=1), encoding='utf-8')
     gabarito = paridade()
     PARIDADE.write_text(json.dumps(gabarito, ensure_ascii=False, indent=1), encoding='utf-8')
     RESUMOS.write_text(json.dumps(resumos(gabarito), ensure_ascii=False, indent=0), encoding='utf-8')
