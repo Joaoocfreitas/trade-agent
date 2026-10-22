@@ -5,7 +5,8 @@
 import { analisar } from './roteador.ts'
 import type { Pedido } from './texto.ts'
 
-type Esperado = Omit<Pedido, 'pergunta'>
+// Os casos são de antes do câmbio: os 4 campos da conta de câmbio ficam de fora (o gabarito de paridade os confere).
+type Esperado = Omit<Pedido, 'pergunta' | 'valor_moeda' | 'moeda' | 'gasto_mensal' | 'gasto_moeda'>
 
 const CASOS: ReadonlyArray<readonly [string, Esperado]> = [
   ["O Copom vai cortar os juros em novembro?", {"mercados": ["juros"], "candidatos": [], "temas": ["copom"], "proibidos": ["direcao"], "voto_informado": false, "pontos": null, "contratos": 1}],

@@ -7,7 +7,7 @@
 // Se o filtro barrar o texto, o cartão também some.
 import type Anthropic from 'npm:@anthropic-ai/sdk@0.132.1'
 import { lerPergunta } from './agente.ts'
-import { iaSemVoto, leituraSemVoto, semDadoPessoal } from './registro.ts'
+import { iaSemVoto, leituraSemVoto, semDadoPessoal, violacoesSemDinheiro } from './registro.ts'
 import { BASE, mercadosMedidos, montar } from './resposta.ts'
 import { ehEleicao } from './roteador.ts'
 import type { Pedido, Violacao } from './texto.ts'
@@ -103,7 +103,7 @@ export async function analisar(req: AnalyzeRequest, cliente?: Anthropic | null):
     pergunta: analysis.query_redacted,
     modo: lida.modo,
     roteador: leituraSemVoto(pedido, req.query),
-    violacoes: r.violacoes,
+    violacoes: violacoesSemDinheiro(r.violacoes, pedido),
     ia: iaSemVoto(lida.ia, pedido, req.query),
     uso: lida.uso,
   }

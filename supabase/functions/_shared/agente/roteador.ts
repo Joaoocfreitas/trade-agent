@@ -21,6 +21,8 @@ const rx = (...partes: string[]): RegExp => new RegExp(partes.join(''))
 const ESPACO = r`[\t\n\v\f\r\x1c-\x1f ]`
 const PALAVRAS = new RegExp(`${ESPACO}+`)
 
+// Símbolo de moeda que o simples() apagaria: vira palavra antes ("€150.000" → "euros 150.000").
+const SIMBOLOS: ReadonlyArray<readonly [string, string]> = [['€', ' euros ']]
 // A ordem importa: o "⬆️" (com o seletor de variação U+FE0F) sai antes do "⬆" sozinho.
 const EMOJI: ReadonlyArray<readonly [string, string]> = [
   ['📈', ' sobe '], ['📉', ' cai '], ['🚀', ' dispara '], ['🔥', ' dispara '], ['💰', ' lucro '], ['🤑', ' lucro '],
@@ -33,8 +35,9 @@ const ABREVIACOES: ReadonlyMap<string, string> = new Map([
   ['subi', 'subir'], ['chace', 'chance'], ['chanse', 'chance'], ['ibov', 'ibovespa'], ['msm', 'mesmo'],
 ])
 
-/** Emoji vira palavra, sai o acento, e a abreviação vira a palavra inteira. */
+/** Emoji e símbolo de moeda viram palavra, sai o acento, e a abreviação vira a palavra inteira. */
 export function normalizar(pergunta: string): string {
+  for (const [e, palavra] of SIMBOLOS) pergunta = pergunta.replaceAll(e, palavra)
   for (const [e, palavra] of EMOJI) pergunta = pergunta.replaceAll(e, palavra)
   const t = simples(pergunta)
   return t.replace(/\b\w+\b/g, (m) => ABREVIACOES.get(m) ?? m)
@@ -45,9 +48,16 @@ export const MERCADOS = {
   mini_dolar: rx(r`\bmini[- ]?dolar\b|\bwdo\b`),
   ibovespa: rx(r`\bibov\w*|\bbolsa\b|\bacoes\b|\bacao\b|\bbova11\b|\bb3\b|\bbovespa\b|\bstocks?\b|\bindice\b`),
   dolar: rx(
-    r`\bdolar\b|\bdollar\b|\bcambio\b|\b(brazilian )?real (sobe|cai|valoriza|desvaloriza|go up|go down)\b`,
+    r`\bdolar(es)?\b|\bdollars?\b|\bus\$|\bcambio\b|\b(brazilian )?real (sobe|cai|valoriza|desvaloriza|go up|go down)\b`,
     r`|\bbrazilian real\b`,
+    // o real contra as outras moedas, e mandar ou trazer dinheiro de fora: é câmbio
+    r`|\breal\b[^.?!]{0,30}\b(valoriz\w*|desvaloriz\w*|fortalec\w*|enfraquec\w*)|\b(valorizacao|desvalorizacao) do real\b`,
+    r`|\bmoeda (brasileira|estrangeira)\b|\bremessas?\b|\btransferencias? internaciona\w*|\bconvert\w* (para|pra|em) reais\b`,
+    r`|\b(trazer|traz|trago|mandar|mando|enviar|envio|levar|transferir)\b[^.?!]{0,30}\b(pro brasil|para o brasil|pra fora`,
+    r`|para fora|do exterior|de fora|para o exterior|pro exterior)\b`,
   ),
+  // Logo depois do dólar: a ordem das chaves é a ordem de p.mercados, como no dict do Python.
+  euro: rx(r`\beuros?\b|\beur\b`),
   juros: rx(r`\bjuros\b|\bdi1?\b|\bdi futuro\b|\bselic\b|\brenda fixa\b|\btesouro\b|\bprefixad\w*`),
   cripto: rx(r`\bcripto\w*|\bbitcoin\b|\bbtc\b|\bethereum\b|\bexchanges?\b|\bstablecoins?\b|\bsolana\b`),
   memecoin: rx(r`\bmeme ?coins?\b|\bmemecoins?\b|\$trump\b|\$libra\b|\$melania\b|\btokens?\b|\bmoeda do candidato\b`),
@@ -226,6 +236,30 @@ const CONTRATOS = rx(r`(?<![\d.,])(\d{1,6})`, ESPACO, r`*contratos?\b`)
 const DIRECAO_NA_CONTA = rx(r`\b(sobe|cai|vai|chance|probabilidad\w*|tendencia)\b`)
 const DICA_NA_CONTA = rx(r`\b(compr\w*|vend\w*|devo|vale|compens\w*|entrar|bora)\b`)
 
+// P4 de câmbio: o dinheiro em moeda estrangeira que a pessoa contou e o gasto por mês, só para a conta (nunca para dizer
+// o que fazer). "150 mil euros", "€150.000", "150k euros", "US$ 20 mil", "20 mil dólares"; "gasto 5 mil reais por mês".
+const MOEDA: ReadonlyArray<readonly [string, string]> = [['euro', r`euros?|eur`], ['dolar', r`dolares|dolar|dollars?|usd|us\$|u\$`]]
+const ROTULOS = MOEDA.map(([, padrao]) => padrao).join('|')
+const MOEDA_INTEIRA = MOEDA.map(([k, padrao]) => [k, new RegExp(`^(?:${padrao})$`)] as const) // re.fullmatch do Python
+const NUM = r`(?<![\d.,])(\d[\d.,]{0,15})`
+const MULT = r`(?: ?(mil|k|milhao|milhoes|mi)\b)?`
+// Com flag g, só para matchAll (o finditer do Python), que copia o padrão e não guarda estado.
+const VALOR_DEPOIS = new RegExp(NUM + MULT + r` ?(?:de |em )?(` + ROTULOS + r`)(?![\w$])`, 'g')
+const VALOR_ANTES = new RegExp(r`(?<![\w$])(` + ROTULOS + r`) ?` + NUM + MULT, 'g')
+const POR_MES = r`(por mes|ao mes|mensais|mensal|todo mes|cada mes|/ ?mes)\b`
+const GASTO_DEPOIS = rx(r`(?:r\$ ?)?`, NUM, MULT, r`(?: ?(reais|`, ROTULOS, r`))?[^.\d!?]{0,25}?\b`, POR_MES)
+const GASTO_ANTES = rx(
+  r`\b(mensalidade|gasto mensal|custo mensal|despesa mensal)( (de|e|é|eh))? (?:r\$ ?)?`, NUM, MULT,
+  r`(?: ?(reais|`, ROTULOS, r`))?`,
+)
+// Pedido de quanto trocar, trazer ou colocar: aí o valor não entra na conta, e vale a recusa do capital (N5).
+const QUANTO_TROCAR = rx(
+  r`\bquanto (eu )?(coloco|ponho|invisto|aplico|boto|trago|troco|converto|mando|envio|mantenho|deixo|devia|deveria)\b`,
+  r`|\bquanto (devo|deveria|preciso) (trazer|trocar|converter|mandar|enviar|manter|deixar)\b|\bquanto investir\b`,
+  r`|\bquantos contratos\b|\b(que|qual|quanto) (parte|porcentagem|percentual)\b|\bquanto disso\b`,
+)
+const MULTIPLICA: ReadonlyMap<string, number> = new Map([['mil', 1e3], ['k', 1e3], ['milhao', 1e6], ['milhoes', 1e6], ['mi', 1e6]])
+
 // Os mercados que o histórico das eleições, do Copom e da linha do tempo mede.
 export const MEDIDOS = ['ibovespa', 'dolar', 'juros'] as const
 
@@ -240,6 +274,16 @@ export function temConta(p: Pedido): boolean {
   return p.pontos !== null && p.mercados.some((m) => m === 'mini_indice' || m === 'mini_dolar')
 }
 
+/** Pedido.conta_cambio do Python: a pessoa contou dinheiro em euro ou em dólar. */
+export function temContaCambio(p: Pedido): boolean {
+  return typeof p.valor_moeda === 'number' && (p.moeda === 'euro' || p.moeda === 'dolar')
+}
+
+/** Pedido.cambio do Python: pergunta de câmbio, que fala de euro ou contou dinheiro em moeda estrangeira. */
+export function ehCambio(p: Pedido): boolean {
+  return p.mercados.includes('euro') || temContaCambio(p)
+}
+
 /** Junta duas leituras da mesma pergunta (a das palavras e a da IA): o que uma achou, vale. */
 export function somar(a: Pedido, b: Pedido): Pedido {
   const junta = (x: string[], y: string[]): string[] => [...x, ...y.filter((v) => !x.includes(v))]
@@ -252,6 +296,11 @@ export function somar(a: Pedido, b: Pedido): Pedido {
     voto_informado: a.voto_informado || b.voto_informado,
     pontos: a.pontos !== null ? a.pontos : b.pontos,
     contratos: a.contratos,
+    // os quatro do câmbio vêm sempre da primeira leitura (a das palavras), como no Python
+    valor_moeda: a.valor_moeda,
+    moeda: a.moeda,
+    gasto_mensal: a.gasto_mensal,
+    gasto_moeda: a.gasto_moeda,
   }
 }
 
@@ -276,6 +325,62 @@ function tirar(xs: string[], x: string): void {
   if (i >= 0) xs.splice(i, 1)
 }
 
+/** _moeda do Python: o rótulo que o padrão achou vira a chave da moeda; "reais" é o real. */
+function moedaDe(rotulo: string | undefined): string | null {
+  if (!rotulo) return null
+  if (rotulo === 'reais') return 'real'
+  const achada = MOEDA_INTEIRA.find(([, padrao]) => padrao.test(rotulo))
+  // o next() do Python levanta StopIteration; não acontece, porque o rótulo saiu do mesmo padrão
+  if (!achada) throw new Error(`moeda desconhecida: ${rotulo}`)
+  return achada[0]
+}
+
+/** _quantia do Python: '150.000' → 150000; '1,5' + 'milhao' → 1500000. Número quebrado ('1,2,3') ou absurdo não vale. */
+function quantia(texto: string, mult: string | undefined): number | null {
+  let v: number
+  try {
+    v = numero(texto) * (MULTIPLICA.get(mult ?? '') ?? 1)
+  } catch {
+    return null // o ValueError do float()
+  }
+  return 0 < v && v < 1e10 ? v : null
+}
+
+export type Cambio = [valor: number | null, moeda: string | null, gasto: number | null, gasto_moeda: string | null]
+
+/** cambio() do Python: (valor, moeda, gasto por mês, moeda do gasto) do texto já normalizado. O gasto sem moeda é em reais. */
+export function cambio(t: string): Cambio {
+  let gasto: number | null = null
+  let gastoMoeda: string | null = null
+  let g = GASTO_DEPOIS.exec(t)
+  if (g) {
+    gasto = quantia(g[1], g[2])
+    gastoMoeda = moedaDe(g[3]) ?? 'real'
+  } else {
+    g = GASTO_ANTES.exec(t)
+    if (g) {
+      gasto = quantia(g[4], g[5])
+      gastoMoeda = moedaDe(g[6]) ?? 'real'
+    }
+  }
+  if (gasto === null) {
+    g = null
+    gastoMoeda = null
+  }
+  // O valor é o 1º dinheiro em moeda estrangeira do texto que não seja o próprio gasto ("pago 3 mil dólares por mês").
+  // Os dois padrões nunca começam na mesma posição (um começa por dígito, o outro por letra): ordenar pelo início basta.
+  const achados: [number, string, string | undefined, string][] = [
+    ...[...t.matchAll(VALOR_DEPOIS)].map((m): [number, string, string | undefined, string] => [m.index, m[1], m[2], m[3]]),
+    ...[...t.matchAll(VALOR_ANTES)].map((m): [number, string, string | undefined, string] => [m.index, m[2], m[3], m[1]]),
+  ].sort((a, b) => a[0] - b[0])
+  for (const [inicio, texto, mult, rotulo] of achados) {
+    if (g && g.index <= inicio && inicio < g.index + g[0].length) continue
+    const valor = quantia(texto, mult)
+    if (valor !== null) return [valor, moedaDe(rotulo), gasto, gastoMoeda]
+  }
+  return [null, null, gasto, gastoMoeda]
+}
+
 export function analisar(pergunta: string): Pedido {
   const t = normalizar(pergunta)
   const achou = (padroes: Record<string, RegExp>): string[] =>
@@ -283,6 +388,7 @@ export function analisar(pergunta: string): Pedido {
   const p: Pedido = {
     pergunta, mercados: achou(MERCADOS), candidatos: achou(CANDIDATOS), temas: achou(TEMAS), proibidos: achou(PROIBIDOS),
     voto_informado: VOTO_INFORMADO.test(t), pontos: null, contratos: 1,
+    valor_moeda: null, moeda: null, gasto_mensal: null, gasto_moeda: null,
   }
   if (p.voto_informado && !p.temas.includes('eleicao')) p.temas.push('eleicao')
   // Conceito de derivativo (margem, ajuste diário, alavancagem): a explicação está no bloco do mini-índice.
@@ -326,6 +432,17 @@ export function analisar(pergunta: string): Pedido {
       if (p.proibidos.includes('direcao') && !DIRECAO_NA_CONTA.test(t)) tirar(p.proibidos, 'direcao')
       if (p.proibidos.includes('dica') && !DICA_NA_CONTA.test(t)) tirar(p.proibidos, 'dica')
     }
+  }
+  // Conta neutra de câmbio com o dinheiro que a pessoa contou (P4): o valor em reais, quanto muda a cada R$ 0,10 e
+  // quantos meses de gasto cobre. "Quanto eu trago?" não é conta: é alocação (N5), e aí o valor não entra.
+  const [valor, moeda, gasto, gastoMoeda] = cambio(t)
+  if (valor !== null && moeda !== null && !QUANTO_TROCAR.test(t)) {
+    p.valor_moeda = valor
+    p.moeda = moeda
+    p.gasto_mensal = gasto
+    p.gasto_moeda = gastoMoeda
+    if (!p.mercados.includes(moeda)) p.mercados.push(moeda)
+    tirar(p.proibidos, 'capital')
   }
   return p
 }

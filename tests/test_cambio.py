@@ -69,7 +69,7 @@ def test_conta_com_gasto_em_reais():
     b = F.conta_cambio(150000, 'euro', 5000, 'real', c=C)
     textos = [ln.texto for ln in b.linhas]
     assert textos[0] == '150.000 euros × R$ 5,6494 (cotação oficial do euro em 22/10/2026) = R$ 847.410.'
-    assert textos[1] == 'Cada R$ 0,10 que o euro sobe ou desce muda esse valor em R$ 15.000.'
+    assert textos[1] == 'Cada R$ 0,10 de diferença na cotação do euro muda esse valor em R$ 15.000.'
     assert 'davam R$ 970.380, R$ 122.970 a mais do que hoje' in textos[2]
     assert 'dariam de R$ 837.660 a R$ 983.910' in textos[3]
     assert textos[4].startswith('Com gasto de R$ 5.000 por mês, R$ 847.410 cobrem 169 meses (cerca de 14 anos)')
@@ -125,3 +125,33 @@ def test_portao_do_euro_segura_o_dia_do_1o_turno():
     motivos = conferir('euro', velha, nova, pd.Timestamp('2026-10-05'))
     assert any('salto' in m for m in motivos), motivos
     assert conferir('euro', velha, nova, pd.Timestamp('2026-10-05'), liberada=True) == []
+
+
+@pytest.mark.parametrize('pergunta', [
+    'tenho US$ 20 mil e pago 3 mil dólares por mês de aluguel', 'tenho 50 mil em dólares e gasto R$ 3.000 por mês. E a eleição?',
+    'Tenho €150.000 na Espanha e gasto 5 mil reais por mês com a faculdade. Como está o euro?', PRINT,
+    'tenho 0,5 euro', 'tenho 9.999.999.999 euros e gasto 1 real por mês',
+])
+def test_conta_de_cambio_passa_no_filtro(pergunta):
+    """Em 22/10 toda conta em dólar caía no filtro (N2): "Cada R$ 0,10 que o dólar sobe ou desce" parecia previsão."""
+    r = montar(pergunta, hoje='2026-10-22')
+    assert r.pedido.conta_cambio
+    assert r.violacoes == [], r.violacoes
+
+
+def test_quantia_quebrada_mantem_os_centavos():
+    assert F.conta_cambio(0.5, 'euro', c=C).resumo.startswith('Seus 0,50 euros valem R$ 2,82')  # sem centavos no real
+
+
+def test_euro_e_sujeito_de_frase_de_direcao():
+    assert frases_proibidas('O euro vai subir depois da eleição.')
+    assert frases_proibidas('o euro sobe com o Flávio')
+
+
+def test_registro_nao_guarda_a_resposta_com_a_conta(tmp_path):
+    from agente.registro import registrar
+    r = montar('Tenho €150.000 na Espanha e gasto 5 mil reais por mês com a faculdade.', hoje='2026-10-22')
+    linha = registrar(r, arquivo=tmp_path / 'conversas.jsonl')
+    guardado = (tmp_path / 'conversas.jsonl').read_text(encoding='utf-8')
+    assert linha['resposta'] is None
+    assert '150.000' not in guardado and '847' not in guardado and '5 mil' not in guardado

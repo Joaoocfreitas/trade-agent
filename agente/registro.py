@@ -78,6 +78,13 @@ def ia_sem_voto(ia: dict | None, p, pergunta: str) -> dict | None:
     return {**ia, 'leitura': leitura}
 
 
+def violacoes_sem_dinheiro(violacoes, p) -> list[dict]:
+    """Com a conta de câmbio, o trecho de uma violação pode trazer o valor calculado a partir do dinheiro da pessoa
+    ("R$ 847.410"): os dígitos saem."""
+    conta = getattr(p, 'conta_cambio', False)
+    return [{**asdict(v), 'trecho': re.sub(r'\d', '#', v.trecho) if conta else v.trecho} for v in violacoes]
+
+
 def registrar(resposta, ia: dict | None = None, uso: dict | None = None, arquivo=ARQUIVO) -> dict:
     p = resposta.pedido
     linha = {
@@ -85,8 +92,9 @@ def registrar(resposta, ia: dict | None = None, uso: dict | None = None, arquivo
         'modo': resposta.modo,
         'pergunta': sem_dado_pessoal(resposta.pergunta),
         'roteador': leitura_sem_voto(p, resposta.pergunta),
-        'resposta': resposta.texto,
-        'violacoes_na_resposta': [asdict(v) for v in resposta.violacoes],
+        # A conta de câmbio leva o dinheiro da pessoa ("Seus 150.000 euros valem..."): essa resposta não fica guardada.
+        'resposta': None if p.conta_cambio else resposta.texto,
+        'violacoes_na_resposta': violacoes_sem_dinheiro(resposta.violacoes, p),
         'ia': ia_sem_voto(ia, p, resposta.pergunta),
         'uso': uso or {},
     }

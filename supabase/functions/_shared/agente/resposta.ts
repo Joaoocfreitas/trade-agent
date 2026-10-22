@@ -2,7 +2,7 @@
 // (gerado por `python -m agente.exportar`); aqui só se escolhe, ordena, numera as fontes e passa pelo filtro.
 import base from '../base.json' with { type: 'json' }
 import { checar } from './filtro.ts'
-import { analisar, ehEleicao, temConta } from './roteador.ts'
+import { analisar, ehCambio, ehEleicao, temConta, temContaCambio } from './roteador.ts'
 import type { Pedido, Violacao } from './texto.ts'
 
 type Fonte = { nome: string; url: string }
@@ -43,6 +43,28 @@ type Base = {
   previsao: Bloco
   binaria: Bloco
   conta: Record<string, { valor: number; nome: string; fonte: Fonte }>
+  /** P4 de câmbio: as cotações e os textos fixos; a conta é feita na hora com o número da pessoa (contaCambio). */
+  cambio: {
+    cotacoes: Record<string, Cotacoes>
+    moedas: Record<string, { nome: string; plural: string; fonte: Fonte }>
+    titulo: string
+    limite_euro: string
+  }
+  /** O euro nos turnos (fatos.euro_turnos), pronto. O caminho do euro está em historico.euro e agenda.euro. */
+  euro_turnos: Bloco
+  /** O começo do resumo da economia (fatos.RESUMO_HOJE): ele vai por último nas 3 linhas. */
+  resumo_hoje: string
+}
+/** fatos.cotacoes: a PTAX de hoje, a do fim do ano passado e a menor e a maior dos 12 meses (datas AAAA-MM-DD). */
+type Cotacoes = {
+  data: string
+  valor: number
+  ano_data: string
+  ano_valor: number
+  min_data: string
+  min_valor: number
+  max_data: string
+  max_valor: number
 }
 
 export const BASE = base as unknown as Base
@@ -90,9 +112,24 @@ function copom(mercados: string[]): Bloco {
   return copia(BASE.copom[mercados.length ? mercadosMedidos(mercados).join(',') : ''])
 }
 
+/** Os dígitos de f'{x:.{casas}f}' do Python, para x >= 0: o valor binário exato, arredondado com empate para o par. */
+function fixo(x: number, casas: number): string {
+  if (!Number.isFinite(x)) return Number.isNaN(x) ? 'nan' : 'inf'
+  // A partir de 1e21 o toFixed vira notação científica; aí o double já é inteiro, e o BigInt dá os dígitos exatos.
+  if (x >= 1e21) return BigInt(x).toString() + (casas ? '.' + '0'.repeat(casas) : '')
+  const s = x.toFixed(casas)
+  // O toFixed arredonda o valor exato, como o Python, mas desempata para cima (2.5 → "3"), e o Python para o par
+  // ("2"). Só há empate quando a expansão exata acaba num 5 logo depois da última casa; toFixed(100) é exato para
+  // todo x >= 2^-48, e abaixo disso não há empate com até 15 casas.
+  const [inteiro, frac] = x.toFixed(100).split('.')
+  if (frac[casas] !== '5' || !/^0*$/.test(frac.slice(casas + 1))) return s
+  const truncado = casas ? `${inteiro}.${frac.slice(0, casas)}` : inteiro
+  return Number(truncado.at(-1)) % 2 === 0 ? truncado : s
+}
+
 /** Número no formato brasileiro, como fatos.num do Python. */
 export function num(x: number, casas = 1): string {
-  const s = Math.abs(x).toFixed(casas)
+  const s = fixo(Math.abs(x), casas)
   const [inteiro, frac] = s.split('.')
   const milhar = inteiro.replace(/\B(?=(\d{3})+(?!\d))/g, '.')
   const texto = frac ? `${milhar},${frac}` : milhar
@@ -125,6 +162,79 @@ export function hojeEmBrasilia(): string {
   return new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Sao_Paulo' }).format(new Date())
 }
 
+/** fatos.dia do Python para uma data AAAA-MM-DD: DD/MM/AAAA. */
+function dia(d: string): string {
+  const [a, m, dd] = d.split('-')
+  return `${dd}/${m}/${a}`
+}
+
+/** fatos._qtd: a quantia que a pessoa contou, inteira sem casas, quebrada com 2 ("0,50 euro" não vira "0 euros"). */
+function qtd(v: number): string {
+  return Number.isInteger(v) ? num(v, 0) : num(v, 2)
+}
+
+/** fatos._reais: real da conta sem centavos a partir de R$ 1.000; abaixo disso, com centavos ("R$ 2,82", não "R$ 3"). */
+function reais(v: number): string {
+  return Math.abs(v) >= 1000 ? num(v, 0) : num(v, 2)
+}
+
+/** fatos._meses: meses inteiros, sem arredondar para cima, e os anos quando passa de 2. */
+export function meses(m: number): string {
+  // int() e // do Python em inteiro de verdade: com BigInt, o piso e a divisão saem exatos em qualquer tamanho.
+  const n = BigInt(Math.trunc(m))
+  if (n < 1n) return 'menos de 1 mês'
+  return `${num(Number(n), 0)} ${n === 1n ? 'mês' : 'meses'}` + (n >= 24n ? ` (cerca de ${num(Number(n / 12n), 0)} anos)` : '')
+}
+
+/** fatos.conta_cambio do Python (P4 de câmbio): o dinheiro em moeda estrangeira que a pessoa contou, em reais, pela
+ * cotação oficial. Só a conta, sem dizer o que fazer, quando trocar nem quanto (N1, N4, N5). `gasto`: o gasto por mês
+ * que ela contou, em reais (ou na própria moeda, se `gastoMoeda` for a mesma). `c`: as cotações (a da base, se faltar). */
+export function contaCambio(valor: number, moeda: string, gasto: number | null = null, gastoMoeda: string | null = null,
+  c: Cotacoes = BASE.cambio.cotacoes[moeda]): Bloco {
+  const { nome, plural, fonte } = BASE.cambio.moedas[moeda]
+  const hojeR = valor * c.valor
+  const anoR = valor * c.ano_valor
+  const linhas: Linha[] = []
+  const add = (texto: string, ...fontes: Fonte[]) => linhas.push({ texto, fontes })
+  add(`${qtd(valor)} ${plural} × R$ ${num(c.valor, 4)} (cotação oficial do ${nome} em ${dia(c.data)}) = ` +
+    `R$ ${reais(hojeR)}.`, fonte)
+  add(`Cada R$ 0,10 de diferença na cotação do ${nome} muda esse valor em R$ ${reais(valor * 0.1)}.`, fonte)
+  const dif = anoR - hojeR
+  add(`No fim de ${c.ano_data.slice(0, 4)} (${dia(c.ano_data)}), 1 ${nome} valia R$ ${num(c.ano_valor, 4)}: os mesmos ` +
+    `${qtd(valor)} ${plural} davam R$ ${reais(anoR)}, ` +
+    (!['0', '0,00'].includes(reais(Math.abs(dif))) ? `R$ ${reais(Math.abs(dif))} ${dif > 0 ? 'a mais' : 'a menos'} do que hoje.`
+      : 'o mesmo que hoje.'),
+    fonte)
+  add(`Nos últimos 12 meses, 1 ${nome} foi de R$ ${num(c.min_valor, 4)} (${dia(c.min_data)}) a ` +
+    `R$ ${num(c.max_valor, 4)} (${dia(c.max_data)}): nesses dois extremos, os mesmos ${plural} dariam de ` +
+    `R$ ${reais(valor * c.min_valor)} a R$ ${reais(valor * c.max_valor)}.`, fonte)
+  let cobre = ''
+  if (gasto) {
+    let m: number
+    if (gastoMoeda === moeda) {
+      m = valor / gasto
+      add(`Com gasto de ${qtd(gasto)} ${plural} por mês, os ${qtd(valor)} ${plural} cobrem ${meses(m)}, sem ` +
+        'contar rendimento, imposto nem custo da troca.')
+    } else {
+      m = hojeR / gasto
+      add(`Com gasto de R$ ${qtd(gasto)} por mês, R$ ${reais(hojeR)} cobrem ${meses(m)}, sem contar ` +
+        `rendimento, imposto nem custo da troca. Com o ${nome} na menor cotação dos 12 meses, seriam ` +
+        `${meses(valor * c.min_valor / gasto)}; na maior, ${meses(valor * c.max_valor / gasto)}.`, fonte)
+    }
+    cobre = `; com o seu gasto por mês, cobrem ${meses(m)}`
+  }
+  add('É só a conta com os números que você contou: não diz o que fazer com o dinheiro, nem quando trocar, nem quanto.')
+  const limite = BASE.cambio.limite_euro
+  return {
+    titulo: BASE.cambio.titulo,
+    linhas,
+    resumo: `Seus ${qtd(valor)} ${plural} valem R$ ${reais(hojeR)} pela cotação oficial de ${dia(c.data)}; cada ` +
+      `R$ 0,10 no ${nome} muda isso em R$ ${reais(valor * 0.1)}${cobre}.`,
+    // str.replace do Python troca todas as ocorrências: replaceAll
+    limites: [moeda !== 'euro' ? limite.replaceAll('do euro', `do ${nome}`) : limite],
+  }
+}
+
 function conta(pontos: number, contratos: number, chave: string): Bloco {
   const c = BASE.conta[chave]
   const total = pontos * c.valor * contratos
@@ -140,16 +250,30 @@ function conta(pontos: number, contratos: number, chave: string): Bloco {
   }
 }
 
+/** fatos.expectativas: fora de dólar, juros e Ibovespa (o euro, por exemplo), o bloco é o mesmo de '' (a ordem das
+ * linhas e o resumo caem no padrão), e a base só guarda esse. */
+function expectativas(mercado: string): Bloco {
+  return copia(BASE.expectativas[mercado] ?? BASE.expectativas[''])
+}
+
+/** _medidos_cambio do Python: os mercados para os blocos medidos (eleições, Copom). Em pergunta de câmbio, o dólar vem
+ * primeiro e o euro sai (ele tem bloco próprio). */
+function medidosCambio(p: Pedido): string[] {
+  if (!ehCambio(p)) return p.mercados
+  return ['dolar', ...p.mercados.filter((m) => m !== 'dolar' && m !== 'euro')]
+}
+
 export function escolherBlocos(p: Pedido, hoje: string): Bloco[] {
   let blocos: (Bloco | null)[] = []
   const pedeDinheiro = p.proibidos.includes('chance_dinheiro')
+  const medidosDoCambio = medidosCambio(p)
   if (ehEleicao(p)) {
-    blocos.push(BASE.candidatos && copia(BASE.candidatos), copia(BASE.economia), eleicoes(p.mercados),
+    blocos.push(BASE.candidatos && copia(BASE.candidatos), copia(BASE.economia), eleicoes(medidosDoCambio),
       BASE.pesquisas && copia(BASE.pesquisas))
   }
   if (p.temas.includes('copom')) {
     if (!ehEleicao(p)) blocos.push(copia(BASE.economia))
-    blocos.push(copom(p.mercados))
+    blocos.push(copom(medidosDoCambio))
   }
   for (const tipo of BASE.tipos) {
     if (p.temas.includes(tipo)) blocos.push(copia(BASE.eventos[tipo]))
@@ -168,9 +292,9 @@ export function escolherBlocos(p: Pedido, hoje: string): Bloco[] {
   }
   if (!temEvento && medidos.length) {
     for (const m of medidos) blocos.push(copia(BASE.historico[m]))
-    blocos.push(copia(BASE.expectativas[medidos[0]]), calendario(medidos[0], hoje))
+    blocos.push(expectativas(medidos[0] === 'euro' ? 'dolar' : medidos[0]), calendario(medidos[0], hoje))
   } else if (p.temas.includes('economia') || p.temas.includes('copom')) {
-    blocos.push(copia(BASE.expectativas[medidos.length ? medidos[0] : '']))
+    blocos.push(expectativas(medidos.length ? medidos[0] : ''))
   }
   if (p.mercados.includes('memecoin')) blocos.push(copia(BASE.memecoins))
   if (p.mercados.includes('previsao')) blocos.push(copia(BASE.previsao))
@@ -184,8 +308,26 @@ export function escolherBlocos(p: Pedido, hoje: string): Bloco[] {
   }
   if (pedeDinheiro || algum(BASE.derivativos.slice(0, 2), p.mercados)) blocos.push(copia(BASE.fgv))
   blocos = blocos.filter((b) => b)
+  if (ehCambio(p)) blocos = cambioPrimeiro(p, blocos as Bloco[])
   if (!blocos.length) blocos.push(copia(BASE.economia))
   return blocos as Bloco[]
+}
+
+/** _cambio_primeiro do Python. Pergunta de câmbio: na frente, a conta com os números da pessoa, o euro nos turnos (se
+ * ela falou de eleição), o que o mercado espera para o dólar e o caminho do euro. O resto segue na ordem de antes. */
+function cambioPrimeiro(p: Pedido, blocos: Bloco[]): Bloco[] {
+  const frente: Bloco[] = []
+  if (temContaCambio(p)) {
+    frente.push(contaCambio(p.valor_moeda as number, p.moeda as string, p.gasto_mensal, p.gasto_moeda))
+  }
+  if (p.mercados.includes('euro') && ehEleicao(p)) frente.push(copia(BASE.euro_turnos))
+  frente.push(blocos.find((b) => b.titulo.startsWith('O que o mercado espera')) ?? expectativas('dolar'))
+  if (p.mercados.includes('euro')) {
+    const euro = BASE.historico.euro
+    frente.push(blocos.find((b) => b.titulo === euro.titulo) ?? copia(euro))
+  }
+  const vistos = new Set(frente.map((b) => b.titulo))
+  return [...frente, ...blocos.filter((b) => !vistos.has(b.titulo))]
 }
 
 function abertura(p: Pedido, achouRepertorio: boolean): string[] {
@@ -211,7 +353,7 @@ function curta(blocos: Bloco[], abertura: string[]): string[] {
     linhas.push('Não achei caso parecido no repertório; ele mostra o que já aconteceu, e abaixo está o que cobre.')
   }
   // Por último: as datas marcadas e o último dado da economia. Primeiro o que aconteceu e o que o mercado espera.
-  const peso = (r: string) => r.startsWith('Último dado:') ? 2 : r.startsWith(BASE.calendario.resumo_inicio) ? 1 : 0
+  const peso = (r: string) => r.startsWith(BASE.resumo_hoje) ? 2 : r.startsWith(BASE.calendario.resumo_inicio) ? 1 : 0
   const resumos = blocos.map((b) => b.resumo).filter((r) => r)
   resumos.sort((a, b) => peso(a) - peso(b))
   return [...linhas, ...resumos].slice(0, 3)

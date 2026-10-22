@@ -794,6 +794,16 @@ def cotacoes(moeda: str) -> dict:
             'max_data': str(doze.idxmax().date()), 'max_valor': float(doze.max())}
 
 
+def _qtd(v: float) -> str:
+    """A quantia que a pessoa contou: inteira sem casas, quebrada com 2 ("0,50 euro" não vira "0 euros")."""
+    return num(v, 0) if float(v).is_integer() else num(v, 2)
+
+
+def _reais(v: float) -> str:
+    """Real da conta: sem centavos a partir de R$ 1.000; abaixo disso, com centavos ("R$ 2,82", não "R$ 3")."""
+    return num(v, 0) if abs(v) >= 1000 else num(v, 2)
+
+
 def _meses(m: float) -> str:
     """Meses inteiros, sem arredondar para cima, e os anos quando passa de 2."""
     n = int(m)
@@ -812,34 +822,34 @@ def conta_cambio(valor: float, moeda: str, gasto: float | None = None, gasto_moe
     hoje_r = valor * c['valor']
     ano_r = valor * c['ano_valor']
     b = Bloco(TITULO_CONTA_CAMBIO)
-    b.add(f'{num(valor, 0)} {plural} × R$ {num(c["valor"], 4)} (cotação oficial do {nome} em {dia(c["data"])}) = '
-          f'R$ {num(hoje_r, 0)}.', fonte)
-    b.add(f'Cada R$ 0,10 que o {nome} sobe ou desce muda esse valor em R$ {num(valor * 0.1, 0)}.', fonte)
+    b.add(f'{_qtd(valor)} {plural} × R$ {num(c["valor"], 4)} (cotação oficial do {nome} em {dia(c["data"])}) = '
+          f'R$ {_reais(hoje_r)}.', fonte)
+    b.add(f'Cada R$ 0,10 de diferença na cotação do {nome} muda esse valor em R$ {_reais(valor * 0.1)}.', fonte)
     dif = ano_r - hoje_r
     b.add(f'No fim de {c["ano_data"][:4]} ({dia(c["ano_data"])}), 1 {nome} valia R$ {num(c["ano_valor"], 4)}: os mesmos '
-          f'{num(valor, 0)} {plural} davam R$ {num(ano_r, 0)}, '
-          + (f'R$ {num(abs(dif), 0)} {"a mais" if dif > 0 else "a menos"} do que hoje.' if num(abs(dif), 0) != '0'
+          f'{_qtd(valor)} {plural} davam R$ {_reais(ano_r)}, '
+          + (f'R$ {_reais(abs(dif))} {"a mais" if dif > 0 else "a menos"} do que hoje.' if _reais(abs(dif)) not in ('0', '0,00')
              else 'o mesmo que hoje.'),
           fonte)
     b.add(f'Nos últimos 12 meses, 1 {nome} foi de R$ {num(c["min_valor"], 4)} ({dia(c["min_data"])}) a '
           f'R$ {num(c["max_valor"], 4)} ({dia(c["max_data"])}): nesses dois extremos, os mesmos {plural} dariam de '
-          f'R$ {num(valor * c["min_valor"], 0)} a R$ {num(valor * c["max_valor"], 0)}.', fonte)
+          f'R$ {_reais(valor * c["min_valor"])} a R$ {_reais(valor * c["max_valor"])}.', fonte)
     cobre = ''
     if gasto:
         if gasto_moeda == moeda:
             meses = valor / gasto
-            b.add(f'Com gasto de {num(gasto, 0)} {plural} por mês, os {num(valor, 0)} {plural} cobrem {_meses(meses)}, sem '
+            b.add(f'Com gasto de {_qtd(gasto)} {plural} por mês, os {_qtd(valor)} {plural} cobrem {_meses(meses)}, sem '
                   f'contar rendimento, imposto nem custo da troca.')
         else:
             meses = hoje_r / gasto
-            b.add(f'Com gasto de R$ {num(gasto, 0)} por mês, R$ {num(hoje_r, 0)} cobrem {_meses(meses)}, sem contar '
+            b.add(f'Com gasto de R$ {_qtd(gasto)} por mês, R$ {_reais(hoje_r)} cobrem {_meses(meses)}, sem contar '
                   f'rendimento, imposto nem custo da troca. Com o {nome} na menor cotação dos 12 meses, seriam '
                   f'{_meses(valor * c["min_valor"] / gasto)}; na maior, {_meses(valor * c["max_valor"] / gasto)}.', fonte)
         cobre = f'; com o seu gasto por mês, cobrem {_meses(meses)}'
     b.add('É só a conta com os números que você contou: não diz o que fazer com o dinheiro, nem quando trocar, nem quanto.')
     b.limites.append(LIMITE_PTAX_EURO.replace('do euro', f'do {nome}') if moeda != 'euro' else LIMITE_PTAX_EURO)
-    b.resumo = (f'Seus {num(valor, 0)} {plural} valem R$ {num(hoje_r, 0)} pela cotação oficial de {dia(c["data"])}; cada '
-                f'R$ 0,10 no {nome} muda isso em R$ {num(valor * 0.1, 0)}{cobre}.')
+    b.resumo = (f'Seus {_qtd(valor)} {plural} valem R$ {_reais(hoje_r)} pela cotação oficial de {dia(c["data"])}; cada '
+                f'R$ 0,10 no {nome} muda isso em R$ {_reais(valor * 0.1)}{cobre}.')
     return b
 
 

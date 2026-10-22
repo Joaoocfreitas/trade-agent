@@ -211,7 +211,7 @@ def _quantia(numero: str, mult: str | None) -> float | None:
         v = _numero(numero) * MULTIPLICA.get(mult or '', 1)
     except ValueError:
         return None
-    return v if 0 < v < 1e12 else None
+    return v if 0 < v < 1e10 else None
 
 
 def cambio(t: str) -> tuple[float | None, str | None, float | None, str | None]:

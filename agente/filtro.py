@@ -26,7 +26,7 @@ AMBAS = re.compile(r'\b(subir ou cair|sobe ou cai|cair ou subir|cai ou sobe|alta
 INEXISTENTE = re.compile(r'\bnao (existe|ha|tem)\b')
 ORACAO = re.compile(r'[.!?;:\n]|\b(mas|porem|contudo|entretanto|so que)\b')
 
-SUJ = (r'(o |a |os |as )?(ibovespa|ibov|bolsa|indice|mini-indice|mini indice|dolar|real|juros|di1?|bitcoin|cripto|'
+SUJ = (r'(o |a |os |as )?(ibovespa|ibov|bolsa|indice|mini-indice|mini indice|dolar|euro|real|juros|di1?|bitcoin|cripto|'
        r'token|memecoin|win|wdo|bova11|acoes|mercado)')
 DIR = (r'(sobe|sobem|subira|subiria|subir|suba|cai|caem|caira|cairia|cair|caia|dispara|disparar|despenca|despencar|'
        r'derrete|derreter|valoriza|valorizar|desvaloriza|desvalorizar|aprecia|apreciar|se apreciar|recua|recuar|cede|'

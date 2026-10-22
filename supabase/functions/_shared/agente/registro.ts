@@ -122,6 +122,13 @@ export type LeituraSemVoto = { mercados: string[]; candidatos: string[]; temas: 
 export type IaRegistrada = { leitura?: Record<string, unknown> | null; [chave: string]: unknown }
 
 /** O que o roteador leu, sem o candidato quando a pessoa contou o voto (senão dá para reconstruir o voto). */
+/** registro.violacoes_sem_dinheiro do Python: com a conta de câmbio, o trecho de uma violação pode trazer o valor
+ * calculado a partir do dinheiro da pessoa ("R$ 847.410"); os dígitos saem. */
+export function violacoesSemDinheiro<V extends { trecho: string }>(violacoes: V[], p: Pedido): V[] {
+  const conta = p.valor_moeda !== null && (p.moeda === 'euro' || p.moeda === 'dolar')
+  return violacoes.map((v) => conta ? { ...v, trecho: v.trecho.replace(/\d/g, '#') } : v)
+}
+
 export function leituraSemVoto(p: PedidoLido, pergunta: string): LeituraSemVoto {
   const voto = p.voto_informado || falouDeVoto(pergunta)
   return { mercados: p.mercados, candidatos: voto ? [] : p.candidatos, temas: p.temas, proibidos: p.proibidos }
