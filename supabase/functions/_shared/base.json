@@ -1,5 +1,5 @@
 {
- "gerado_em": "2026-10-22T19:53:11-03:00",
+ "gerado_em": "2026-10-22T19:54:00-03:00",
  "textos": {
   "AVISO": "⚠️ Sou uma IA e posso errar. Isto não é recomendação de investimento: a empresa não é analista credenciada na APIMEC nem consultora autorizada pela CVM. Rentabilidade passada não indica rentabilidade futura.",
   "RECUSA": "Não digo se você deve comprar, vender ou esperar, nem para onde o preço vai: isso seria análise ou consultoria. Mostro o que dá para saber hoje, com fonte, para você decidir.",
@@ -8699,6 +8699,90 @@
     }
    ],
    "resumo": "Os economistas que o Banco Central consulta toda semana (boletim Focus, 104 instituições em 16/10/2026) esperam o dólar a R$ 5,13 no fim de 2026; as respostas vão de R$ 4,50 a R$ 5,45. É a expectativa deles, não do Thoran, e ela já errou: de 2021 a 2025, a diferença entre o esperado e o dólar do fim do ano foi de R$ 0,38 a R$ 1,19, para os dois lados.",
+   "limites": [
+    "A expectativa é a mediana das instituições que respondem ao Focus, não uma previsão do Thoran, e já errou para os dois lados.",
+    "Os erros listados são de medianas feitas cerca de 12 meses antes do fim de cada ano; a de hoje é do boletim de 16/10/2026."
+   ]
+  },
+  "euro": {
+   "titulo": "O que o mercado espera (boletim Focus do Banco Central, mediana das instituições, 16/10/2026)",
+   "linhas": [
+    {
+     "texto": "Câmbio: R$ 5,13 para o fim de 2026 e R$ 5,22 para o fim de 2027, pela mediana de 104 instituições no Focus de 16/10/2026 (a expectativa delas, não do Thoran); para 2026, as respostas vão de R$ 4,50 a R$ 5,45.",
+     "fontes": [
+      {
+       "nome": "Banco Central, boletim Focus (expectativas anuais: mediana das instituições que respondem)",
+       "url": "https://olinda.bcb.gov.br/olinda/servico/Expectativas/versao/v1/odata/ExpectativasMercadoAnuais"
+      }
+     ]
+    },
+    {
+     "texto": "Selic: 13,25% no fim de 2026, pela mediana de 133 instituições; para a próxima reunião do Copom (R7/2026, decisão em 04/11/2026), 13,50%. A meta hoje é de 13,75%.",
+     "fontes": [
+      {
+       "nome": "Banco Central, boletim Focus (expectativas anuais: mediana das instituições que respondem)",
+       "url": "https://olinda.bcb.gov.br/olinda/servico/Expectativas/versao/v1/odata/ExpectativasMercadoAnuais"
+      },
+      {
+       "nome": "Banco Central, boletim Focus (expectativa da Selic por reunião)",
+       "url": "https://olinda.bcb.gov.br/olinda/servico/Expectativas/versao/v1/odata/ExpectativasMercadoSelic"
+      },
+      {
+       "nome": "Banco Central, SGS 432 (meta da Selic)",
+       "url": "https://api.bcb.gov.br/dados/serie/bcdata.sgs.432/dados/ultimos/1?formato=json"
+      }
+     ]
+    },
+    {
+     "texto": "IPCA: 5,22% em 2026 e 4,32% em 2027.",
+     "fontes": [
+      {
+       "nome": "Banco Central, boletim Focus (expectativas anuais: mediana das instituições que respondem)",
+       "url": "https://olinda.bcb.gov.br/olinda/servico/Expectativas/versao/v1/odata/ExpectativasMercadoAnuais"
+      }
+     ]
+    },
+    {
+     "texto": "O Focus também erra. Câmbio: a mediana do último boletim do ano anterior, cerca de 12 meses antes, contra a PTAX do último dia útil do ano: 2021, R$ 5,00 contra R$ 5,5805; 2022, R$ 5,60 contra R$ 5,2177; 2023, R$ 5,27 contra R$ 4,8413; 2024, R$ 5,00 contra R$ 6,1923; 2025, R$ 6,00 contra R$ 5,5024.",
+     "fontes": [
+      {
+       "nome": "Banco Central, boletim Focus (expectativas anuais: mediana das instituições que respondem)",
+       "url": "https://olinda.bcb.gov.br/olinda/servico/Expectativas/versao/v1/odata/ExpectativasMercadoAnuais"
+      },
+      {
+       "nome": "Banco Central, SGS 1 (dólar PTAX de venda)",
+       "url": "https://api.bcb.gov.br/dados/serie/bcdata.sgs.1/dados/ultimos/1?formato=json"
+      }
+     ]
+    },
+    {
+     "texto": "O Focus também erra. Selic: a mediana do último boletim do ano anterior, cerca de 12 meses antes, contra a meta em 31/12: 2021, 3,00% contra 9,25%; 2022, 11,50% contra 13,75%; 2023, 12,25% contra 11,75%; 2024, 9,00% contra 12,25%; 2025, 14,75% contra 15,00%.",
+     "fontes": [
+      {
+       "nome": "Banco Central, boletim Focus (expectativas anuais: mediana das instituições que respondem)",
+       "url": "https://olinda.bcb.gov.br/olinda/servico/Expectativas/versao/v1/odata/ExpectativasMercadoAnuais"
+      },
+      {
+       "nome": "Banco Central, SGS 432 (meta da Selic)",
+       "url": "https://api.bcb.gov.br/dados/serie/bcdata.sgs.432/dados/ultimos/1?formato=json"
+      }
+     ]
+    },
+    {
+     "texto": "Diferença entre a mediana e o que aconteceu, sem o sinal, de 2021 a 2025: câmbio de R$ 0,38 a R$ 1,19; Selic de 0,25 a 6,25 p.p.",
+     "fontes": [
+      {
+       "nome": "Banco Central, boletim Focus (expectativas anuais: mediana das instituições que respondem)",
+       "url": "https://olinda.bcb.gov.br/olinda/servico/Expectativas/versao/v1/odata/ExpectativasMercadoAnuais"
+      },
+      {
+       "nome": "Cálculo próprio: estudo de evento 2016–2026 sobre as séries oficiais (método no cofre, nota \"Estudo de evento 2016–2026\")",
+       "url": ""
+      }
+     ]
+    }
+   ],
+   "resumo": "O Focus não pergunta pelo euro; para o dólar, os economistas que o Banco Central consulta toda semana (boletim Focus, 104 instituições em 16/10/2026) esperam o dólar a R$ 5,13 no fim de 2026; as respostas vão de R$ 4,50 a R$ 5,45. É a expectativa deles, não do Thoran, e ela já errou: de 2021 a 2025, a diferença entre o esperado e o dólar do fim do ano foi de R$ 0,38 a R$ 1,19, para os dois lados.",
    "limites": [
     "A expectativa é a mediana das instituições que respondem ao Focus, não uma previsão do Thoran, e já errou para os dois lados.",
     "Os erros listados são de medianas feitas cerca de 12 meses antes do fim de cada ano; a de hoje é do boletim de 16/10/2026."

@@ -66,7 +66,7 @@ def base() -> dict:
         'eventos': {t: _bloco(F.eventos(t)) for t in F.TIPOS},
         'mercado': {k: _bloco(F.mercado(k)) for k in ('mini_indice', 'mini_dolar', 'juros', 'ibovespa', 'cripto')},
         'historico': {k: _bloco(F.historico(k)) for k in F.HISTORICO},
-        'expectativas': {k: _bloco(F.expectativas(k)) for k in ('', 'dolar', 'juros', 'ibovespa')},
+        'expectativas': {k: _bloco(F.expectativas(k)) for k in ('', 'dolar', 'euro', 'juros', 'ibovespa')},
         'agenda': {k: [{'tipo': i['tipo'], 'data': i['data'], 'curto': i['curto'],
                         'fontes': [_fonte(f) for f in i['fontes']]} for i in F.agenda(k)] for k in F.HISTORICO},
         'titulo_cripto': F.TITULO_CRIPTO,
