@@ -1,0 +1,13 @@
+{
+  "id": "P062",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "habit",
+  "reason": "Toda noite eu já assisto live de trader no YouTube de graça, e eles já falam do Copom e do mini-índice. Pagar R$ 29,90 por uma ferramenta que me devolve tabela de histórico pra eu mesma ler não cabe na minha rotina.",
+  "objection": "Não tenho tempo de ler histórico, quero algo rápido. Isso parece que vai me jogar número, melhor e pior caso e fonte, e no fim nem diz o que fazer, então eu ainda tenho que interpretar tudo sozinha.",
+  "would_change_my_mind": "Ver um trader que eu já acompanho usando isso numa live e mostrando que a resposta sai em uma frase curta, em segundos, com um teste grátis pra eu tentar antes de pagar.",
+  "price_too_cheap": 5,
+  "price_cheap": 12,
+  "price_expensive": 30,
+  "price_too_expensive": 60
+}

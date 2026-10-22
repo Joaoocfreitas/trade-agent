@@ -1,0 +1,13 @@
+{
+  "id": "P088",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "need",
+  "reason": "Já pago a Empiricus e ela me entrega a tese pronta; isso aqui me dá histórico desde 2016 pra eu mesmo interpretar, e eu não tenho tempo de ler tabela de melhor e pior caso. R$ 29,90 não pesa no bolso, mas não vou assinar mais uma coisa que vira lição de casa.",
+  "objection": "Se não diz o que fazer, vou ter que ler os casos, as fontes e os riscos e tirar a conclusão sozinho, e é exatamente isso que eu pago a casa de análise pra não ter que fazer.",
+  "would_change_my_mind": "Um resumo de três linhas no topo de cada resposta, que eu leia em 30 segundos antes do pregão, mostrando o que mudou em relação ao que a minha casa de análise está dizendo.",
+  "price_too_cheap": 9.9,
+  "price_cheap": 19.9,
+  "price_expensive": 59.9,
+  "price_too_expensive": 99
+}

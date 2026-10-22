@@ -1,6 +1,8 @@
 """Estudo de evento.
 
   python -m estudo baixar   # baixa as séries oficiais e o Focus das reuniões do Copom para dados/series/
+  python -m estudo focus    # só o que o mercado espera (Focus), o histórico de erro e a agenda do Copom
+  python -m estudo diario   # a rodada automática: séries e Focus, o portão (estudo/portao.py) e o relatório
   python -m estudo medir    # mede os eventos da linha do tempo e grava dados/estudo/
 """
 import argparse
@@ -15,6 +17,8 @@ from coletor.config import DADOS, FONTES_DIR, FUSO
 from .agregados import agregar, analisar_copom, caminho_medio, depois_do_dia_zero, permutacao
 from .janelas import calendario, comportamento, dia_zero, medir_preco, medir_taxa, no_calendario
 from .eleicoes import tabela_eleicoes
+from .expectativas import baixar_expectativas
+from .portao import aplicar
 from .series import Cliente, baixar_tudo, limpar_ibov
 from .surpresa import COMUNICADOS, decisao, dividida, expectativa_na_vespera, reunioes, url_focus, url_focus_reuniao
 
@@ -166,6 +170,68 @@ def baixar(_args: argparse.Namespace) -> None:
                                'registros': c.json(url_focus_reuniao(r['reuniao'], r['decisao']))['value']}
     (SERIES / 'copom_reunioes.json').write_text(json.dumps(todas, ensure_ascii=False), encoding='utf-8')
     print(f'  Copom: {len(todas)} reuniões com o Focus de antes da decisão', flush=True)
+    focus_hoje(_args)
+
+
+def focus_hoje(_args: argparse.Namespace) -> None:
+    """Só o que o mercado espera hoje (Focus), o histórico de erro do Focus e a agenda do Copom: dados/series/focus.json."""
+    f = baixar_expectativas(Cliente(), SERIES, pd.Timestamp.now(tz=FUSO).date())
+    print(f"  Focus de {f['data']}: {len(f['atual'])} medianas, próxima reunião {f['proxima_reuniao']['reuniao']}, "
+          f"{len(f['historico'])} anos de histórico, {len(f['agenda_copom'])} reuniões na agenda", flush=True)
+
+
+def diario(_args: argparse.Namespace) -> None:
+    """A rodada automática (GitHub Actions, duas vezes por dia). Baixa as séries e o Focus, passa cada uma pelo portão e
+    devolve a de antes quando a nova não passa. Não mede evento nem mexe em dados/estudo: caso novo só entra por PR.
+    Variáveis: ACEITAR (séries cujo salto a pessoa conferiu e liberou, separadas por vírgula), RELATORIO e AVISO
+    (caminhos dos arquivos de saída). Sai 0 mesmo com série segurada: o aviso é que chama a pessoa."""
+    import os
+    import shutil
+    import tempfile
+    from pathlib import Path
+    hoje = pd.Timestamp.now(tz=FUSO).date()
+    antes = Path(tempfile.mkdtemp(prefix='antes-'))
+    for f in list(SERIES.glob('*.csv')) + [SERIES / 'focus.json', SERIES / 'manifesto.json']:
+        if f.exists():
+            shutil.copy2(f, antes / f.name)
+    ligadas_json = SERIES / 'ligadas.json'
+    ligadas = {k: v for k, v in json.loads(ligadas_json.read_text(encoding='utf-8')).items() if not k.startswith('_')} \
+        if ligadas_json.exists() else {}
+    falhas = []
+    try:
+        baixar_tudo(SERIES, date(2015, 1, 1), hoje, pular=frozenset(k for k, v in ligadas.items() if not v))
+    except Exception as e:  # noqa: BLE001 — a rodada segue com o que veio; o portão devolve o resto
+        falhas.append(f'séries: {e}')
+    try:
+        baixar_expectativas(Cliente(), SERIES, hoje)
+    except Exception as e:  # noqa: BLE001
+        falhas.append(f'Focus: {type(e).__name__}: {e}')
+    aceitar = frozenset(x.strip() for x in os.environ.get('ACEITAR', '').split(',') if x.strip())
+    res = aplicar(SERIES, antes, ligadas, pd.Timestamp(hoje), aceitar)
+    # manifesto: só as séries que mudaram de verdade levam a entrada nova; sem nada novo, fica o de antes inteiro
+    mudou = {r.nome for r in res if r.situacao == 'atualizada'}
+    velho = json.loads((antes / 'manifesto.json').read_text(encoding='utf-8')) if (antes / 'manifesto.json').exists() else {}
+    if not mudou - {'focus'}:
+        if velho:
+            (SERIES / 'manifesto.json').write_text(json.dumps(velho, ensure_ascii=False, indent=1), encoding='utf-8')
+    else:
+        novo = json.loads((SERIES / 'manifesto.json').read_text(encoding='utf-8'))
+        for nome in set(novo) | set(velho):
+            if not nome.startswith('_') and nome not in mudou and nome in velho:
+                novo[nome] = velho[nome]
+        (SERIES / 'manifesto.json').write_text(json.dumps(novo, ensure_ascii=False, indent=1), encoding='utf-8')
+    seguradas = [r for r in res if r.situacao == 'segurada']
+    linhas = [f'Rodada de {pd.Timestamp.now(tz=FUSO):%d/%m/%Y %H:%M} (Brasília)', ''] + [r.linha() for r in res]
+    if falhas:
+        linhas += ['', 'Falhas de download (a série ficou a de antes):'] + [f'- {f}' for f in falhas]
+    texto = '\n'.join(linhas)
+    print(texto)
+    if os.environ.get('RELATORIO'):
+        Path(os.environ['RELATORIO']).write_text(texto + '\n', encoding='utf-8')
+    if seguradas and os.environ.get('AVISO'):
+        Path(os.environ['AVISO']).write_text(
+            texto + '\n\nO número que está no ar é o de antes, com a data de antes. Para liberar depois de conferir na fonte: '
+            'Actions › Rodada diária › Run workflow, com as séries em "aceitar" (ex.: ptax,ibov).\n', encoding='utf-8')
 
 
 def medir(_args: argparse.Namespace) -> None:
@@ -245,8 +311,10 @@ def main() -> None:
     sub = p.add_subparsers(dest='cmd', required=True)
     sub.add_parser('baixar')
     sub.add_parser('medir')
+    sub.add_parser('focus')
+    sub.add_parser('diario')
     args = p.parse_args()
-    baixar(args) if args.cmd == 'baixar' else medir(args)
+    {'baixar': baixar, 'focus': focus_hoje, 'diario': diario, 'medir': medir}[args.cmd](args)
 
 
 if __name__ == '__main__':

@@ -1,0 +1,13 @@
+{
+  "id": "P044",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "habit",
+  "reason": "Eu aprendo tudo de graça no YouTube e no Instagram, todo dia tem alguém explicando o que o mini-índice fez na semana do Copom. Não é que R$ 29,90 me quebre, é que eu simplesmente não pago por informação e não vi aqui nada que eu não ache de graça.",
+  "objection": "Quem está por trás disso? Não diz quem fez, nem se tem registro na CVM. Falar que 'não é recomendação' é o que todo mundo fala, e eu não sei se os números são confiáveis mesmo citando B3 e Banco Central.",
+  "would_change_my_mind": "Saber quem são as pessoas por trás e ter um teste grátis de uns 7 dias pra eu fazer as minhas perguntas e conferir se os números batem com a fonte.",
+  "price_too_cheap": 5,
+  "price_cheap": 10,
+  "price_expensive": 20,
+  "price_too_expensive": 35
+}

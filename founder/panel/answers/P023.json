@@ -1,0 +1,13 @@
+{
+  "id": "P023",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "habit",
+  "reason": "A pergunta do Copom é exatamente a que eu faço, mas eu já vejo análise de Copom e eleição de graça no YouTube e no Twitter toda semana. Pagar R$ 29,90 por mês por uma IA que eu nunca testei, sem saber se acerta os números, não entra no meu orçamento agora.",
+  "objection": "Já tem muito conteúdo grátis sobre isso, e não sei se a IA puxa o dado certo ou inventa; se ela não diz quando entrar, pra quem opera mini-índice no intervalo fica parecendo só curiosidade histórica.",
+  "would_change_my_mind": "Poder fazer umas 5 perguntas de graça antes de pagar e conferir eu mesmo um número contra a fonte da B3 ou do Banco Central.",
+  "price_too_cheap": 5,
+  "price_cheap": 12,
+  "price_expensive": 25,
+  "price_too_expensive": 40
+}

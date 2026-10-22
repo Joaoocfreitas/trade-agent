@@ -1,0 +1,13 @@
+{
+  "id": "P077",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "habit",
+  "reason": "Eu aprendo tudo de graça no YouTube e no Instagram, todo dia tem alguém falando de Copom e mini-índice sem me cobrar nada. Pagar R$ 29,90 por mês por estatística do passado não entra no meu orçamento de quem opera no tempo livre.",
+  "objection": "O passado não garante o que vai acontecer agora. Saber que o mini-índice caiu 7 de 10 vezes na semana do Copom não me diz o que fazer nessa semana, e a própria IA avisa que não diz quando entrar nem quanto colocar.",
+  "would_change_my_mind": "Um período grátis em que eu visse uma resposta dessas me poupar de uma perda de verdade numa semana de Copom, ou um influenciador que eu já sigo mostrando que usa.",
+  "price_too_cheap": 5,
+  "price_cheap": 9.9,
+  "price_expensive": 19.9,
+  "price_too_expensive": 30
+}

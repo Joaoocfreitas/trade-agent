@@ -1,0 +1,13 @@
+{
+  "id": "P084",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "need",
+  "reason": "Se a IA não me diz o que comprar nem quando entrar, eu continuo tendo que decidir sozinha, e o app da corretora e os relatórios grátis já me dão notícia e gráfico. Pagar R$ 29,90 todo mês por estatística do passado não cabe no meu jeito de usar só o que é de graça.",
+  "objection": "Saber que o mini-índice subiu tantas vezes na semana do Copom desde 2016 não me diz o que fazer agora, e o passado não garante nada; parece um Google caro com gráfico bonito.",
+  "would_change_my_mind": "Uma versão grátis com algumas perguntas por mês, pra eu ver se aquilo muda de verdade como eu opero antes de assinar.",
+  "price_too_cheap": 3,
+  "price_cheap": 9.9,
+  "price_expensive": 19.9,
+  "price_too_expensive": 29.9
+}

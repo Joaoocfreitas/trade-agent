@@ -1,0 +1,13 @@
+{
+  "id": "P018",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "need",
+  "reason": "A agenda de segunda com Copom e votação eu usaria, e ela já vem no grátis. Eu opero mini-índice no intervalo do trabalho, preciso saber se entro comprado ou vendido, e 'quantas vezes aconteceu desde 2016' não me diz isso; 3 perguntas por semana no grátis dão conta da minha curiosidade.",
+  "objection": "Se não diz o que comprar, pra que serve? Estatística de semana de Copom desde 2016 é pouca amostra pra quem opera intraday, e média histórica não me ajuda na hora de clicar.",
+  "would_change_my_mind": "Ver durante um mês, no grátis, que o histórico de eventos políticos (votação no Congresso, decisão do STF, pesquisa eleitoral) bateu com o que o mini-índice fez no dia, e acabar as 3 perguntas numa semana quente de eleição.",
+  "price_too_cheap": 5,
+  "price_cheap": 15,
+  "price_expensive": 30,
+  "price_too_expensive": 50
+}

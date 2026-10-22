@@ -1,0 +1,13 @@
+{
+  "id": "P074",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "Não sei quem está por trás disso nem se tem registro na CVM, e esse tipo de estatística do Copom eu já vejo de graça no YouTube e nos grupos de Telegram. Não é o preço, R$ 29,90 é nada pra mim; é que eu não pago por informação de quem eu não conheço.",
+  "objection": "Quem são essas pessoas? Se der errado e eu perder dinheiro achando que 'o histórico mostra', ninguém responde por nada, porque eles mesmos dizem que não é recomendação.",
+  "would_change_my_mind": "Ver o nome de quem faz, com CNPJ e alguém conhecido do mercado ou registrado na CVM, e um teste grátis pra eu comparar com o que já recebo de graça nos grupos.",
+  "price_too_cheap": 5,
+  "price_cheap": 15,
+  "price_expensive": 50,
+  "price_too_expensive": 90
+}

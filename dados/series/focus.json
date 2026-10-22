@@ -1,0 +1,213 @@
+{
+ "baixado_em": "2026-10-22T16:38:33-03:00",
+ "data": "2026-10-16",
+ "atual": {
+  "Selic|2026": {
+   "data": "2026-10-16",
+   "mediana": 13.25,
+   "minimo": 13.0,
+   "maximo": 14.0,
+   "respondentes": 133
+  },
+  "IPCA|2026": {
+   "data": "2026-10-16",
+   "mediana": 5.219,
+   "minimo": 4.5,
+   "maximo": 5.875,
+   "respondentes": 137
+  },
+  "IPCA|2027": {
+   "data": "2026-10-16",
+   "mediana": 4.3206,
+   "minimo": 3.1418,
+   "maximo": 6.0,
+   "respondentes": 137
+  },
+  "Câmbio|2026": {
+   "data": "2026-10-16",
+   "mediana": 5.132,
+   "minimo": 4.5,
+   "maximo": 5.45,
+   "respondentes": 104
+  },
+  "Câmbio|2027": {
+   "data": "2026-10-16",
+   "mediana": 5.2213,
+   "minimo": 4.6,
+   "maximo": 5.6,
+   "respondentes": 103
+  },
+  "PIB Total|2026": {
+   "data": "2026-10-16",
+   "mediana": 1.8301,
+   "minimo": 1.3797,
+   "maximo": 2.2825,
+   "respondentes": 105
+  }
+ },
+ "proxima_reuniao": {
+  "data": "2026-10-16",
+  "reuniao": "R7/2026",
+  "mediana": 13.5,
+  "respondentes": 131
+ },
+ "historico": {
+  "2021": {
+   "Selic": {
+    "data": "2020-12-31",
+    "mediana": 3.0,
+    "minimo": 2.0,
+    "maximo": 5.5,
+    "respondentes": 103
+   },
+   "IPCA": {
+    "data": "2020-12-31",
+    "mediana": 3.32,
+    "minimo": 2.5,
+    "maximo": 4.18,
+    "respondentes": 118
+   },
+   "Câmbio": {
+    "data": "2020-12-31",
+    "mediana": 5.0,
+    "minimo": 4.5,
+    "maximo": 6.0,
+    "respondentes": 99
+   }
+  },
+  "2022": {
+   "Selic": {
+    "data": "2021-12-31",
+    "mediana": 11.5,
+    "minimo": 8.25,
+    "maximo": 13.75,
+    "respondentes": 117
+   },
+   "IPCA": {
+    "data": "2021-12-31",
+    "mediana": 5.0302,
+    "minimo": 2.9377,
+    "maximo": 6.5479,
+    "respondentes": 132
+   },
+   "Câmbio": {
+    "data": "2021-12-31",
+    "mediana": 5.6,
+    "minimo": 4.0,
+    "maximo": 6.32,
+    "respondentes": 108
+   }
+  },
+  "2023": {
+   "Selic": {
+    "data": "2022-12-30",
+    "mediana": 12.25,
+    "minimo": 10.25,
+    "maximo": 13.75,
+    "respondentes": 124
+   },
+   "IPCA": {
+    "data": "2022-12-30",
+    "mediana": 5.3128,
+    "minimo": 3.4016,
+    "maximo": 6.93,
+    "respondentes": 138
+   },
+   "Câmbio": {
+    "data": "2022-12-30",
+    "mediana": 5.27,
+    "minimo": 4.4,
+    "maximo": 5.88,
+    "respondentes": 109
+   }
+  },
+  "2024": {
+   "Selic": {
+    "data": "2023-12-29",
+    "mediana": 9.0,
+    "minimo": 7.0,
+    "maximo": 10.5,
+    "respondentes": 142
+   },
+   "IPCA": {
+    "data": "2023-12-29",
+    "mediana": 3.9,
+    "minimo": 3.0198,
+    "maximo": 5.26,
+    "respondentes": 149
+   },
+   "Câmbio": {
+    "data": "2023-12-29",
+    "mediana": 5.0,
+    "minimo": 4.2,
+    "maximo": 5.42,
+    "respondentes": 117
+   }
+  },
+  "2025": {
+   "Selic": {
+    "data": "2024-12-31",
+    "mediana": 14.75,
+    "minimo": 11.75,
+    "maximo": 16.325,
+    "respondentes": 143
+   },
+   "IPCA": {
+    "data": "2024-12-31",
+    "mediana": 4.9932,
+    "minimo": 3.6416,
+    "maximo": 6.5,
+    "respondentes": 149
+   },
+   "Câmbio": {
+    "data": "2024-12-31",
+    "mediana": 5.997,
+    "minimo": 5.4,
+    "maximo": 6.9,
+    "respondentes": 120
+   }
+  }
+ },
+ "agenda_copom": [
+  {
+   "inicio": "2026-11-03",
+   "decisao": "2026-11-04"
+  },
+  {
+   "inicio": "2026-12-08",
+   "decisao": "2026-12-09"
+  },
+  {
+   "inicio": "2027-01-26",
+   "decisao": "2027-01-27"
+  },
+  {
+   "inicio": "2027-03-16",
+   "decisao": "2027-03-17"
+  },
+  {
+   "inicio": "2027-04-27",
+   "decisao": "2027-04-28"
+  },
+  {
+   "inicio": "2027-06-15",
+   "decisao": "2027-06-16"
+  },
+  {
+   "inicio": "2027-08-03",
+   "decisao": "2027-08-04"
+  },
+  {
+   "inicio": "2027-09-21",
+   "decisao": "2027-09-22"
+  },
+  {
+   "inicio": "2027-10-26",
+   "decisao": "2027-10-27"
+  },
+  {
+   "inicio": "2027-12-07",
+   "decisao": "2027-12-08"
+  }
+ ]
+}

@@ -1,0 +1,13 @@
+{
+  "id": "P006",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "price",
+  "reason": "Eu não pago assinatura pra nada de mercado, uso o app da corretora e o que é grátis. Talvez eu use as 3 perguntas grátis por semana e a agenda de segunda, mas R$ 29,90 por mês é muito pra quem ganha o que eu ganho e opera pouco.",
+  "objection": "Ainda acho que pode ser mais um 'IA pra trader' bonitinho. O link pra fonte oficial e o nome do cara ajudam, mas saber o que aconteceu das outras vezes não me diz se eu vou ganhar agora, e pagar todo mês por histórico eu não pago.",
+  "would_change_my_mind": "Usar o grátis por uns meses e ver que os números batem mesmo com a B3 e o Banco Central e que me ajudou a não fazer besteira numa semana de Copom; e um preço tipo R$ 9,90, ou anual bem mais barato.",
+  "price_too_cheap": 3,
+  "price_cheap": 7,
+  "price_expensive": 15,
+  "price_too_expensive": 25
+}

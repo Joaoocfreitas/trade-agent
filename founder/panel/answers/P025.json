@@ -1,0 +1,13 @@
+{
+  "id": "P025",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "Não sei quem está por trás disso, e o anúncio não fala nada de CVM nem de quem faz. Eu já acompanho tudo de graça no app da corretora, então não vou pagar R$ 29,90 por mês pra uma IA de quem eu nunca ouvi falar.",
+  "objection": "Quem garante que esses números estão certos? IA inventa coisa, e 'não é recomendação' parece mais um jeito de tirar o corpo fora se der errado do que uma garantia pra mim.",
+  "would_change_my_mind": "Um teste grátis de verdade, sem cartão, junto com o nome de quem faz e alguém conhecido do mercado por trás, pra eu conferir alguns números com a fonte antes de pagar.",
+  "price_too_cheap": 5,
+  "price_cheap": 9.9,
+  "price_expensive": 19.9,
+  "price_too_expensive": 39.9
+}

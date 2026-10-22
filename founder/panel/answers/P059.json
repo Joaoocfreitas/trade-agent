@@ -1,0 +1,13 @@
+{
+  "id": "P059",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "habit",
+  "reason": "Eu acompanho tudo pelo app da corretora e pelo que é de graça, e ganho pouco; mais R$ 29,90 por mês pra ver estatística do passado, sem dizer o que fazer, não entra no meu orçamento. Se for pra gastar, já tenho a casa de análise.",
+  "objection": "O app da corretora e a casa de análise já me dão relatório e notícia; não vejo o que uma IA mostrando o que aconteceu desde 2016 me dá de diferente, e não sei se confio nesses números sem ver primeiro.",
+  "would_change_my_mind": "Uma versão grátis com algumas perguntas por mês, pra eu testar e ver se me ajuda mais do que o que eu já uso.",
+  "price_too_cheap": 3,
+  "price_cheap": 9.9,
+  "price_expensive": 19.9,
+  "price_too_expensive": 29.9
+}

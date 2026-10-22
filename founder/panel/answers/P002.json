@@ -1,0 +1,13 @@
+{
+  "id": "P002",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "Já paguei sala de sinais, perdi dinheiro e prometi que não ia mais assinar nada de 'IA pra trader' só por um texto bonito. R$ 29,90 não me pesa, mas sem ver uma resposta de verdade antes, pra mim é igual aos outros.",
+  "objection": "Não sei se esses números 'desde 2016' são reais ou escolhidos a dedo pra parecer que funciona, e quem me vendeu curso também dizia que não era recomendação.",
+  "would_change_my_mind": "Poder fazer umas perguntas de graça e conferir eu mesmo na fonte (B3, Banco Central) que os números batem.",
+  "price_too_cheap": 5,
+  "price_cheap": 15,
+  "price_expensive": 40,
+  "price_too_expensive": 70
+}

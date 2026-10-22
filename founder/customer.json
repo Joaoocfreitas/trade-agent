@@ -1,0 +1,37 @@
+{
+  "business": "Repertório de mercado com IA para trader iniciante (produto do mega brain de trade)",
+  "target": "Trader iniciante brasileiro, 18 a 50 anos, que opera ou quer operar ações da B3, mini-índice ou cripto e acompanha política; todos os valores são em reais (R$), inclusive a renda anual",
+  "where": "Brasil, compra online",
+  "age": [18, 50],
+  "segments": [
+    {"name": "Jovem começando (estudante ou primeiro emprego)", "share": 0.35, "income": [18000, 48000]},
+    {"name": "Assalariado que opera no tempo livre", "share": 0.40, "income": [48000, 140000]},
+    {"name": "Profissional de renda alta que quer diversificar", "share": 0.25, "income": [140000, 400000]}
+  ],
+  "behaviours": [
+    {"name": "Aprende de graça no YouTube e no Instagram", "share": 0.25, "how": "Consome conteúdo de trader e influenciador gratuito todo dia e quase nunca paga por informação."},
+    {"name": "Já pagou curso de trade ou sala de sinais", "share": 0.15, "how": "Comprou um curso ou entrou numa sala de sinais, perdeu dinheiro e ficou com o pé atrás."},
+    {"name": "Desconfiado de golpe", "share": 0.15, "how": "Já viu golpe de 'robô que acerta 90%'; só paga se vir prova, reputação e quem está por trás."},
+    {"name": "Já assina casa de análise", "share": 0.15, "how": "Assina Empiricus, Nord ou parecida e compara preço e entrega antes de assinar outra coisa."},
+    {"name": "Só usa o que é grátis", "share": 0.10, "how": "Usa o app da corretora e ferramentas gratuitas; assinatura mensal é exceção."},
+    {"name": "Viciado em política", "share": 0.10, "how": "Acompanha eleição, Congresso e STF todo dia e quer entender como isso mexe no bolso."},
+    {"name": "Quer o atalho", "share": 0.10, "how": "Quer alguém que diga o que fazer; acha que análise sem dica direta não serve para nada."}
+  ],
+  "objections": [
+    "Se não diz o que comprar, pra que serve?",
+    "Já tem muito conteúdo grátis no YouTube sobre isso",
+    "Parece mais um golpe de 'IA para trader'",
+    "O passado não garante o que vai acontecer agora",
+    "Eu já pago uma casa de análise",
+    "Não tenho tempo de ler histórico, quero algo rápido",
+    "Quem está por trás disso? Tem registro na CVM?"
+  ],
+  "habits": [
+    "você acompanha o mercado pelo app da corretora no celular",
+    "você assiste lives de trader no YouTube à noite",
+    "você opera mini-índice no intervalo do trabalho",
+    "você segue perfis de política no X e no Instagram",
+    "você comprou cripto pela primeira vez em 2024",
+    "você está em grupos de investimento no WhatsApp e no Telegram"
+  ]
+}

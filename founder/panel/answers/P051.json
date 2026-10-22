@@ -1,0 +1,13 @@
+{
+  "id": "P051",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "habit",
+  "reason": "Eu não pago assinatura pra operar: uso o app da corretora, o Investing e o que rola nos grupos de WhatsApp e Telegram, tudo de graça. Estatística de semana de Copom desde 2016 o pessoal do grupo já solta de vez em quando, e o passado não garante o que vai acontecer agora.",
+  "objection": "Saber quantas vezes o mini-índice subiu ou caiu em semana de Copom não me diz o que fazer amanhã, e eles mesmos falam que não dizem quando entrar. Vou pagar R$ 29,90 todo mês por um histórico que não decide nada por mim?",
+  "would_change_my_mind": "Uma versão grátis com algumas perguntas por mês, pra eu testar umas semanas e ver se o que ela mostra bate com o que aconteceu de verdade no mercado.",
+  "price_too_cheap": 5,
+  "price_cheap": 9.9,
+  "price_expensive": 19.9,
+  "price_too_expensive": 29.9
+}

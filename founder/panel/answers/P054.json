@@ -1,0 +1,13 @@
+{
+  "id": "P054",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "Já caí em curso e sala de sinal que prometiam o mundo e perdi dinheiro, então não assino nada de mercado sem saber quem está por trás. O anúncio não diz quem fez, nem se tem alguém registrado na CVM, só que 'não é recomendação', o que todo mundo fala pra se proteger.",
+  "objection": "Quem são essas pessoas e por que eu confiaria nos números de uma IA? Se a IA errar ou inventar um dado, o prejuízo é meu, e R$ 29,90 todo mês pesa pra quem ganha o que eu ganho.",
+  "would_change_my_mind": "Poder testar de graça uns dias, fazendo minhas próprias perguntas e conferindo eu mesma a fonte de cada número, e ver o nome e o CNPJ de quem está por trás.",
+  "price_too_cheap": 5,
+  "price_cheap": 12,
+  "price_expensive": 25,
+  "price_too_expensive": 45
+}

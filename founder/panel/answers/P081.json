@@ -1,0 +1,13 @@
+{
+  "id": "P081",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "need",
+  "reason": "Eu já pago uma casa de análise e ela pelo menos me diz o que fazer; mais R$ 29,90 por mês por uma IA que só mostra o histórico e não fala nem entrada nem saída não cabe no meu orçamento de quem ganha uns 4 mil por mês.",
+  "objection": "Não vejo o que isso me entrega que o relatório da casa que eu já assino não entrega, e estatística de semana de Copom desde 2016 não me ajuda a decidir o trade de hoje no intervalo do trabalho.",
+  "would_change_my_mind": "Um teste grátis de uma ou duas semanas em que eu visse, no mini-índice, que o histórico com fonte me fez evitar uma entrada ruim — ou se fosse barato o bastante pra eu nem pensar duas vezes do lado da casa de análise.",
+  "price_too_cheap": 5,
+  "price_cheap": 12,
+  "price_expensive": 22,
+  "price_too_expensive": 35
+}

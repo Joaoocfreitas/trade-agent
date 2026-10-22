@@ -3,6 +3,7 @@
   python -m coletor listar [--categoria CHAVE]
   python -m coletor coletar [--categoria CHAVE] [--paginas] [--artigos N] [--max-alvos N] [--sem-cofre]
   python -m coletor resumo   # reescreve a nota da última rodada sem ir à rede
+  python -m coletor gatilhos [--horas 24] [--saida caminho.md]   # lista do dia para revisão, sem rede
 
 Por padrão lê os feeds e captura o texto completo dos N artigos mais novos de cada feed de texto.
 Com --paginas, também tira um retrato das páginas das fontes sem feed (mais lento: rode uma vez por semana).
@@ -147,6 +148,25 @@ def refazer_resumo(_args: argparse.Namespace) -> None:
     print(f'{len(novos)} itens; resumo reescrito: {destino}')
 
 
+def lista_de_gatilhos(args: argparse.Namespace) -> None:
+    """Lê o índice, separa as manchetes das últimas N horas que acionam um gatilho e grava a lista do dia. Sem rede."""
+    from datetime import timedelta
+    from pathlib import Path
+
+    from .gatilhos import GATILHOS, contar, markdown, selecionar
+
+    ate = datetime.now(config.FUSO)
+    desde = ate - timedelta(hours=args.horas)
+    selecionados = selecionar(Armazem(config.COLETA_DIR).registros(), desde, ate)
+    destino = Path(args.saida) if args.saida else config.COLETA_DIR / f'gatilhos-{ate:%Y-%m-%d}.md'
+    destino.parent.mkdir(parents=True, exist_ok=True)
+    destino.write_text(markdown(selecionados, ate.date(), desde, ate), encoding='utf-8')
+    n = contar(selecionados)
+    por = ', '.join(f'{g.nome}: {n[g.nome]}' for g in GATILHOS if n[g.nome])
+    print(f'{len(selecionados)} itens{f" ({por})" if por else ""}')
+    print(f'lista: {destino}')
+
+
 def main() -> None:
     p = argparse.ArgumentParser(prog='coletor')
     sub = p.add_subparsers(dest='cmd', required=True)
@@ -160,11 +180,18 @@ def main() -> None:
     pc.add_argument('--sem-cofre', action='store_true', help='não grava o resumo no Obsidian')
     pc.add_argument('--ver', action='store_true', help='abre a janela do navegador na tela para acompanhar')
     sub.add_parser('resumo', help='reescreve a nota da última rodada, sem rede')
+    pg = sub.add_parser('gatilhos', help='lista do dia para revisão do fundador, sem rede')
+    pg.add_argument('--horas', type=float, default=24, help='janela: as últimas N horas até agora (padrão 24)')
+    pg.add_argument('--saida', help='arquivo .md (padrão: dados/coleta/gatilhos-AAAA-MM-DD.md)')
     args = p.parse_args()
+    if args.cmd == 'gatilhos' and args.horas <= 0:
+        p.error('--horas precisa ser maior que zero')
     if args.cmd == 'listar':
         listar(args)
     elif args.cmd == 'resumo':
         refazer_resumo(args)
+    elif args.cmd == 'gatilhos':
+        lista_de_gatilhos(args)
     else:
         with trava(config.COLETA_DIR):
             asyncio.run(coletar(args))

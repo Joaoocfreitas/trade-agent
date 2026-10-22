@@ -1,0 +1,13 @@
+{
+  "id": "P003",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "need",
+  "reason": "Já me queimei pagando sala de sinal, então não pago mais nada de trade de cara. Pego o grátis, 3 perguntas por semana e a agenda de segunda já cobrem o que eu consigo usar no intervalo do trampo.",
+  "objection": "Isso não me diz o que fazer na hora. No intervalo eu tenho 15 minutos pra decidir se entro no mini-índice, e saber que a semana do Copom teve tal pior caso desde 2016 não me fala se eu compro ou vendo agora. Pagar R$ 29,90 todo mês com o que eu ganho, por histórico, não fecha.",
+  "would_change_my_mind": "Ver, nas respostas publicadas ou no meu próprio uso grátis, que o histórico teria me livrado de um stop feio numa semana de Copom. Se em um mês de grátis isso me salvar uma perda maior que R$ 30, eu assino.",
+  "price_too_cheap": 5,
+  "price_cheap": 10,
+  "price_expensive": 20,
+  "price_too_expensive": 35
+}

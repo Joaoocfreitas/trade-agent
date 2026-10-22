@@ -1,0 +1,13 @@
+{
+  "id": "P015",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "habit",
+  "reason": "Eu nunca pago por informação de mercado: o que preciso vem de graça no YouTube, no Instagram e nos grupos de WhatsApp e Telegram. Uso as 3 perguntas grátis por semana e a agenda de segunda, e isso já me basta.",
+  "objection": "Quem é o João Freitas no mercado? Nome, rosto e CNPJ ajudam, mas não vi registro na CVM. Ele diz que não é recomendação, mas a agenda com 'o que aconteceu das outras vezes' já parece um empurrão. E se as 3 perguntas grátis respondem o que quero, não vejo motivo pra pagar R$ 29,90.",
+  "would_change_my_mind": "Ver, no meu próprio uso grátis, que uma resposta com link pra fonte oficial me salvou de uma operação ruim, e o pessoal dos meus grupos citando o Repertório como referência confiável.",
+  "price_too_cheap": 5,
+  "price_cheap": 14.9,
+  "price_expensive": 39.9,
+  "price_too_expensive": 69.9
+}

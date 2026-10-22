@@ -1,4 +1,47 @@
 {
+ "ptax": {
+  "fonte": "Banco Central SGS 1",
+  "n": 2962,
+  "de": "2015-01-02",
+  "ate": "2026-10-22"
+ },
+ "selic_meta": {
+  "fonte": "Banco Central SGS 432",
+  "n": 4313,
+  "de": "2015-01-01",
+  "ate": "2026-10-22"
+ },
+ "ibov_bcb": {
+  "fonte": "Banco Central SGS 7",
+  "n": 1171,
+  "de": "2015-01-02",
+  "ate": "2019-09-30"
+ },
+ "ipca_12m": {
+  "fonte": "Banco Central SGS 13522",
+  "n": 141,
+  "de": "2015-01-01",
+  "ate": "2026-09-01"
+ },
+ "divida_bruta": {
+  "fonte": "Banco Central SGS 13762",
+  "n": 140,
+  "de": "2015-01-01",
+  "ate": "2026-08-01"
+ },
+ "pre_2a": {
+  "fonte": "Tesouro Direto, prefixados interpolados a 2 anos",
+  "n": 2935,
+  "de": "2015-01-02",
+  "ate": "2026-10-15"
+ },
+ "pre_5a": {
+  "fonte": "Tesouro Direto, prefixados interpolados a 5 anos",
+  "n": 2935,
+  "de": "2015-01-02",
+  "ate": "2026-10-15"
+ },
+ "_baixado_em": "2026-10-22T17:38:23-03:00",
  "ibov": {
   "fonte": "Ipeadata GM366_IBVSP366 (republica o fechamento da B3), sem 19 pontos falsos",
   "n": 2929,
@@ -25,36 +68,5 @@
    "2025-03-08=124519.38",
    "2026-08-22=170448.875"
   ]
- },
- "ptax": {
-  "fonte": "Banco Central SGS 1",
-  "n": 2961,
-  "de": "2015-01-02",
-  "ate": "2026-10-21"
- },
- "selic_meta": {
-  "fonte": "Banco Central SGS 432",
-  "n": 4312,
-  "de": "2015-01-01",
-  "ate": "2026-10-21"
- },
- "ibov_bcb": {
-  "fonte": "Banco Central SGS 7",
-  "n": 1171,
-  "de": "2015-01-02",
-  "ate": "2019-09-30"
- },
- "pre_2a": {
-  "fonte": "Tesouro Direto, prefixados interpolados a 2 anos",
-  "n": 2935,
-  "de": "2015-01-02",
-  "ate": "2026-10-15"
- },
- "pre_5a": {
-  "fonte": "Tesouro Direto, prefixados interpolados a 5 anos",
-  "n": 2935,
-  "de": "2015-01-02",
-  "ate": "2026-10-15"
- },
- "_baixado_em": "2026-10-21T19:32:59-03:00"
+ }
 }

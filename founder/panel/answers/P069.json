@@ -1,0 +1,13 @@
+{
+  "id": "P069",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "convenience",
+  "reason": "Eu já leio política o dia todo no X e no app da corretora de graça. Um monte de estatística desde 2016, com melhor caso, pior caso e fonte, é coisa pra ler com calma, e eu quero saber em 10 segundos o que a notícia de hoje faz com o mini-índice.",
+  "objection": "Se não diz o que fazer, vira mais uma coisa pra eu ler e interpretar sozinho. Pra mim isso é relatório, não atalho, e o research da corretora já me dá algo parecido sem pagar.",
+  "would_change_my_mind": "Um alerta curto no celular quando sai uma notícia de Congresso, STF ou Copom, tipo 'nas últimas 8 vezes parecidas o mini caiu em 6', em uma linha, sem eu ter que perguntar.",
+  "price_too_cheap": 5,
+  "price_cheap": 12,
+  "price_expensive": 35,
+  "price_too_expensive": 60
+}

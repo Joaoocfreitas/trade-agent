@@ -1,0 +1,13 @@
+{
+  "id": "P046",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "Já pago a Empiricus e vejo live de trader de graça toda noite; não vou colocar mais R$ 29,90 por mês numa IA que eu nem sei de quem é. Estatística do Copom desde 2016 parece útil, mas sem nome e sem rosto por trás eu não assino.",
+  "objection": "Quem está por trás disso? Não aparece nome, empresa, nem se tem registro na CVM. E 'não é recomendação' me soa como jeito de ninguém se responsabilizar se o número estiver errado.",
+  "would_change_my_mind": "Ver quem é a equipe, com CNPJ e alguém com credencial de mercado (CNPI ou registro na CVM) assinando, e um teste grátis de uns 7 dias pra eu comparar com o que a Empiricus já me entrega.",
+  "price_too_cheap": 5,
+  "price_cheap": 14.9,
+  "price_expensive": 39.9,
+  "price_too_expensive": 59.9
+}

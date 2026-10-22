@@ -1,0 +1,246 @@
+{
+ "business": "Repertório de mercado com IA para trader iniciante (produto do mega brain de trade)",
+ "seed": 883158,
+ "dealt": 100,
+ "answered": 100,
+ "skipped": [],
+ "buys": 0,
+ "passes": 100,
+ "buy_rate": 0.0,
+ "by_segment": [
+  [
+   "Profissional de renda alta que quer diversificar",
+   25,
+   0.0
+  ],
+  [
+   "Assalariado que opera no tempo livre",
+   40,
+   0.0
+  ],
+  [
+   "Jovem começando (estudante ou primeiro emprego)",
+   35,
+   0.0
+  ]
+ ],
+ "by_behaviour": [
+  [
+   "Já assina casa de análise",
+   15,
+   0.0
+  ],
+  [
+   "Já pagou curso de trade ou sala de sinais",
+   15,
+   0.0
+  ],
+  [
+   "Viciado em política",
+   10,
+   0.0
+  ],
+  [
+   "Quer o atalho",
+   10,
+   0.0
+  ],
+  [
+   "Desconfiado de golpe",
+   15,
+   0.0
+  ],
+  [
+   "Só usa o que é grátis",
+   10,
+   0.0
+  ],
+  [
+   "Aprende de graça no YouTube e no Instagram",
+   25,
+   0.0
+  ]
+ ],
+ "by_income": [
+  [
+   "$122,000 and up",
+   34,
+   0.0
+  ],
+  [
+   "$45,000 to $122,000",
+   34,
+   0.0
+  ],
+  [
+   "under $45,000",
+   32,
+   0.0
+  ]
+ ],
+ "why_not": [
+  [
+   "need",
+   36,
+   [
+    "R$ 29,90 não me pesa nada, mas já pago casa de análise que me entrega tese e ponto de entrada; uma estatística de 'quantas vezes aconteceu desde 2016' não muda o que eu faço no mini-índice no intervalo do trabalho. O passado não garante o que vai acontecer agora, e eu não vou empilhar mais uma assinatura que não decide nada por mim.",
+    "Eu quero alguém que me diga o que fazer, e o próprio anúncio diz que a IA não fala o que comprar, quando entrar nem quanto colocar. Estatística de Copom desde 2016 sem uma dica no final é dever de casa que eu não tenho tempo nem paciência pra fazer."
+   ],
+   [
+    "P001",
+    "P004"
+   ]
+  ],
+  [
+   "trust",
+   36,
+   [
+    "Já paguei sala de sinais, perdi dinheiro e prometi que não ia mais assinar nada de 'IA pra trader' só por um texto bonito. R$ 29,90 não me pesa, mas sem ver uma resposta de verdade antes, pra mim é igual aos outros.",
+    "Já paguei sala de sinais e perdi dinheiro, então qualquer coisa de trade vendida por assinatura me deixa com o pé atrás. Saber o que o mini-índice fez em Copom desde 2016 é legal, mas o passado não garante o que vai acontecer agora, e eu não vejo como isso muda a minha operação na segunda-feira."
+   ],
+   [
+    "P002",
+    "P006"
+   ]
+  ],
+  [
+   "habit",
+   24,
+   [
+    "Eu já pago uma casa de análise, e com o que eu ganho não dá pra ficar empilhando assinatura. A parte de eleição, Copom e STF me chama atenção, mas se não diz o que comprar, eu continuo com a que já tenho.",
+    "Eu acompanho tudo pelo app da corretora e pelas ferramentas grátis, e não pago assinatura pra nada disso. E histórico desde 2016 com fonte de cada número é coisa pra ler com calma, que eu não tenho tempo."
+   ],
+   [
+    "P003",
+    "P010"
+   ]
+  ],
+  [
+   "convenience",
+   3,
+   [
+    "Eu opero mini-índice no intervalo do trampo, tenho uns 10 minutos; não vou ficar lendo quantas vezes aconteceu desde 2016, melhor caso, pior caso, fonte. Se no fim não me diz nada que eu use na hora, pra mim é mais leitura que eu não vou fazer.",
+    "Eu já leio política o dia todo no X e no app da corretora de graça. Um monte de estatística desde 2016, com melhor caso, pior caso e fonte, é coisa pra ler com calma, e eu quero saber em 10 segundos o que a notícia de hoje faz com o mini-índice."
+   ],
+   [
+    "P005",
+    "P069"
+   ]
+  ],
+  [
+   "price",
+   1,
+   [
+    "A parte de eleição, Copom e memecoin de político me pegou, é exatamente o que eu acompanho. Mas R$ 29,90 todo mês pesa pra quem ganha o que eu ganho, ainda mais quando tenho live de trader de graça toda noite no YouTube falando disso."
+   ],
+   [
+    "P018"
+   ]
+  ]
+ ],
+ "why_yes": [],
+ "flip": [
+  "Um teste grátis de uma semana em que eu visse, no meu próprio operacional de mini-índice, um caso concreto em que o histórico teria me tirado de um trade ruim ou segurado um bom, com dado intraday e não só fechamento diário.",
+  "Poder fazer umas perguntas de graça e conferir eu mesmo na fonte (B3, Banco Central) que os números batem.",
+  "Um teste grátis de uma semana, numa semana de Copom ou de votação importante, em que ele me mostre algo sobre política e mercado que a minha casa de análise não mostrou.",
+  "Um teste grátis em que eu pergunte de uma semana real que eu já operei e veja que a resposta teria me feito ganhar ou evitar perder dinheiro, de um jeito que eu consiga usar na hora sem ficar analisando.",
+  "Uma resposta curtinha, tipo três linhas no celular que eu leio em 30 segundos antes de abrir a operação, e uns 7 dias grátis pra eu ver se serve sem botar cartão.",
+  "Um teste grátis de uns 7 dias sem cartão, em que eu pudesse fazer minhas próprias perguntas e conferir sozinha na fonte oficial (B3, BC) se os números batem.",
+  "Um teste grátis de uns 7 dias em que eu fizesse minhas próprias perguntas e visse que acha coisa que o YouTube e a Empiricus não mostram, ou vir junto/desconto pra quem já assina casa de análise.",
+  "Se a resposta viesse em uma linha, tipo um alerta direto no celular dizendo 'na semana do Copom o mini-índice caiu em 7 de 10 vezes', sem eu precisar ler histórico nenhum.",
+  "Uma semana grátis sem cadastrar cartão, com o nome de quem está por trás aparecendo, e eu conseguir clicar na fonte de um número e bater com o site da B3 ou do Banco Central eu mesma.",
+  "Uma versão grátis que me responda em uma linha, dentro do celular, na semana do Copom, e só aí eu ver se vale pagar.",
+  "Se substituísse a casa de análise que eu já pago, ou se eu testasse de graça uns dias e visse que o histórico realmente me salvou de uma operação ruim no mini-índice.",
+  "Poder testar de graça uns dias, fazendo as minhas perguntas de verdade, e ver que o número bate com a fonte da B3 ou do BC que eles citam.",
+  "Ver no próprio site, sem assinar, uma resposta de exemplo de três linhas que eu leia em 30 segundos antes do Copom e que me mostre algo que a Empiricus não me mostra.",
+  "Uma semana grátis, ou poder ver de graça umas respostas reais com o link da fonte da B3 ou do Banco Central em cada número, pra eu mesmo conferir antes de pagar.",
+  "Ver gente conhecida dos meus grupos usando e falando bem, com o nome e CNPJ da empresa à vista, e um teste grátis onde eu pego uma resposta da IA e confiro o número na fonte da B3 ou do Banco Central eu mesma.",
+  "Uma semana grátis pra eu testar numa semana de Copom de verdade e ver se aquilo me impediu de fazer besteira no mini, sem pedir cartão antes.",
+  "Um período grátis de verdade onde eu visse que aquilo me fez evitar uma perda ou acertar uma operação, ou um preço perto de R$ 10.",
+  "Um teste grátis de uma semana que pegue um Copom ou uma votação grande, pra eu ver se aquilo me ajuda de verdade no dia, ou um plano de uns R$ 10 por mês.",
+  "Poder fazer umas perguntas de graça antes de assinar e conferir eu mesmo na fonte (B3, Banco Central) se os números batem.",
+  "Um teste grátis em que a resposta venha em duas linhas, tipo 'na semana do Copom subiu 7 de 10 vezes', sem eu ter que ler tabela.",
+  "Um teste grátis onde eu pergunto antes do pregão e recebo a resposta em duas ou três linhas no celular, rápido de bater o olho, e ver que isso me poupou de uma operação ruim.",
+  "Ver um trader que eu já assisto nas lives do YouTube usando ao vivo e mostrando quem é a equipe, com um teste grátis pra eu conferir se a resposta é rápida e direta.",
+  "Poder fazer umas 5 perguntas de graça antes de pagar e conferir eu mesmo um número contra a fonte da B3 ou do Banco Central.",
+  "Poder testar de graça uma semana de Copom e ver que acertou o comportamento do mini-índice melhor que o relatório da minha casa de análise, a ponto de eu cancelar ela e ficar só com essa.",
+  "Um teste grátis de verdade, sem cartão, junto com o nome de quem faz e alguém conhecido do mercado por trás, pra eu conferir alguns números com a fonte antes de pagar.",
+  "Ver a empresa e o responsável com nome, CNPJ e registro (CNPI/CVM), e um teste grátis de uns 7 dias para eu conferir se o que a IA mostra do mini-índice bate com o que eu vi operando.",
+  "Um teste grátis de uma ou duas semanas em que eu visse, numa semana de Copom ou de payroll, um dado que a minha casa de análise não me deu e que mudasse como eu opero.",
+  "Ver quem são os responsáveis, com nome e histórico, e testar de graça uma pergunta real, tipo semana do Copom, conferindo que cada número bate com a fonte da B3 ou do Banco Central.",
+  "Um teste grátis em que eu visse, numa semana de Copom de verdade, que esse histórico me poupou de um trade ruim que os perfis grátis que eu sigo não pegaram.",
+  "Se trouxesse uma leitura direta tipo 'nessa situação a maioria das vezes deu alta' com um sinal claro de entrada que eu pudesse seguir.",
+  "Um teste grátis de uma semana em que eu visse, na prática, uma resposta que mudasse uma decisão minha e que eu não teria achado de graça em canal nenhum.",
+  "Um teste grátis em que eu visse, nas minhas próprias operações de mini-índice, que esse histórico me tira de pelo menos um trade ruim por mês.",
+  "Ver quem está por trás (empresa, CNPJ, pessoas com nome e reputação) e poder testar de graça uma pergunta e conferir os números na fonte da B3 ou do Banco Central eu mesmo.",
+  "Poder fazer umas perguntas de graça e conferir eu mesmo dois ou três números na fonte (B3, Banco Central, TSE) antes de pagar; se baterem, R$ 29,90 eu pago sem drama.",
+  "Um teste grátis de uma semana em que eu faço uma pergunta e recebo um resumo de duas linhas, com link pra conferir o número na fonte, e saber quem é a empresa por trás, com nome e CNPJ.",
+  "Ver quem está por trás (nome, CNPJ, histórico) e um teste grátis em que eu confira uma resposta contra a fonte da B3 ou do Banco Central e ela venha curta, em 30 segundos de leitura.",
+  "Se ela me desse um resumo de uma linha tipo 'na semana do Copom o mini-índice caiu em 7 de 10 vezes' direto no celular antes do pregão, sem eu ter que perguntar nada.",
+  "Ver quem são as pessoas por trás, com nome e histórico, e conseguir testar de graça uma pergunta e conferir eu mesma o número na fonte oficial (B3 ou Banco Central).",
+  "Uma versão grátis ou um teste sem cartão em que eu veja, numa semana de Copom de verdade, que a resposta me poupou tempo ou um stop mal colocado.",
+  "Se, além do histórico, me desse um sinal direto pra próxima operação, tipo 'nesse cenário a maioria comprou mini-índice'. Aí os R$ 29,90 nem pesam.",
+  "Ver quem são os donos (nome, CNPJ, histórico) e poder testar de graça uns dias conferindo eu mesma 2 ou 3 números com a fonte da B3 ou do Banco Central.",
+  "Ver quem são as pessoas por trás com nome e histórico, e conseguir testar de graça por uns dias conferindo eu mesmo um ou dois números com a fonte oficial da B3 ou do Banco Central.",
+  "Um teste grátis de 7 dias ou uma resposta de exemplo completa, com as fontes, sobre uma pergunta minha, pra eu ver se traz algo que o YouTube e a Empiricus não me dão.",
+  "Saber quem são as pessoas por trás e ter um teste grátis de uns 7 dias pra eu fazer as minhas perguntas e conferir se os números batem com a fonte.",
+  "Ter uma versão grátis com algumas perguntas por mês, pra eu ver se aquilo me ajuda de verdade na hora de operar antes de pagar qualquer coisa.",
+  "Ver quem é a equipe, com CNPJ e alguém com credencial de mercado (CNPI ou registro na CVM) assinando, e um teste grátis de uns 7 dias pra eu comparar com o que a Empiricus já me entrega.",
+  "Se no fim de cada resposta viesse uma leitura clara e direta, tipo 'na maioria das vezes o mais prudente foi ficar de fora', em vez de só números.",
+  "Se a resposta terminasse com um cenário direto pro dia, tipo 'na maioria das vezes caiu na abertura, fica de olho nesse nível', algo que eu consiga usar na operação, e um teste grátis de uma semana pra eu ver se bate.",
+  "Um teste grátis de uma semana em que eu faça minhas próprias perguntas (Copom, eleição) e consiga conferir os números na fonte oficial, e veja algo que a minha casa de análise não me mostra.",
+  "Um trader que eu já sigo no YouTube usando ao vivo, mostrando a resposta com a fonte da B3 ou do Banco Central batendo, ou uns dias grátis para eu conferir sozinho.",
+  "Uma versão grátis com algumas perguntas por mês, pra eu testar umas semanas e ver se o que ela mostra bate com o que aconteceu de verdade no mercado.",
+  "Um teste grátis de uma semana em que eu visse a IA me avisar de um risco que a minha casa de análise não avisou, com a fonte, antes de eu perder dinheiro.",
+  "Um teste grátis de uma ou duas semanas, de preferência numa semana de Copom, em que eu visse na prática o histórico me poupando de uma entrada ruim no mini-índice.",
+  "Poder testar de graça uns dias, fazendo minhas próprias perguntas e conferindo eu mesma a fonte de cada número, e ver o nome e o CNPJ de quem está por trás.",
+  "Alguém de um dos meus grupos de investimento mostrar uma resposta dela com as fontes oficiais que eu não acharia sozinha no YouTube, ou um teste grátis pra eu ver isso com as minhas próprias perguntas.",
+  "Ver quem está por trás (nome, CNPJ, histórico) e testar de graça uma pergunta sobre Copom e mini-índice, conferindo eu mesmo o número na fonte do Banco Central ou da B3.",
+  "Se o trader que eu assisto na live usasse isso ao vivo e mostrasse que ganhou operando em cima, ou se viesse junto com um sinal direto de entrada.",
+  "Uma versão grátis ou um teste de alguns dias em que eu visse um número com fonte que nenhum canal do YouTube me dá, tipo o que aconteceu no mini-índice em toda semana de Copom desde 2016.",
+  "Uma versão grátis com algumas perguntas por mês, pra eu testar e ver se me ajuda mais do que o que eu já uso.",
+  "Vir de graça dentro do app da minha corretora, ou um período grátis em que eu visse algo que a minha casa de análise não me dá.",
+  "Se desse pra testar grátis uns dias numa semana de Copom e eu visse que me poupa de pagar a casa de análise, aí eu trocaria uma pela outra.",
+  "Ver um trader que eu já acompanho usando isso numa live e mostrando que a resposta sai em uma frase curta, em segundos, com um teste grátis pra eu tentar antes de pagar.",
+  "Se desse pra testar grátis por uma ou duas semanas e eu conferisse os números contra a fonte, e se servisse pra substituir a casa de análise que eu já pago em vez de somar com ela.",
+  "Ver quem são os responsáveis, com CNPJ e alguém conhecido do mercado assinando, e poder testar uns dias de graça pra conferir se os números batem com o que eu vejo na B3.",
+  "Poder testar de graça uns dias e conferir eu mesmo um ou dois números contra o site do Banco Central ou da B3, com o link da fonte do lado.",
+  "Um teste grátis com uma resposta curtinha, tipo três linhas no celular antes da abertura, e um preço perto de R$ 10.",
+  "Um teste grátis em que eu consiga clicar na fonte de cada número e conferir no site da B3 ou do BC, mais saber quem são as pessoas por trás e ver gente real que eu sigo usando.",
+  "Ter uma versão grátis com algumas perguntas por mês, para eu testar antes e ver se substitui a casa de análise que eu já pago.",
+  "Um alerta curto no celular quando sai uma notícia de Congresso, STF ou Copom, tipo 'nas últimas 8 vezes parecidas o mini caiu em 6', em uma linha, sem eu ter que perguntar.",
+  "Ver quem são as pessoas por trás com nome e CNPJ, e um teste grátis onde eu confira umas respostas contra o dado oficial e veja que batem.",
+  "Um influenciador que eu já sigo mostrando ao vivo uma resposta com os números batendo com a fonte oficial, e um teste grátis pra eu ver sem colocar cartão.",
+  "Poder testar de graça umas perguntas sobre a próxima semana de Copom e ver que ela me mostra algo que os grupos gratuitos não mostram, tipo os casos que fugiram da média com a fonte do lado.",
+  "Um teste grátis em que eu fizesse uma pergunta e recebesse um número com fonte que nenhum trader gratuito que eu sigo me dá.",
+  "Ver o nome de quem faz, com CNPJ e alguém conhecido do mercado ou registrado na CVM, e um teste grátis pra eu comparar com o que já recebo de graça nos grupos.",
+  "Ver quem são as pessoas por trás e conseguir testar de graça por uns dias, conferindo eu mesma um número da IA na fonte da B3 ou do Banco Central.",
+  "Um resumo de uma linha, tipo 'na semana do Copom o mini-índice caiu em 7 de 10 vezes', que eu leio em 10 segundos, e um teste grátis pra ver se isso me ajuda de verdade antes de pagar.",
+  "Um período grátis em que eu visse uma resposta dessas me poupar de uma perda de verdade numa semana de Copom, ou um influenciador que eu já sigo mostrando que usa.",
+  "Um resumo de uma linha no celular antes de cada evento grande (Copom, votação no Congresso, decisão do STF), tipo alerta no WhatsApp, e uns dias grátis pra eu ver se me ajuda de verdade.",
+  "Um teste grátis em que a resposta viesse em duas ou três linhas, tipo um resumo de bolso antes do Copom, que eu conseguisse ler no celular entre uma reunião e outra.",
+  "Ver o nome da empresa e das pessoas responsáveis, com CNPJ e algum registro ou nome conhecido do mercado por trás, e poder testar de graça uns dias pra comparar com o que a Empiricus já me entrega.",
+  "Um teste grátis de uma ou duas semanas em que eu visse, no mini-índice, que o histórico com fonte me fez evitar uma entrada ruim — ou se fosse barato o bastante pra eu nem pensar duas vezes do lado da casa de análise.",
+  "Ver quem são os responsáveis, com nome e histórico no mercado, e poder testar de graça uma pergunta tipo a do Copom, checando eu mesmo a fonte de cada número.",
+  "Uma semana grátis em que eu pergunte sobre o mini-índice num evento real e receba um número com fonte que eu não ache em nenhum vídeo gratuito.",
+  "Uma versão grátis com algumas perguntas por mês, pra eu ver se aquilo muda de verdade como eu opero antes de assinar.",
+  "Ver um trader que eu já acompanho no YouTube usando ao vivo, com a empresa e as pessoas identificadas, e um teste grátis de uma semana sem precisar deixar cartão.",
+  "Um teste grátis em que eu visse um dado que nenhum trader do YouTube mostra, tipo os casos que fugiram da média antes de um Copom, e que isso me salvasse de uma operação ruim.",
+  "Ver o nome de quem faz, com registro ou histórico conhecido no mercado, e poder testar de graça uma pergunta tipo a do Copom e conferir eu mesmo a fonte na B3 ou no Banco Central.",
+  "Um resumo de três linhas no topo de cada resposta, que eu leia em 30 segundos antes do pregão, mostrando o que mudou em relação ao que a minha casa de análise está dizendo.",
+  "Um resumo de duas linhas no celular antes de cada Copom, eleição ou votação no STF, tipo 'nas últimas 8 vezes o índice caiu em 6, pior caso tanto', sem eu precisar perguntar nada.",
+  "Alguém de confiança do meu grupo de investimento mostrando que usa e que o histórico com a fonte oficial ajudou a evitar uma besteira, ou um teste grátis de uma semana para eu checar os números contra a B3.",
+  "Um período grátis de verdade, tipo um mês, em que eu visse a resposta dela acertar o contexto de uma semana que eu operei melhor do que o conteúdo grátis que eu já consumo.",
+  "Ver quem é o responsável, com nome e registro na CVM, e um amigo do grupo mostrando um print de que olhou o histórico antes de um Copom e acertou o movimento do mini-índice.",
+  "Um teste grátis em que eu conseguisse conferir sozinha, na fonte oficial (B3, Banco Central), que os números que a IA mostra batem, sem ninguém tentando me vender curso ou sinal depois.",
+  "Poder usar de graça por uma ou duas semanas, numa semana de Copom de verdade, e conferir eu mesma os números na fonte oficial antes de passar o cartão.",
+  "Um teste grátis de uma semana em que eu visse que essas respostas me fizeram evitar uma perda de verdade numa operação minha.",
+  "Poder fazer umas perguntas de graça antes de pagar e conferir eu mesma, na fonte oficial, que os números batem; se alguém de confiança do meu grupo mostrasse que usa e que é sério, eu testaria um mês.",
+  "Poder testar de graça uns dias com perguntas minhas e conferir os números na fonte, e ver um trader que eu já acompanho no YouTube mostrando que usa e dizendo quem é a empresa e o CNPJ.",
+  "Ter uma versão grátis com umas perguntas por semana, pra eu ver se o histórico realmente me ajuda a não perder dinheiro no mini antes de pagar qualquer coisa.",
+  "Se mostrasse um sinal claro, tipo 'em 8 de 10 vezes o mini caiu nesse cenário', com um setup pronto de entrada e stop que eu pudesse copiar.",
+  "Se tivesse um teste grátis e a resposta viesse em uma frase curta que eu leio em dez segundos no celular, eu até experimentava."
+ ],
+ "purchases_first_month_per_buyer": null,
+ "price_answers": 100
+}

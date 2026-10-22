@@ -1,0 +1,13 @@
+{
+  "id": "P050",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "R$ 29,90 não pesa no meu bolso, mas bateu o alarme de 'mais uma IA para trader'. Eu já vejo live de trader todo dia de graça, e não vou pôr cartão num site que nunca ouvi falar só pela promessa.",
+  "objection": "Não sei quem está por trás nem se esses números 'desde 2016' estão certos. IA inventa dado, e se ela errar a fonte eu nem percebo.",
+  "would_change_my_mind": "Um trader que eu já sigo no YouTube usando ao vivo, mostrando a resposta com a fonte da B3 ou do Banco Central batendo, ou uns dias grátis para eu conferir sozinho.",
+  "price_too_cheap": 5,
+  "price_cheap": 15,
+  "price_expensive": 50,
+  "price_too_expensive": 90
+}

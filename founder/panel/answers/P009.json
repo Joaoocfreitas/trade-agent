@@ -1,0 +1,13 @@
+{
+  "id": "P009",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "Não diz quem está por trás, não mostra CNPJ, nome, nada — já caí em papo de robô e não pago assinatura de quem eu não sei quem é. E mesmo que seja sério, no intervalo do trabalho eu tenho cinco minutos pra operar o mini, não dá pra ficar lendo histórico desde 2016 que no fim não me diz o que fazer.",
+  "objection": "Quem garante que esses números são verdade? 'Fonte oficial' qualquer um escreve no site. Sem saber quem fez e sem eu conseguir conferir, é só mais um site bonito pedindo R$ 29,90 todo mês.",
+  "would_change_my_mind": "Uma semana grátis sem cadastrar cartão, com o nome de quem está por trás aparecendo, e eu conseguir clicar na fonte de um número e bater com o site da B3 ou do Banco Central eu mesma.",
+  "price_too_cheap": 5,
+  "price_cheap": 12,
+  "price_expensive": 25,
+  "price_too_expensive": 40
+}

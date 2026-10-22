@@ -1,0 +1,10 @@
+{
+ "_leia": "Séries que a rodada diária pode atualizar sozinha. false = fica a última aceita, com a data dela. O Ibovespa começa desligado até o advogado responder sobre a licença de dados da B3 (política nova em 01/11/2026). Religar é trocar para true num PR.",
+ "ibov": false,
+ "ptax": true,
+ "selic_meta": true,
+ "ipca_12m": true,
+ "divida_bruta": true,
+ "pre_2a": true,
+ "pre_5a": true
+}

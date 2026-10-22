@@ -1,0 +1,13 @@
+{
+  "id": "P010",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "habit",
+  "reason": "Eu acompanho tudo pelo app da corretora e pelas ferramentas grátis, e não pago assinatura pra nada disso. E histórico desde 2016 com fonte de cada número é coisa pra ler com calma, que eu não tenho tempo.",
+  "objection": "Não quero um relatório de casos parecidos, quero algo rápido na hora que o mercado mexe. Se não diz o que fazer, pra mim vira mais uma leitura que eu vou deixar de lado e pagar à toa.",
+  "would_change_my_mind": "Uma versão grátis que me responda em uma linha, dentro do celular, na semana do Copom, e só aí eu ver se vale pagar.",
+  "price_too_cheap": 5,
+  "price_cheap": 9.9,
+  "price_expensive": 19.9,
+  "price_too_expensive": 39.9
+}

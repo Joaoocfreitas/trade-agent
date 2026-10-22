@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Teste do agente</title>
+<!-- Página de teste do agente (e exemplo mínimo para o site): login por e-mail, termos, cota e pergunta.
+     Rodar em http://localhost:3000, que é o endereço que o login do Supabase aceita por padrão. -->
+<style>
+  :root { --fundo: #faf8f5; --texto: #1d1b18; --suave: #6b665e; --linha: #e4dfd6; --destaque: #1d1b18; }
+  @media (prefers-color-scheme: dark) { :root { --fundo: #161513; --texto: #f1ede6; --suave: #a59f95; --linha: #33302b; --destaque: #f1ede6; } }
+  body { margin: 0; background: var(--fundo); color: var(--texto); font: 16px/1.5 -apple-system, system-ui, sans-serif; }
+  main { max-width: 720px; margin: 0 auto; padding: 24px 16px 64px; }
+  h1 { font-size: 22px; margin: 0 0 4px; }
+  p.suave, .suave { color: var(--suave); font-size: 14px; }
+  section { border: 1px solid var(--linha); border-radius: 12px; padding: 16px; margin: 16px 0; }
+  input, textarea, button { font: inherit; color: inherit; }
+  input, textarea { width: 100%; box-sizing: border-box; padding: 10px; border: 1px solid var(--linha); border-radius: 8px; background: transparent; }
+  textarea { min-height: 80px; }
+  button { margin-top: 8px; padding: 10px 14px; border-radius: 8px; border: 1px solid var(--destaque); background: var(--destaque); color: var(--fundo); cursor: pointer; }
+  button.secundario { background: transparent; color: var(--texto); }
+  pre { white-space: pre-wrap; word-wrap: break-word; font: 14px/1.5 ui-monospace, monospace; margin: 0; }
+  a { color: inherit; }
+  [hidden] { display: none !important; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Teste do agente de repertório</h1>
+  <p class="suave">Ambiente de teste. Não é recomendação de investimento.</p>
+
+  <section id="entrar">
+    <label for="email">Seu e-mail</label>
+    <input id="email" type="email" autocomplete="email" placeholder="voce@exemplo.com">
+    <button id="enviar">Mandar link de entrada</button>
+    <p id="aviso-email" class="suave"></p>
+  </section>
+
+  <section id="logado" hidden>
+    <p class="suave" id="quem"></p>
+    <p id="cota"></p>
+    <div id="termos" hidden>
+      <p>Para perguntar, aceite os termos de uso (versão de teste).</p>
+      <button id="aceitar">Aceito os termos</button>
+    </div>
+    <label for="pergunta">Pergunta</label>
+    <textarea id="pergunta" maxlength="1000" placeholder="Ibovespa: o que aconteceu nas eleições anteriores?"></textarea>
+    <button id="perguntar">Perguntar</button>
+    <button id="sair" class="secundario">Sair</button>
+  </section>
+
+  <section id="resultado" hidden>
+    <pre id="curto"></pre>
+    <details><summary>Ver detalhes</summary><pre id="completo"></pre></details>
+  </section>
+  <p id="erro" class="suave"></p>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.3/dist/umd/supabase.min.js"></script>
+<script>
+  const db = window.supabase.createClient('https://ainbuvumkglumwodvdok.supabase.co', 'sb_publishable_20XhJwLUXyrWRF0gVWTy9Q_HBiUIKJR')
+  const $ = (id) => document.getElementById(id)
+
+  async function mostrarCota() {
+    const { data, error } = await db.rpc('minha_cota')
+    if (error) { $('cota').textContent = 'Erro ao ler a cota: ' + error.message; return }
+    $('cota').textContent = `Plano ${data.plano}: ${data.usadas} de ${data.limite} perguntas nos últimos 7 dias.`
+    $('termos').hidden = data.aceitou_termos
+  }
+
+  async function atualizar() {
+    const { data: { session } } = await db.auth.getSession()
+    $('entrar').hidden = !!session
+    $('logado').hidden = !session
+    if (session) { $('quem').textContent = 'Entrou como ' + session.user.email; await mostrarCota() }
+  }
+
+  $('enviar').onclick = async () => {
+    const { error } = await db.auth.signInWithOtp({ email: $('email').value.trim(), options: { emailRedirectTo: location.origin } })
+    $('aviso-email').textContent = error ? 'Erro: ' + error.message : 'Pronto: abra o link que chegou no seu e-mail.'
+  }
+  $('aceitar').onclick = async () => { await db.rpc('aceitar_termos'); await mostrarCota() }
+  $('sair').onclick = async () => { await db.auth.signOut(); await atualizar() }
+  $('perguntar').onclick = async () => {
+    $('erro').textContent = 'Pensando… (pode levar até um minuto na primeira pergunta)'
+    $('resultado').hidden = true
+    const { data, error } = await db.functions.invoke('perguntar', { body: { pergunta: $('pergunta').value } })
+    if (error) {
+      let corpo = null
+      try { corpo = await error.context.json() } catch (_) {}
+      $('erro').textContent = corpo ? `${corpo.error} (${corpo.code ?? 'sem código'})` : 'Sem conexão. Tente de novo.'
+    } else {
+      $('erro').textContent = ''
+      $('curto').textContent = data.data.texto_curto
+      $('completo').textContent = data.data.texto
+      $('resultado').hidden = false
+    }
+    await mostrarCota()
+  }
+  db.auth.onAuthStateChange(() => atualizar())
+  atualizar()
+</script>
+</body>
+</html>

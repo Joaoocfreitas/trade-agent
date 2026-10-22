@@ -1,0 +1,13 @@
+{
+  "id": "P020",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "need",
+  "reason": "Pelo menos parece sério: tem nome, CNPJ, link pra fonte oficial e não pede cartão, então não tem cara de golpe. Mas se não diz o que comprar nem quando entrar, eu fico com as 3 perguntas grátis e a agenda de segunda e não vejo motivo pra pagar R$ 29,90.",
+  "objection": "Se não diz o que comprar, pra que serve? Saber que o mini-índice já subiu e caiu na semana do Copom não me fala o que fazer na segunda, e a agenda de eventos eu já vejo de graça nos grupos de WhatsApp e Telegram.",
+  "would_change_my_mind": "Ver no grupo alguém que eu conheço usando de verdade e mostrando que a estatística do histórico mudou como ele opera, com o resultado aparecendo.",
+  "price_too_cheap": 5,
+  "price_cheap": 12,
+  "price_expensive": 30,
+  "price_too_expensive": 50
+}

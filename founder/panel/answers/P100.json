@@ -1,0 +1,13 @@
+{
+  "id": "P100",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "habit",
+  "reason": "Eu aprendo tudo de graça no YouTube e no Instagram, todo dia tem trader explicando o que vai acontecer no Copom. Pagar R$ 29,90 por mês pra ler histórico desde 2016, que eu nem tenho tempo de ler, não faz sentido pra mim.",
+  "objection": "Não tenho tempo de ficar lendo melhor caso, pior caso e fonte de número. Eu quero algo rápido, e isso aí não me diz nem o que fazer no fim.",
+  "would_change_my_mind": "Se tivesse um teste grátis e a resposta viesse em uma frase curta que eu leio em dez segundos no celular, eu até experimentava.",
+  "price_too_cheap": 5,
+  "price_cheap": 9.9,
+  "price_expensive": 19.9,
+  "price_too_expensive": 29.9
+}

@@ -1,0 +1,55 @@
+# Manchetes: de 2 em 2 horas, das 07h às 23h (Brasília), o coletor lê só título e link dos feeds de imprensa, sem abrir
+# o artigo e sem navegador. Nada disso vai para o usuário. Na rodada das 07h sai, nas Issues, a lista do dia com o que
+# casou um gatilho (pesquisa registrada, decisão do Copom, resultado do TSE...), para revisão. Fato só entra na base
+# por pull request, com a fonte primária e um segundo conferente; o merge publica (publicar.yml).
+name: Manchetes
+
+on:
+  schedule:
+    - cron: '7 10 * * *'                       # 07:07 em Brasília: esta rodada abre a lista do dia
+    - cron: '7 12,14,16,18,20,22,0,2 * * *'  # 09:07 a 23:07
+  workflow_dispatch:
+
+concurrency:
+  group: manchetes
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  manchetes:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+          cache-dependency-path: requirements-ci.txt
+
+      - run: pip install -r requirements-ci.txt
+
+      # O que já foi visto fica no cache do Actions (privado), não no repositório: título e link de terceiros.
+      - uses: actions/cache@v4
+        with:
+          path: dados/coleta
+          key: coleta-${{ github.run_id }}
+          restore-keys: coleta-
+
+      - name: Ler as manchetes
+        run: python -m coletor coletar --categoria imprensa_br --artigos 0 --sem-cofre
+
+      # Pelo cron que disparou, não pela hora: o GitHub às vezes atrasa a rodada agendada em mais de uma hora.
+      - name: Lista do dia (só na rodada das 07h ou à mão)
+        if: github.event.schedule == '7 10 * * *' || github.event_name == 'workflow_dispatch'
+        run: |
+          python -m coletor gatilhos --horas 24 --saida "$RUNNER_TEMP/gatilhos.md"
+          grep -q '^- ' "$RUNNER_TEMP/gatilhos.md" || exit 0
+          gh label create manchetes --color 0E8A16 --description 'Lista do dia para revisão' --force >/dev/null
+          gh issue create --title "Manchetes para revisar: $(TZ=America/Sao_Paulo date +%d/%m/%Y)" --label manchetes --body-file "$RUNNER_TEMP/gatilhos.md"

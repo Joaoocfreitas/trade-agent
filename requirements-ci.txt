@@ -1,0 +1,11 @@
+# A rodada automática (GitHub Actions): séries, Focus, agente e testes, sem o navegador do coletor (crawl4ai).
+# O coletor completo, com páginas e artigos, continua no requirements.txt e roda no Mac.
+anthropic==1.17.0
+beautifulsoup4==4.15.0
+feedparser==6.0.11
+httpx==0.28.1
+numpy==2.3.4
+pandas==2.3.3
+protego==0.7.0
+pytest==8.3.4
+scipy==1.18.1

@@ -1,0 +1,13 @@
+{
+  "id": "P076",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "habit",
+  "reason": "R$ 29,90 não pesa no meu bolso, mas eu já consumo trader e influenciador de graça todo dia no YouTube e no Instagram e nunca pago por informação. E não quero ficar lendo histórico desde 2016, com melhor caso, pior caso e fonte de cada número; quero algo rápido.",
+  "objection": "Se ela não me diz o que fazer, vira mais uma coisa pra eu ler e interpretar sozinho, e tempo pra isso eu não tenho. O conteúdo de graça já me dá uma opinião pronta em um minuto.",
+  "would_change_my_mind": "Um resumo de uma linha, tipo 'na semana do Copom o mini-índice caiu em 7 de 10 vezes', que eu leio em 10 segundos, e um teste grátis pra ver se isso me ajuda de verdade antes de pagar.",
+  "price_too_cheap": 5,
+  "price_cheap": 15,
+  "price_expensive": 50,
+  "price_too_expensive": 100
+}

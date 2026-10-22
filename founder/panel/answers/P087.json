@@ -1,0 +1,13 @@
+{
+  "id": "P087",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "Não aparece quem está por trás nem se tem alguém registrado na CVM, e eu não coloco cartão em coisa de mercado sem saber quem responde por ela. Além disso, já pago uma casa de análise que pelo menos me diz o que fazer; uma IA que só mostra histórico e não recomenda nada eu não sei se vale mais uma assinatura.",
+  "objection": "Quem são essas pessoas, tem CNPI ou registro na CVM? E como eu sei que esses números 'desde 2016' estão certos e não são a IA inventando com cara de fonte oficial?",
+  "would_change_my_mind": "Ver o nome de quem faz, com registro ou histórico conhecido no mercado, e poder testar de graça uma pergunta tipo a do Copom e conferir eu mesmo a fonte na B3 ou no Banco Central.",
+  "price_too_cheap": 9.9,
+  "price_cheap": 19.9,
+  "price_expensive": 49.9,
+  "price_too_expensive": 79.9
+}

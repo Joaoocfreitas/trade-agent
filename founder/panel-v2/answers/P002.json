@@ -1,0 +1,13 @@
+{
+  "id": "P002",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "Vejo nome, rosto e CNPJ, mas não vejo registro na CVM nem quem é esse João Freitas no mercado. Já pago casa de análise que me manda agenda do Copom; uso as 3 perguntas grátis por umas semanas antes de colocar um real.",
+  "objection": "Quem está por trás disso e qual a credencial? Sem CVM ou analista CNPI associado, e com base desde 2016 (poucos Copoms parecidos), não sei se a estatística vale alguma coisa ou é só curiosidade bonita.",
+  "would_change_my_mind": "Um histórico público de algumas semanas com as respostas batendo com a fonte oficial, e alguém com credencial de mercado (CNPI ou gestora conhecida) assinando junto.",
+  "price_too_cheap": 9.9,
+  "price_cheap": 19.9,
+  "price_expensive": 49.9,
+  "price_too_expensive": 99
+}

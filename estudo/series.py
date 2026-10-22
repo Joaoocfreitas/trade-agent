@@ -3,7 +3,8 @@
 - Ibovespa: Ipeadata, série GM366_IBVSP366, que republica o fechamento da B3. O Ipeadata tem pontos falsos (16 fins de
   semana e 3 feriados com valor quebrado, de 2016 a 2024); `limpar_ibov` tira esses pontos. Conferência: SGS 7 do
   Banco Central (até 2019) e, quando o João mandar, os arquivos da própria B3.
-- Dólar PTAX venda (SGS 1), Selic meta (SGS 432): API do Banco Central.
+- Dólar PTAX venda (SGS 1), Selic meta (SGS 432), IPCA em 12 meses (SGS 13522) e dívida bruta do governo geral em %
+  do PIB (SGS 13762): API do Banco Central.
 - Juros prefixados: CSV de taxas do Tesouro Direto (Tesouro Prefixado e Prefixado com Juros Semestrais).
 
 O Yahoo Finance foi descartado de propósito: o robots.txt de query1.finance.yahoo.com proíbe qualquer robô.
@@ -22,7 +23,7 @@ import pandas as pd
 from coletor.config import ROBO, TIMEOUT_S, USER_AGENT
 from coletor.robots import interpretar
 
-SGS = {'ptax': 1, 'selic_meta': 432, 'ibov_bcb': 7}
+SGS = {'ptax': 1, 'selic_meta': 432, 'ibov_bcb': 7, 'ipca_12m': 13522, 'divida_bruta': 13762}
 IPEA_IBOV = 'GM366_IBVSP366'
 TD_CSV = ('https://www.tesourotransparente.gov.br/ckan/dataset/df56aa42-484a-4a59-8184-7676580c81e3/resource/'
           '796d2059-14e9-44e3-80c9-2d9e30b405c1/download/precotaxatesourodireto.csv')
@@ -185,8 +186,27 @@ def curva_constante(pre: pd.DataFrame, anos: float, folga: float = 0.75) -> pd.S
 
 # ---------- download ----------
 
-def baixar_tudo(pasta: Path, inicio: date, fim: date) -> dict:
-    """Baixa tudo para `pasta` (CSV por série) e devolve o manifesto com fonte, cobertura e data do download."""
+def baixar_sgs(c: Cliente, codigo: int, inicio: date, fim: date) -> pd.Series:
+    """Uma série do SGS inteira, em janelas de até 10 anos."""
+    partes, a = [], inicio
+    while a <= fim:
+        b = min(date(a.year + MAX_ANOS_SGS - 1, 12, 31), fim)
+        url = (f'https://api.bcb.gov.br/dados/serie/bcdata.sgs.{codigo}/dados?formato=json'
+               f'&dataInicial={a:%d/%m/%Y}&dataFinal={b:%d/%m/%Y}')
+        try:
+            partes.append(ler_sgs(c.json(url)))
+        except httpx.HTTPStatusError as e:
+            if e.response.status_code != 404:  # 404 = série sem valor no período (a 7 parou em 2019)
+                raise
+        a = date(b.year + 1, 1, 1)
+    s = pd.concat(partes).sort_index() if partes else pd.Series(dtype=float)
+    return s[~s.index.duplicated()]
+
+
+def baixar_tudo(pasta: Path, inicio: date, fim: date, pular: frozenset = frozenset()) -> dict:
+    """Baixa tudo para `pasta` (CSV por série) e devolve o manifesto com fonte, cobertura e data do download.
+    Cada fonte é um passo: se uma falha (fora do ar, robots.txt que não responde), as outras seguem e, no fim, a falha
+    sobe junto com a lista. `pular`: séries que não devem ser pedidas (as desligadas da rodada diária)."""
     pasta.mkdir(parents=True, exist_ok=True)
     c = Cliente()
     manifesto = {}
@@ -198,32 +218,39 @@ def baixar_tudo(pasta: Path, inicio: date, fim: date) -> dict:
                            'ate': str(s.index.max().date()) if s.size else None}
         print(f'  {nome:12} {s.size:5} pontos  {manifesto[nome]["de"]} → {manifesto[nome]["ate"]}  ({fonte})', flush=True)
 
-    ibov = ler_ipeadata(c.json(f"http://www.ipeadata.gov.br/api/odata4/ValoresSerie(SERCODIGO='{IPEA_IBOV}')")['value'])
-    # só no período do estudo: antes de 2015 o índice tinha casas decimais de verdade
-    ibov, falsos = limpar_ibov(ibov[(ibov.index >= pd.Timestamp(inicio)) & (ibov.index <= pd.Timestamp(fim))])
-    guardar('ibov', ibov, f'Ipeadata {IPEA_IBOV} (republica o fechamento da B3), sem {len(falsos)} pontos falsos')
-    manifesto['ibov']['pontos_falsos_retirados'] = falsos
+    falhas = []
 
+    def passo(nome: str, fazer) -> None:
+        try:
+            fazer()
+        except Exception as e:  # noqa: BLE001 — as outras fontes seguem; a falha sobe no fim
+            falhas.append(f'{nome}: {type(e).__name__}: {e}')
+            print(f'  {nome:12} FALHOU: {type(e).__name__}: {e}', flush=True)
+
+    def ibov() -> None:
+        s = ler_ipeadata(c.json(f"http://www.ipeadata.gov.br/api/odata4/ValoresSerie(SERCODIGO='{IPEA_IBOV}')")['value'])
+        # só no período do estudo: antes de 2015 o índice tinha casas decimais de verdade
+        s, falsos = limpar_ibov(s[(s.index >= pd.Timestamp(inicio)) & (s.index <= pd.Timestamp(fim))])
+        guardar('ibov', s, f'Ipeadata {IPEA_IBOV} (republica o fechamento da B3), sem {len(falsos)} pontos falsos')
+        manifesto['ibov']['pontos_falsos_retirados'] = falsos
+
+    def tesouro() -> None:
+        bruto = c.arquivo(TD_CSV, pasta / 'brutos' / 'precotaxatesourodireto.csv')
+        pre = ler_tesouro(bruto.read_bytes())
+        for anos in (2, 5):
+            guardar(f'pre_{anos}a', curva_constante(pre, anos), f'Tesouro Direto, prefixados interpolados a {anos} anos')
+
+    if 'ibov' not in pular:
+        passo('ibov', ibov)
     for nome, codigo in SGS.items():
-        partes, a = [], inicio
-        while a <= fim:
-            b = min(date(a.year + MAX_ANOS_SGS - 1, 12, 31), fim)
-            url = (f'https://api.bcb.gov.br/dados/serie/bcdata.sgs.{codigo}/dados?formato=json'
-                   f'&dataInicial={a:%d/%m/%Y}&dataFinal={b:%d/%m/%Y}')
-            try:
-                partes.append(ler_sgs(c.json(url)))
-            except httpx.HTTPStatusError as e:
-                if e.response.status_code != 404:  # 404 = série sem valor no período (a 7 parou em 2019)
-                    raise
-            a = date(b.year + 1, 1, 1)
-        s = pd.concat(partes).sort_index() if partes else pd.Series(dtype=float)
-        guardar(nome, s[~s.index.duplicated()], f'Banco Central SGS {codigo}')
-
-    bruto = c.arquivo(TD_CSV, pasta / 'brutos' / 'precotaxatesourodireto.csv')
-    pre = ler_tesouro(bruto.read_bytes())
-    for anos in (2, 5):
-        guardar(f'pre_{anos}a', curva_constante(pre, anos), f'Tesouro Direto, prefixados interpolados a {anos} anos')
+        if nome not in pular:
+            passo(nome, lambda nome=nome, codigo=codigo: guardar(nome, baixar_sgs(c, codigo, inicio, fim),
+                                                                   f'Banco Central SGS {codigo}'))
+    if not {'pre_2a', 'pre_5a'} <= pular:
+        passo('tesouro', tesouro)
 
     manifesto['_baixado_em'] = pd.Timestamp.now(tz='America/Sao_Paulo').isoformat(timespec='seconds')
     (pasta / 'manifesto.json').write_text(json.dumps(manifesto, ensure_ascii=False, indent=1), encoding='utf-8')
+    if falhas:
+        raise RuntimeError('; '.join(falhas))
     return manifesto

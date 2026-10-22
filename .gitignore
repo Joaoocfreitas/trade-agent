@@ -5,3 +5,4 @@ __pycache__/
 dados/coleta/
 dados/*.log
 dados/series/brutos/
+dados/agente/conversas.jsonl

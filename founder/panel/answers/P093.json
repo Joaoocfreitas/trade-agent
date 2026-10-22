@@ -1,0 +1,13 @@
+{
+  "id": "P093",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "Já paguei sala de sinais e perdi dinheiro, então qualquer coisa de trade com 'IA' me deixa com o pé atrás. E mostrar o que aconteceu desde 2016 é olhar pro passado, que não garante nada do que vai acontecer agora; os grupos de WhatsApp e Telegram já me jogam esse tipo de estatística de graça.",
+  "objection": "O passado não garante o futuro. Saber que o mini-índice subiu tantas vezes na semana do Copom não me diz o que fazer amanhã, e eu não sei se essa IA não vai inventar número ou escolher os casos que convêm.",
+  "would_change_my_mind": "Um teste grátis em que eu conseguisse conferir sozinha, na fonte oficial (B3, Banco Central), que os números que a IA mostra batem, sem ninguém tentando me vender curso ou sinal depois.",
+  "price_too_cheap": 5,
+  "price_cheap": 15,
+  "price_expensive": 50,
+  "price_too_expensive": 100
+}

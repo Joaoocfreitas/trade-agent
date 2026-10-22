@@ -1,0 +1,13 @@
+{
+  "id": "P031",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "need",
+  "reason": "R$ 29,90 não pesa no meu bolso, mas se a ferramenta não me diz o que comprar nem quando entrar, ela vira só mais uma estatística de Copom que eu já vejo de graça no YouTube e no Instagram todo dia. Eu quero saber o que fazer com o meu dinheiro, não ler histórico.",
+  "objection": "Se não diz o que comprar, pra que serve? Histórico de 'o que aconteceu desde 2016' não me diz o que vai acontecer agora, e os influenciadores que eu sigo já comentam isso de graça na semana do Copom.",
+  "would_change_my_mind": "Um teste grátis de uma semana em que eu visse, na prática, uma resposta que mudasse uma decisão minha e que eu não teria achado de graça em canal nenhum.",
+  "price_too_cheap": 5,
+  "price_cheap": 15,
+  "price_expensive": 40,
+  "price_too_expensive": 80
+}

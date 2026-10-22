@@ -1,0 +1,13 @@
+{
+  "id": "P026",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "Já paguei sala de sinais, perdi dinheiro e jurei que não pago mais nada de trade sem saber quem está por trás. Aqui não aparece nome, CNPJ nem ninguém com registro na CVM, então R$ 29,90 por mês não me convence, mesmo sendo barato.",
+  "objection": "Quem montou isso e de onde vêm os números de verdade? Dizer 'fonte oficial' e 'não é recomendação' qualquer sala diz; quero ver a empresa e a pessoa responsável antes de passar o cartão.",
+  "would_change_my_mind": "Ver a empresa e o responsável com nome, CNPJ e registro (CNPI/CVM), e um teste grátis de uns 7 dias para eu conferir se o que a IA mostra do mini-índice bate com o que eu vi operando.",
+  "price_too_cheap": 5,
+  "price_cheap": 15,
+  "price_expensive": 39.9,
+  "price_too_expensive": 69.9
+}

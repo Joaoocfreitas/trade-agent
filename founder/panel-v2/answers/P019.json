@@ -1,0 +1,13 @@
+{
+  "id": "P019",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "Já paguei sala de sinal e me arrependi, então não pago nada no primeiro mês. Vou ficar no grátis: 3 perguntas por semana e a agenda dão conta do meu mini-índice no intervalo, e assim vejo se isso serve pra alguma coisa.",
+  "objection": "Ter nome, rosto e CNPJ ajuda, mas não vi registro na CVM, e 'não é recomendação' é o mesmo aviso que a sala de sinais usava. E não sei se saber o que aconteceu nos Copom desde 2016 me ajuda num trade de meia hora no mini-índice.",
+  "would_change_my_mind": "Usar o grátis umas quatro semanas e ver que os números batem com a B3 e com o Banco Central quando eu clico, e que pelo menos uma vez me tiraram de uma entrada ruim.",
+  "price_too_cheap": 5,
+  "price_cheap": 15,
+  "price_expensive": 49,
+  "price_too_expensive": 89
+}

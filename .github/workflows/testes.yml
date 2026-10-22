@@ -1,0 +1,27 @@
+# Testes de todo pull request: exporta a base com o que o PR mudou e roda o Python e o TypeScript. Sem segredo.
+name: Testes
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  testes:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+          cache-dependency-path: requirements-ci.txt
+      - run: pip install -r requirements-ci.txt
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.8.3
+      - run: python -m agente.exportar
+      - run: python -m pytest -q --ignore=tests/test_navegador.py
+      - run: deno test --allow-read --allow-env supabase/functions/_shared/agente/

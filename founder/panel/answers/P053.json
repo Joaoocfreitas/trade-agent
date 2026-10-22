@@ -1,0 +1,13 @@
+{
+  "id": "P053",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "need",
+  "reason": "Eu já paguei sala de sinais e curso e perdi dinheiro, e o que eu procuro é saber o que fazer na operação. Uma IA que me mostra estatística desde 2016 mas não diz o que comprar nem quando entrar não resolve o meu problema; vira mais uma coisa pra eu ler e depois decidir sozinho do mesmo jeito.",
+  "objection": "Se não diz o que comprar, pra que serve? O passado não garante nada, e eu já caí em promessa de 'dado' e 'método' antes. Não sei se esses números batem mesmo nem se ajudam a ganhar.",
+  "would_change_my_mind": "Um teste grátis de uma ou duas semanas, de preferência numa semana de Copom, em que eu visse na prática o histórico me poupando de uma entrada ruim no mini-índice.",
+  "price_too_cheap": 5,
+  "price_cheap": 15,
+  "price_expensive": 40,
+  "price_too_expensive": 70
+}

@@ -1,0 +1,13 @@
+{
+  "id": "P036",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "R$ 29,90 não pesa nada pra mim, mas não sei quem está por trás disso e já vi muita IA de mercado que era golpe com outro nome. E sinceramente não tenho tempo de ficar lendo histórico desde 2016; queria algo rápido, e isso parece ser lição de casa.",
+  "objection": "Quem fez isso e como eu sei que os números estão certos? 'Fonte oficial' qualquer um escreve na página; sem nome, CNPJ, reputação e alguém que eu conheça usando, eu passo.",
+  "would_change_my_mind": "Ver quem está por trás (nome, CNPJ, histórico) e um teste grátis em que eu confira uma resposta contra a fonte da B3 ou do Banco Central e ela venha curta, em 30 segundos de leitura.",
+  "price_too_cheap": 9.9,
+  "price_cheap": 19.9,
+  "price_expensive": 79.9,
+  "price_too_expensive": 149.9
+}

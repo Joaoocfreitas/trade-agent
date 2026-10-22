@@ -1,0 +1,13 @@
+{
+  "id": "P060",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "need",
+  "reason": "Eu já pago uma casa de análise e o resto eu vejo de graça no app da corretora. Mais uma assinatura para me mostrar histórico, sem dizer o que fazer, não me acrescenta nada na semana.",
+  "objection": "Se a casa de análise que eu já pago traz relatório sobre Copom e eleição, por que eu pagaria outra coisa que nem recomenda nada? Parece mais um gasto que esqueço de cancelar.",
+  "would_change_my_mind": "Vir de graça dentro do app da minha corretora, ou um período grátis em que eu visse algo que a minha casa de análise não me dá.",
+  "price_too_cheap": 5,
+  "price_cheap": 9.9,
+  "price_expensive": 19.9,
+  "price_too_expensive": 35
+}

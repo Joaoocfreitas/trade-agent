@@ -1,0 +1,13 @@
+{
+  "id": "P032",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "need",
+  "reason": "Já pago casa de análise que me diz o que fazer; uma IA que só me conta o que aconteceu desde 2016 e não fala entrada nem saída não muda meu trade no intervalo do almoço. Estatística de Copom eu acho de graça em fórum e na própria casa.",
+  "objection": "Se não diz o que comprar, pra que serve? Histórico de semana de Copom não me dá setup, e no mini-índice eu preciso de ponto de entrada e stop, não de média desde 2016.",
+  "would_change_my_mind": "Um teste grátis em que eu visse, nas minhas próprias operações de mini-índice, que esse histórico me tira de pelo menos um trade ruim por mês.",
+  "price_too_cheap": 9.9,
+  "price_cheap": 14.9,
+  "price_expensive": 29.9,
+  "price_too_expensive": 49.9
+}

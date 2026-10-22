@@ -1,0 +1,13 @@
+{
+  "id": "P045",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "need",
+  "reason": "Se a IA não me diz o que comprar nem quando entrar, pra que eu vou pagar? Histórico do Copom eu já vejo de graça nas lives que assisto à noite e no app da corretora.",
+  "objection": "Pagar R$ 29,90 todo mês por estatística do passado que não me fala o que fazer amanhã, ganhando o que eu ganho, não fecha.",
+  "would_change_my_mind": "Ter uma versão grátis com algumas perguntas por mês, pra eu ver se aquilo me ajuda de verdade na hora de operar antes de pagar qualquer coisa.",
+  "price_too_cheap": 3,
+  "price_cheap": 9.9,
+  "price_expensive": 19.9,
+  "price_too_expensive": 29.9
+}

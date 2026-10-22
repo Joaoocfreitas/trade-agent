@@ -1,0 +1,13 @@
+{
+  "id": "P056",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "R$ 29,90 não faz diferença no meu bolso, mas eu já caí em sala de sinal e curso que prometia muito. Aqui não aparece quem está por trás, então não passo cartão no impulso.",
+  "objection": "Quem fez isso? Tem CNPJ, tem alguém com registro na CVM? Dizer 'não é recomendação' parece aquele aviso padrão de quem não quer se responsabilizar quando dá errado.",
+  "would_change_my_mind": "Ver quem está por trás (nome, CNPJ, histórico) e testar de graça uma pergunta sobre Copom e mini-índice, conferindo eu mesmo o número na fonte do Banco Central ou da B3.",
+  "price_too_cheap": 10,
+  "price_cheap": 25,
+  "price_expensive": 80,
+  "price_too_expensive": 150
+}

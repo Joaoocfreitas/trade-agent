@@ -1,0 +1,13 @@
+{
+  "id": "P033",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "Gostei que não promete acerto nem diz o que comprar, isso já é diferente dos golpes que vejo. Mas não sei quem está por trás, e o passado do mini-índice em semana de Copom não me diz o que vai acontecer agora, então não vejo por que pagar todo mês por estatística antiga.",
+  "objection": "Quem fez isso? Não aparece empresa, CNPJ, nome de ninguém com histórico no mercado. E IA inventa número; como eu sei que o 'desde 2016' está certo e não é só um texto bonito?",
+  "would_change_my_mind": "Ver quem está por trás (empresa, CNPJ, pessoas com nome e reputação) e poder testar de graça uma pergunta e conferir os números na fonte da B3 ou do Banco Central eu mesmo.",
+  "price_too_cheap": 5,
+  "price_cheap": 15,
+  "price_expensive": 40,
+  "price_too_expensive": 70
+}

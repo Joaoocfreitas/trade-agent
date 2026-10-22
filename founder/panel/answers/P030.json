@@ -1,0 +1,13 @@
+{
+  "id": "P030",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "need",
+  "reason": "Eu quero alguém que fale 'compra isso, entra aqui, sai ali'. Se a própria IA avisa que não diz o que comprar, fico só com um monte de número de 2016 pra cá e continuo sem saber o que fazer; pra isso eu assisto as lives de graça no YouTube.",
+  "objection": "Se não diz o que comprar, pra que serve? Saber que o mini-índice subiu tantas vezes na semana do Copom não me fala se eu compro ou vendo amanhã.",
+  "would_change_my_mind": "Se trouxesse uma leitura direta tipo 'nessa situação a maioria das vezes deu alta' com um sinal claro de entrada que eu pudesse seguir.",
+  "price_too_cheap": 5,
+  "price_cheap": 10,
+  "price_expensive": 25,
+  "price_too_expensive": 40
+}

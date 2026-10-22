@@ -1,0 +1,13 @@
+{
+  "id": "P086",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "habit",
+  "reason": "Eu aprendo tudo de graça no YouTube e nas lives de trader toda noite, e o pessoal já comenta como o índice reage no Copom. Pagar R$ 29,90 por mês por algo que não me diz nem quando entrar não cabe no meu bolso agora.",
+  "objection": "Já tem muito conteúdo grátis sobre isso, e se a IA não fala o que fazer, pra mim parece só uma planilha de histórico que eu teria que interpretar sozinho.",
+  "would_change_my_mind": "Um teste grátis em que eu visse um dado que nenhum trader do YouTube mostra, tipo os casos que fugiram da média antes de um Copom, e que isso me salvasse de uma operação ruim.",
+  "price_too_cheap": 3,
+  "price_cheap": 9.9,
+  "price_expensive": 19.9,
+  "price_too_expensive": 29.9
+}

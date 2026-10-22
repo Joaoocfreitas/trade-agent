@@ -1,0 +1,13 @@
+{
+  "id": "P064",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "A pergunta do Copom é exatamente o que eu queria saber no meu mini-índice, mas a oferta não diz quem está por trás nem se tem registro na CVM. Com a renda que eu tenho, não coloco R$ 29,90 por mês em site que eu não sei de quem é.",
+  "objection": "Quem fez isso? Não tem nome, não tem CNPJ, não tem CVM. Dizer que não é recomendação pode ser só um jeito de fugir da responsabilidade, e 'dados oficiais' qualquer um escreve.",
+  "would_change_my_mind": "Ver quem são os responsáveis, com CNPJ e alguém conhecido do mercado assinando, e poder testar uns dias de graça pra conferir se os números batem com o que eu vejo na B3.",
+  "price_too_cheap": 9.9,
+  "price_cheap": 19.9,
+  "price_expensive": 39.9,
+  "price_too_expensive": 59.9
+}

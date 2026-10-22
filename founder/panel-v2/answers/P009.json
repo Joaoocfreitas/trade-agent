@@ -1,0 +1,13 @@
+{
+  "id": "P009",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "price",
+  "reason": "Eu usaria o grátis, 3 perguntas por semana e a agenda de segunda já me bastam, e talvez até mande a agenda no grupo do WhatsApp. Pagar R$ 29,90 todo mês com o que eu ganho não entra, assinatura pra mim é exceção e isso aqui não me diz o que fazer, só o que já aconteceu.",
+  "objection": "Tem nome, rosto e CNPJ, beleza, mas CNPJ não é registro na CVM. Quem é esse João Freitas no mercado? Já vi muito perfil bonito em grupo de Telegram que depois sumiu.",
+  "would_change_my_mind": "Se eu usasse o grátis por umas semanas, conferisse os links na fonte e as 3 perguntas começassem a faltar antes de operar, aí pensaria num plano mais barato, uns R$ 9,90.",
+  "price_too_cheap": 3,
+  "price_cheap": 9.9,
+  "price_expensive": 19.9,
+  "price_too_expensive": 29.9
+}

@@ -12,7 +12,9 @@ FUSO = ZoneInfo('America/Sao_Paulo')
 
 # O robô se identifica como robô. Nada de se passar por navegador de gente.
 ROBO = 'TradeAgentPesquisa'
-USER_AGENT = f'Mozilla/5.0 (compatible; {ROBO}/0.1; pesquisa pessoal sem fins comerciais)'
+# O robô diz quem é e onde ver o produto (22/10/2026: o dado passa a alimentar um site com plano pago, então "pesquisa
+# pessoal sem fins comerciais" deixou de ser verdade). O nome que o robots.txt lê continua o mesmo.
+USER_AGENT = f'Mozilla/5.0 (compatible; {ROBO}/0.2; +https://thoran-rho.vercel.app)'
 
 TIMEOUT_S = 20
 INTERVALO_MESMO_DOMINIO_S = 1.5  # contado do FIM do pedido anterior ao mesmo domínio

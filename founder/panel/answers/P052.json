@@ -1,0 +1,13 @@
+{
+  "id": "P052",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "need",
+  "reason": "Já pago a Empiricus, que pelo menos me diz o que comprar e quando. Uma IA que só mostra o histórico desde 2016 e deixa a decisão toda comigo é mais uma assinatura pra eu ler e continuar sem saber o que fazer.",
+  "objection": "Se não diz o que comprar, pra que serve? Estatística do que aconteceu na semana do Copom eu acho de graça no relatório que já recebo, e passado não garante nada.",
+  "would_change_my_mind": "Um teste grátis de uma semana em que eu visse a IA me avisar de um risco que a minha casa de análise não avisou, com a fonte, antes de eu perder dinheiro.",
+  "price_too_cheap": 9.9,
+  "price_cheap": 14.9,
+  "price_expensive": 29.9,
+  "price_too_expensive": 49.9
+}

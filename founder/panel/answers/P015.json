@@ -1,0 +1,13 @@
+{
+  "id": "P015",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "Eu já pago uma casa de análise e lá pelo menos eu sei quem é o analista, tem CNPI e histórico. Aqui é uma IA que eu não sei de quem é, sem nome, sem reputação nos grupos, e já vi muito 'robô' bonito que era golpe.",
+  "objection": "Quem está por trás disso e como eu confiro que os números que a IA mostra são reais e não inventados? 'Fonte oficial' no texto qualquer um escreve.",
+  "would_change_my_mind": "Ver gente conhecida dos meus grupos usando e falando bem, com o nome e CNPJ da empresa à vista, e um teste grátis onde eu pego uma resposta da IA e confiro o número na fonte da B3 ou do Banco Central eu mesma.",
+  "price_too_cheap": 9.9,
+  "price_cheap": 19.9,
+  "price_expensive": 49.9,
+  "price_too_expensive": 79.9
+}
