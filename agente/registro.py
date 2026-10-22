@@ -12,7 +12,7 @@ from pathlib import Path
 
 from coletor.config import FUSO
 from .fatos import AGENTE
-from .roteador import simples
+from .roteador import cambio, normalizar, simples
 
 # TRADE_AGENTE_REGISTRO aponta outro arquivo (testes e ataques não sujam o registro de verdade).
 ARQUIVO = Path(os.environ.get('TRADE_AGENTE_REGISTRO') or AGENTE / 'conversas.jsonl')
@@ -49,8 +49,13 @@ def _sem_voto(texto: str) -> tuple[str, bool]:
 
 
 def sem_dado_pessoal(texto: str) -> str:
+    # Se o roteador acha dinheiro em moeda estrangeira ou gasto por mês, todo número solto sai, em qualquer formato
+    # ("EUR 80.000", "80.000€", "20 mil USD"): o registro nunca guarda o que entra na conta de câmbio.
+    valor, _, gasto, _ = cambio(normalizar(texto))
     texto, _ = _sem_voto(texto)
     texto = VALOR.sub('[valor omitido]', texto)
+    if valor is not None or gasto is not None:
+        return NUMERO_SOLTO.sub('[valor omitido]', texto)
     partes = ORACOES.split(texto)
     for i in range(0, len(partes), 2):
         if DINHEIRO.search(partes[i]):

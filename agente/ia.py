@@ -60,7 +60,9 @@ estratégia, conselho, "como abordo esse mercado").
   direcao: pede para onde um preço vai, quanto vai subir ou cair, se está caro ou barato, se é topo ou fundo, viés, \
 tendência, palpite, chance de alta ou queda, ou "o que acontece com X se Y ganhar/cortar".
   momento: pede hora, dia, entrada, saída, stop, alvo, alerta ou sinal.
-  capital: conta quanto dinheiro tem, ganha ou quer pôr, ou pergunta quanto colocar ou quantos contratos.
+  capital: pergunta quanto colocar, investir, trocar, trazer, mandar ou manter, que parte ou fatia mover, ou quantos \
+contratos; ou conta quanto tem em reais, ou quanto ganha. Contar quanto tem em moeda estrangeira (euro, dólar) e quanto \
+gasta por mês, sem perguntar quanto mover, NÃO é capital.
   perfil: conta idade, objetivo, prazo, aposentadoria, reserva de emergência ou tolerância a risco, ou pergunta se \
 algo "serve para mim".
   comparar: pede para escolher entre classes de ativo ("cripto ou renda fixa?", "dólar ou bolsa?").

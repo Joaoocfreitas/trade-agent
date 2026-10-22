@@ -123,6 +123,19 @@ EXTRAS = [
     'tenho 150k euros, quanto eu trago pro brasil?', 'Como está o euro?', 'o euro vai cair depois do 2º turno?',
     'O que aconteceu com o euro nas eleições?', 'EUR 80.000 parados no banco, e o Copom?', 'gasto 2 mil euros por mês',
     'paguei 1 euro no café', 'tenho 50 mil em dólares e gasto R$ 3.000 por mês. E a eleição?',
+    # 22/10/2026, achados da revisão: quando e quanto mover, formatos de número, gasto em outra moeda, euro e Copom.
+    'tenho 80 mil euros. troco hoje?', 'tenho 150 mil euros, trago tudo?', 'tenho 90 mil euros guardados, mando pro Brasil ou deixo lá?',
+    'remessa pra fora ta cara? mando agora?', 'tenho 60 mil euros e o Copom é dia 4, e aí?', 'tengo 40 mil euros, cuando cambio a reales?',
+    'Tengo 100.000 euros, ¿conviene traerlos a Brasil ahora?', 'tenho 100 mil dólares, troco agora ou depois do Copom?',
+    'tenho 150 mil euros, trago metade agora e metade depois do segundo turno?', 'tenho 150 mil euros, quanto desse dinheiro eu trago?',
+    'how much of my 100k eur should I convert', 'tenho 150 mil euros, qual o melhor momento pra trocar?',
+    'quero converter R$ 100 mil em euros, quanto dá?', 'tenho R$ 50 mil em dólares, como está o dólar?',
+    'O que aconteceu com o euro 2 dias depois do 1º turno?', 'I have 50,000 euros and spend 2,000 euros a month. How is the euro?',
+    'tenho 1.5 milhão de euros', 'tenho 20 mil euros rendendo 1% ao mês', 'tenho 100 mil euros e gasto 2 mil dólares por mês',
+    'tenho 50 mil euros e gasto 8 mil por mês, quanto tempo dura?', 'tenho 3 contratos de 10 mil dólares no mini dólar, 5.400 pontos',
+    'euro e Copom: o que acontece com o euro quando o Copom surpreende?', 'como o real reagiu à eleição?', 'quanto tá o euro hoje?',
+    'Como estão o euro e a bolsa?', 'vale a pena renda fixa agora?', 'O DI futuro sobe no Copom?', 'como mando dinheiro pra fora?',
+    'O que é câmbio?', 'O que a eleição traz para o dólar?', 'tenho 0,5 euro', 'como os juros reagem à eleição?',
 ]
 
 
@@ -175,7 +188,8 @@ def _frases_de_registro() -> list[str]:
               'eu apoio o Lula', 'odeio o PT', 'o mito vai ganhar', 'voto no Flávio Bolsonaro', 'Ele votou contra o arcabouço?',
               'Tenho 22 anos e 3 contratos de WIN', 'Minha reserva de 2026 é de 15 mil',
               'Tenho €150.000 e gasto 5 mil reais por mês', 'tenho US$ 20 mil', '150k euros na Espanha',
-              'mensalidade de R$ 4.500, tenho 1,2 milhão de euros', 'EUR 80.000 parados no banco']
+              'mensalidade de R$ 4.500, tenho 1,2 milhão de euros', 'EUR 80.000 parados no banco', 'tenho 80.000€ na conta',
+              'USD 20.000 guardados', 'tenho 20 mil USD', 'mensalidade de 4500', 'I have 50,000 euros and spend 2,000 euros a month']
     return list(dict.fromkeys(VOTOS + VALORES + FICAM + outras))
 
 

@@ -5,6 +5,7 @@ Nada aqui é escrito pela IA. O modo com IA recebe estes blocos prontos e só po
 import json
 import re
 from dataclasses import dataclass, field
+from decimal import ROUND_HALF_EVEN, Decimal
 from functools import cache
 
 import pandas as pd
@@ -63,35 +64,52 @@ def juntar(xs: list[str]) -> str:
     return xs[0] if len(xs) == 1 else ', '.join(xs[:-1]) + ' e ' + xs[-1]
 
 
-def mov(x: float, casas: int = 1, un: str = '%') -> str:
-    """Variação em palavras, para quem está começando: 'subiu 1,3%', 'caiu 2,2%'."""
+VERBOS = {False: ('subiu', 'caiu', 'ficou estável', 'foi'), True: ('subiram', 'caíram', 'ficaram estáveis', 'foram')}
+
+
+PONTOS_BASE = ' pontos-base'
+EXPLICA_PB = ' (100 pontos-base = 1 ponto percentual)'
+
+
+def mov(x: float, casas: int = 1, un: str = '%', plural: bool = False) -> str:
+    """Variação em palavras, para quem está começando: 'subiu 1,3%', 'caiu 2,2%' ('os juros subiram', com plural)."""
+    sobe, cai, parado, _ = VERBOS[plural]
     s = num(abs(x), casas)
     if float(s.replace('.', '').replace(',', '.')) == 0:
-        return 'ficou estável'
-    return f'{"subiu" if x > 0 else "caiu"} {s}{un}'
+        return parado
+    return f'{sobe if x > 0 else cai} {s}{un}'
 
 
-def movs(xs, casas: int = 1, un: str = '%') -> str:
+def movs(xs, casas: int = 1, un: str = '%', plural: bool = False) -> str:
     """Poucos casos, cada um em palavras: 'caiu 1,0% e 1,7%' quando foram para o mesmo lado; 'caiu 2,2% e subiu 1,3%'
     quando não."""
+    sobe, cai, _, _ = VERBOS[plural]
     xs = [float(x) for x in xs]
-    textos = [mov(x, casas, un) for x in xs]
-    verbos = {t.split(' ', 1)[0] for t in textos}
-    if len(verbos) == 1 and verbos != {'ficou'}:
-        return f'{verbos.pop()} ' + juntar([t.split(' ', 1)[1] for t in textos])
+    textos = [mov(x, casas, un, plural) for x in xs]
+    for verbo in (sobe, cai):
+        if all(t.startswith(verbo + ' ') for t in textos):
+            return f'{verbo} ' + juntar([t[len(verbo) + 1:] for t in textos])
     return juntar(textos)
 
 
-def faixa_mov(lo: float, hi: float, casas: int = 1, un: str = '%') -> str:
+def faixa_mov(lo: float, hi: float, casas: int = 1, un: str = '%', plural: bool = False) -> str:
     """De lo a hi em palavras: 'subiu de 4,6% a 7,7%', 'caiu de 0,5% a 3,2%', 'foi de queda de 2,0% a alta de 1,5%'."""
+    sobe, cai, _, foi = VERBOS[plural]
     lo, hi = float(lo), float(hi)
     if lo > 0:
-        return f'subiu de {num(lo, casas)}{un} a {num(hi, casas)}{un}'
+        return f'{sobe} de {num(lo, casas)}{un} a {num(hi, casas)}{un}'
     if hi < 0:
-        return f'caiu de {num(abs(hi), casas)}{un} a {num(abs(lo), casas)}{un}'
+        return f'{cai} de {num(abs(hi), casas)}{un} a {num(abs(lo), casas)}{un}'
     ponta = lambda x: (f'queda de {num(abs(x), casas)}{un}' if x < 0 else f'alta de {num(x, casas)}{un}' if x > 0  # noqa: E731
                        else 'estabilidade')
-    return f'foi de {ponta(lo)} a {ponta(hi)}'
+    return f'{foi} de {ponta(lo)} a {ponta(hi)}'
+
+
+def curto(x: float, casas_linha: int, casas: int) -> float:
+    """Arredonda para o resumo a partir do número já escrito na linha, com a regra do filtro (D8: meio para o par). Sem
+    isso, 5,6450 na linha viraria 5,65 no resumo pelo f-string e 5,64 no filtro, e a resposta cairia na de segurança."""
+    d = Decimal(f'{abs(x):.{casas_linha}f}').quantize(Decimal(1).scaleb(-casas), ROUND_HALF_EVEN)
+    return float(d) * (1 if x >= 0 else -1)
 
 
 def dia(d) -> str:
@@ -196,7 +214,7 @@ def economia() -> Bloco:
           f'{dia(d_pre5)}.', F_TESOURO, F_ESTUDO)
     b.add(f'Dívida bruta do governo geral: {num(div, 2)}% do PIB em {mes(d_div)}.', F_DIVIDA)
     b.resumo = (f'{RESUMO_HOJE} juros básicos (Selic) de {num(selic, 2)}% ao ano, inflação de {num(ipca, 2)}% em 12 meses '
-                f'(até {mes(d_ipca)}) e dólar a R$ {num(ptax, 2)} (cotação oficial de {dia(d_ptax)}).')
+                f'(até {mes(d_ipca)}) e dólar a R$ {num(curto(ptax, 4, 2), 2)} (cotação oficial de {dia(d_ptax)}).')
     return b
 
 
@@ -272,13 +290,13 @@ def historico(mercado: str) -> Bloco:
     if mercado == 'euro':
         b.limites.append(LIMITE_PTAX_EURO)
     # Para quem está começando: o nível arredondado, o ano em palavras e a faixa dos 12 meses.
-    curto = (lambda v: f'R$ {num(v, 2)}') if mercado in ('dolar', 'euro') else fmt
+    nivel = (lambda v: f'R$ {num(curto(v, 4, 2), 2)}') if mercado in ('dolar', 'euro') else fmt
     nome_cap = nome[0].upper() + nome[1:]
     ano = ''
     if len(antes) and not juros:
-        ano = f' No ano, {mov(var, 1)}.'
-    b.resumo = (f'{nome_cap} está em {curto(fim)} ({dia(d_fim)}).{ano} Nos últimos 12 meses, foi de '
-                f'{curto(float(doze[d_lo]))} a {curto(float(doze[d_hi]))}.')
+        ano = f' No ano, {mov(curto(var, 2, 1), 1)}.'
+    b.resumo = (f'{nome_cap} está em {nivel(fim)} ({dia(d_fim)}).{ano} Nos últimos 12 meses, foi de '
+                f'{nivel(float(doze[d_lo]))} a {nivel(float(doze[d_hi]))}.')
     return b
 
 
@@ -302,6 +320,10 @@ def _realizado(ano: int) -> dict:
     p = ptax[ptax.index.year == ano]
     return {'Câmbio': (p.index[-1], float(p.iloc[-1])), 'Selic': float(selic[selic.index <= f'{ano}-12-31'].iloc[-1]),
             'IPCA': float(ipca[ipca.index == f'{ano}-12-01'].iloc[0])}
+
+
+TITULO_EXPECTATIVAS = 'O que o mercado espera'
+SEM_FOCUS_EURO = 'O Focus não pergunta pelo euro; para o dólar, '
 
 
 def expectativas(mercado: str) -> Bloco:
@@ -328,9 +350,9 @@ def expectativas(mercado: str) -> Bloco:
     }
     fontes = {'cambio': (F_FOCUS_ANUAL,), 'selic': (F_FOCUS_ANUAL, F_FOCUS, F_SELIC), 'ipca': (F_FOCUS_ANUAL,),
               'pib': (F_FOCUS_ANUAL,)}
-    ordem = {'dolar': ['cambio', 'selic', 'ipca'], 'juros': ['selic', 'ipca', 'cambio'],
+    ordem = {'dolar': ['cambio', 'selic', 'ipca'], 'euro': ['cambio', 'selic', 'ipca'], 'juros': ['selic', 'ipca', 'cambio'],
              'ibovespa': ['selic', 'pib', 'ipca', 'cambio']}.get(mercado, ['selic', 'ipca', 'cambio', 'pib'])
-    b = Bloco(f'O que o mercado espera (boletim Focus do Banco Central, mediana das instituições, {dia(data)})')
+    b = Bloco(f'{TITULO_EXPECTATIVAS} (boletim Focus do Banco Central, mediana das instituições, {dia(data)})')
     for k in ordem:
         b.add(linhas[k], *fontes[k])
     # O Focus também erra: a última mediana registrada no ano anterior contra o que aconteceu.
@@ -348,7 +370,7 @@ def expectativas(mercado: str) -> Bloco:
         erros['IPCA'].append(real['IPCA'] - esperado['IPCA']['mediana'])
     nomes = {'Câmbio': ('Câmbio', 'a PTAX do último dia útil do ano', F_PTAX),
              'Selic': ('Selic', 'a meta em 31/12', F_SELIC), 'IPCA': ('IPCA', 'o IPCA do ano', F_IPCA)}
-    chave = {'dolar': ['Câmbio', 'Selic'], 'juros': ['Selic', 'IPCA']}.get(mercado, ['Selic', 'IPCA', 'Câmbio'])
+    chave = {'dolar': ['Câmbio', 'Selic'], 'euro': ['Câmbio', 'Selic'], 'juros': ['Selic', 'IPCA']}.get(mercado, ['Selic', 'IPCA', 'Câmbio'])
     for ind in chave:
         nome, real_txt, fonte_real = nomes[ind]
         b.add(f'O Focus também erra. {nome}: a mediana do último boletim do ano anterior, cerca de 12 meses antes, contra '
@@ -370,17 +392,21 @@ def expectativas(mercado: str) -> Bloco:
     # Para quem está começando: quem são, o que esperam e quanto já erraram, sem sigla.
     quem = lambda n: (f'Os economistas que o Banco Central consulta toda semana (boletim Focus, {n} instituições '  # noqa: E731
                       f'em {dia(data)})')
-    if mercado == 'dolar':
+    if mercado in ('dolar', 'euro'):
         e = [abs(x) for x in erros['Câmbio']]
-        b.resumo = (f'{quem(c0["respondentes"])} esperam o dólar a R$ {num(c0["mediana"], 2)} no fim de {ano}; as respostas '
-                    f'vão de R$ {num(c0["minimo"], 2)} a R$ {num(c0["maximo"], 2)}. É a expectativa deles, não do Thoran, e '
-                    f'ela já errou: {periodo}, o dólar do fim do ano ficou de R$ {num(min(e), 2)} a R$ {num(max(e), 2)} longe '
-                    f'do esperado{lados("Câmbio")}.')
+        sujeito = quem(c0['respondentes'])
+        if mercado == 'euro':
+            sujeito = SEM_FOCUS_EURO + sujeito[0].lower() + sujeito[1:]
+        b.resumo = (f'{sujeito} esperam o dólar a R$ {num(c0["mediana"], 2)} no fim de {ano}; as '
+                    f'respostas vão de R$ {num(c0["minimo"], 2)} a R$ {num(c0["maximo"], 2)}. É a expectativa deles, não do '
+                    f'Thoran, e ela já errou: {periodo}, a diferença entre o esperado e o dólar do fim do ano foi de '
+                    f'R$ {num(min(e), 2)} a R$ {num(max(e), 2)}{lados("Câmbio")}.')
     else:
         e = [abs(x) for x in erros['Selic']]
         b.resumo = (f'{quem(s0["respondentes"])} esperam os juros básicos (Selic) em {num(s0["mediana"], 2)}% no fim de '
-                    f'{ano}. É a expectativa deles, não do Thoran, e ela já errou: {periodo}, a Selic do fim do ano ficou de '
-                    f'{num(min(e), 2)} a {num(max(e), 2)} ponto percentual longe do esperado{lados("Selic")}.')
+                    f'{ano}; hoje estão em {num(selic_hoje, 2)}%. É a expectativa deles, não do Thoran, e ela já errou: '
+                    f'{periodo}, a diferença entre o esperado e a Selic do fim do ano foi de {num(min(e), 2)} a '
+                    f'{num(max(e), 2)} pontos percentuais{lados("Selic")}.')
     return b
 
 
@@ -397,7 +423,8 @@ def agenda(mercado: str) -> list[dict]:
     for r in _focus()['agenda_copom'][:2]:
         d = pd.Timestamp(r['decisao'])
         itens.append({'tipo': 'copom', 'data': r['decisao'], 'fontes': (F_AGENDA_COPOM,),
-                      'curto': f'decisão do Copom em {d.strftime("%d/%m")} ({DIAS_DA_SEMANA[d.weekday()]}, depois das 18h30)'})
+                      'curto': f'decisão do Copom (o comitê do Banco Central que define a Selic) em {d.strftime("%d/%m")} '
+                               f'({DIAS_DA_SEMANA[d.weekday()]}, depois das 18h30)'})
     return itens
 
 
@@ -488,11 +515,13 @@ def eleicoes(mercados: list[str]) -> Bloco:
     v = (tab[col] * k).round(casas)
     surpresa_nos_primeiros = bool(tab[~segundo].surpresa_mensuravel.all() and not tab[segundo].surpresa_mensuravel.any())
     um_lado = len({1 if x > 0 else -1 for x in med.surpresa_pp}) == 1
-    un_txt = ' pontos-base' if un.strip() == 'p.b.' else un
-    b.resumo = (f'Depois dos {segundo.sum()} segundos turnos desde 2018, o {nome} {movs(v[segundo], casas, un_txt)} no dia '
-                f'seguinte; depois dos {(~segundo).sum()} primeiros'
+    pb = un.strip() == 'p.b.'
+    un_txt, plural, artigo = (PONTOS_BASE, True, 'os') if pb else (un, False, 'o')
+    b.resumo = (f'Depois dos {segundo.sum()} segundos turnos desde 2018, {artigo} {nome} '
+                f'{movs(v[segundo], casas, un_txt, plural)} no dia seguinte; depois dos {(~segundo).sum()} primeiros'
                 + (', em que a urna surpreendeu as pesquisas' if surpresa_nos_primeiros else '')
-                + f', {faixa_mov(v[~segundo].min(), v[~segundo].max(), casas, un_txt)}. Leitura do estudo: pesou mais a '
+                + f', {faixa_mov(v[~segundo].min(), v[~segundo].max(), casas, un_txt, plural)}'
+                + (EXPLICA_PB if pb else '') + '. Leitura do estudo: pesou mais a '
                 f'surpresa das urnas do que o nome de quem ganhou'
                 + (f', mas as {len(med)} surpresas foram a favor do mesmo campo político, e a amostra não mostra o outro lado'
                    if um_lado else '')
@@ -640,9 +669,10 @@ def copom(mercados: list[str] | None = None) -> Bloco:
         v = com.pre2_d0_pb.round(1)
         abaixo, acima = int((com.surpresa_pb < 0).sum()), int((com.surpresa_pb > 0).sum())
         b.resumo = (f'Nas {todas["n"]} reuniões do Copom desde 2016, a decisão foi diferente da que os economistas '
-                    f'esperavam (boletim Focus) em {todas["com_surpresa"]}: {abaixo} abaixo e {acima} acima. Nelas, os juros '
-                    f'de 2 anos {faixa_mov(v.min(), v.max(), 1, " pontos-base")} no dia seguinte; no valor do meio, '
-                    f'mexeram {num(todas["juros2a_mediana_abs_com_pb"], 1)} pontos-base, contra '
+                    f'esperavam (boletim Focus) em {todas["com_surpresa"]}: em {abaixo}, a Selic ficou abaixo do esperado; '
+                    f'em {acima}, acima. Nessas reuniões, os juros de 2 anos '
+                    f'{faixa_mov(v.min(), v.max(), 1, PONTOS_BASE, True)}{EXPLICA_PB} no dia seguinte; no valor do meio, a '
+                    f'mexida foi de {num(todas["juros2a_mediana_abs_com_pb"], 1)} pontos-base, contra '
                     f'{num(todas["juros2a_mediana_abs_sem_pb"], 1)} nas outras {todas["sem_surpresa"]}.')
     b.limites += ['O Focus é a expectativa de economistas, não o preço de mercado.',
                   f'São só {len(com)} reuniões com surpresa desde 2016.',
@@ -764,18 +794,27 @@ def euro_turnos() -> Bloco:
     b.linhas.append(taxa_base('euro', 'euro'))
     med = t[t.surpresa_mensuravel]
     um_lado = len({1 if x > 0 else -1 for x in med.surpresa_pp}) == 1  # o mesmo critério do bloco das eleições
-    # Com as mesmas 2 casas das linhas: arredondar 1,05 para 1,1 não bate com o número dos fatos (o filtro, D8, barra).
-    b.resumo = (f'Depois dos {segundo.sum()} segundos turnos desde 2018, o euro {movs(v[segundo], 2)} no dia seguinte; '
-                f'depois dos {(~segundo).sum()} primeiros, {faixa_mov(v[~segundo].min(), v[~segundo].max(), 2)}. São só '
+    # Com os mesmos números das linhas (as mesmas 2 casas, do mesmo float): senão o filtro (D8) pode barrar o arredondado.
+    d0 = t.d0
+    b.resumo = (f'Depois dos {segundo.sum()} segundos turnos desde 2018, o euro {movs(d0[segundo], 2)} no dia seguinte; '
+                f'depois dos {(~segundo).sum()} primeiros, {faixa_mov(d0[~segundo].min(), d0[~segundo].max(), 2)}. São só '
                 f'{len(t)} casos'
-                + (f', e as {len(med)} surpresas das urnas foram a favor do mesmo campo político: a amostra não mostra o '
-                   f'outro lado' if um_lado and len(med) else '')
+                + (f', e as {len(med)} surpresas das urnas ({juntar(list(med.turno))}) foram a favor do mesmo campo '
+                   f'político: a amostra não mostra o outro lado' if um_lado and len(med) else '')
                 + '. Não dá para tirar regra.')
     b.limites += [f'São só {len(t)} turnos: não dá para tirar regra.',
                   'A reação é de um dia, com a cotação oficial do Banco Central (PTAX, fixada entre 10h e 13h), não o '
                   'fechamento; o movimento de um dia não diz nada sobre os meses seguintes.',
                   LIMITE_PTAX_EURO]
     return b
+
+
+EURO_SEM_ESTUDO = ('O estudo do Copom e da linha do tempo mede o dólar (a cotação oficial do Banco Central), não o euro: '
+                   'os números de câmbio abaixo são do dólar.')
+
+
+def euro_sem_estudo() -> Bloco:
+    return Bloco('Sobre o euro', [Linha(EURO_SEM_ESTUDO)])
 
 
 MOEDAS = {'euro': ('euro', 'euros', 'euro', F_EURO), 'dolar': ('dólar', 'dólares', 'ptax', F_PTAX)}
@@ -805,18 +844,22 @@ def _reais(v: float) -> str:
 
 
 def _meses(m: float) -> str:
-    """Meses inteiros, sem arredondar para cima, e os anos quando passa de 2."""
+    """Meses inteiros, sem arredondar para cima, e os anos exatos quando passa de 2: "35 meses (2 anos e 11 meses)"."""
     n = int(m)
     if n < 1:
         return 'menos de 1 mês'
-    return f'{num(n, 0)} {"mês" if n == 1 else "meses"}' + (f' (cerca de {num(n // 12, 0)} anos)' if n >= 24 else '')
+    txt = f'{num(n, 0)} {"mês" if n == 1 else "meses"}'
+    if n >= 24:
+        anos, resto = divmod(n, 12)
+        txt += f' ({num(anos, 0)} anos' + (f' e {resto} {"mês" if resto == 1 else "meses"}' if resto else '') + ')'
+    return txt
 
 
 def conta_cambio(valor: float, moeda: str, gasto: float | None = None, gasto_moeda: str | None = None,
-                 c: dict | None = None) -> Bloco:
+                 c: dict | None = None, cg: dict | None = None) -> Bloco:
     """P4 de câmbio: o dinheiro em moeda estrangeira que a pessoa contou, em reais, pela cotação oficial. Só a conta, sem
-    dizer o que fazer, quando trocar nem quanto (N1, N4, N5). `gasto`: o gasto por mês que ela contou, em reais (ou na
-    própria moeda, se `gasto_moeda` for a mesma)."""
+    dizer o que fazer, quando trocar nem quanto (N1, N4, N5). `gasto`: o gasto por mês que ela contou, em reais, na
+    própria moeda ou em outra moeda estrangeira (convertido pela cotação oficial dela, `cg`)."""
     nome, plural, _, fonte = MOEDAS[moeda]
     c = c or cotacoes(moeda)
     hoje_r = valor * c['valor']
@@ -829,27 +872,41 @@ def conta_cambio(valor: float, moeda: str, gasto: float | None = None, gasto_moe
     b.add(f'No fim de {c["ano_data"][:4]} ({dia(c["ano_data"])}), 1 {nome} valia R$ {num(c["ano_valor"], 4)}: os mesmos '
           f'{_qtd(valor)} {plural} davam R$ {_reais(ano_r)}, '
           + (f'R$ {_reais(abs(dif))} {"a mais" if dif > 0 else "a menos"} do que hoje.' if _reais(abs(dif)) not in ('0', '0,00')
-             else 'o mesmo que hoje.'),
-          fonte)
+             else 'o mesmo que hoje.'), fonte)
     b.add(f'Nos últimos 12 meses, 1 {nome} foi de R$ {num(c["min_valor"], 4)} ({dia(c["min_data"])}) a '
           f'R$ {num(c["max_valor"], 4)} ({dia(c["max_data"])}): nesses dois extremos, os mesmos {plural} dariam de '
           f'R$ {_reais(valor * c["min_valor"])} a R$ {_reais(valor * c["max_valor"])}.', fonte)
     cobre = ''
     if gasto:
         if gasto_moeda == moeda:
+            gasto_txt = f'{_qtd(gasto)} {plural}'
             meses = valor / gasto
-            b.add(f'Com gasto de {_qtd(gasto)} {plural} por mês, os {_qtd(valor)} {plural} cobrem {_meses(meses)}, sem '
-                  f'contar rendimento, imposto nem custo da troca.')
+            b.add(f'Com gasto de {gasto_txt} por mês, os {_qtd(valor)} {plural} cobrem {_meses(meses)}, sem contar '
+                  f'rendimento, imposto nem custo da troca.')
         else:
-            meses = hoje_r / gasto
-            b.add(f'Com gasto de R$ {_qtd(gasto)} por mês, R$ {_reais(hoje_r)} cobrem {_meses(meses)}, sem contar '
-                  f'rendimento, imposto nem custo da troca. Com o {nome} na menor cotação dos 12 meses, seriam '
-                  f'{_meses(valor * c["min_valor"] / gasto)}; na maior, {_meses(valor * c["max_valor"] / gasto)}.', fonte)
-        cobre = f'; com o seu gasto por mês, cobrem {_meses(meses)}'
+            if gasto_moeda in MOEDAS:  # outra moeda estrangeira: o gasto vira real pela cotação oficial dela
+                nome_g, plural_g, _, fonte_g = MOEDAS[gasto_moeda]
+                cg = cg or cotacoes(gasto_moeda)
+                gasto_r = gasto * cg['valor']
+                gasto_txt = f'{_qtd(gasto)} {plural_g}'
+                abre = (f'Com gasto de {gasto_txt} por mês (R$ {_reais(gasto_r)} pela cotação oficial do {nome_g} em '
+                        f'{dia(cg["data"])})')
+                fontes_g = (fonte, fonte_g)
+            else:
+                gasto_r = gasto
+                gasto_txt = f'R$ {_qtd(gasto)}'
+                abre = f'Com gasto de {gasto_txt} por mês'
+                fontes_g = (fonte,)
+            meses = hoje_r / gasto_r
+            b.add(f'{abre}, R$ {_reais(hoje_r)} cobrem {_meses(meses)}, sem contar rendimento, imposto nem custo da troca. '
+                  f'Com o {nome} na menor cotação dos 12 meses, seriam {_meses(valor * c["min_valor"] / gasto_r)}; na maior, '
+                  f'{_meses(valor * c["max_valor"] / gasto_r)}.', *fontes_g)
+        cobre = f'; com gasto de {gasto_txt} por mês, cobrem {_meses(meses)}'
     b.add('É só a conta com os números que você contou: não diz o que fazer com o dinheiro, nem quando trocar, nem quanto.')
     b.limites.append(LIMITE_PTAX_EURO.replace('do euro', f'do {nome}') if moeda != 'euro' else LIMITE_PTAX_EURO)
-    b.resumo = (f'Seus {_qtd(valor)} {plural} valem R$ {_reais(hoje_r)} pela cotação oficial de {dia(c["data"])}; cada '
-                f'R$ 0,10 no {nome} muda isso em R$ {_reais(valor * 0.1)}{cobre}.')
+    b.resumo = (f'Pela cotação oficial de {dia(c["data"])}, seus {_qtd(valor)} {plural} equivalem a R$ {_reais(hoje_r)}; na '
+                f'troca de verdade entram a tarifa e o spread do banco ou do app. Cada R$ 0,10 de diferença no {nome} muda '
+                f'isso em R$ {_reais(valor * 0.1)}{cobre}.')
     return b
 
 

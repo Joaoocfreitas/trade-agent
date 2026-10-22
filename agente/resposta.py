@@ -6,6 +6,7 @@ o que o mercado espera, o que aconteceu antes, datas marcadas, pesquisas registr
 → limitações → fontes numeradas. Nada repete o aviso: em 22/10/2026 uma recusa dizia "não" 9 vezes.
 É também a resposta de segurança do modo com IA: se a IA escrever algo que o filtro barra, a pessoa recebe esta.
 """
+import re
 from dataclasses import dataclass, field
 from datetime import datetime
 
@@ -14,7 +15,7 @@ from coletor.config import FUSO
 from . import fatos as F
 from . import textos as T
 from .filtro import Violacao, checar
-from .roteador import Pedido, analisar
+from .roteador import CONTRATO, Pedido, analisar, normalizar
 
 DERIVATIVOS = ('mini_indice', 'mini_dolar', 'juros')
 
@@ -67,7 +68,7 @@ def escolher_blocos(p: Pedido, hoje: str) -> list[F.Bloco]:
                if m in F.HISTORICO]
     if not tem_evento and medidos:
         blocos += [F.historico(m) for m in medidos]
-        blocos += [F.expectativas('dolar' if medidos[0] == 'euro' else medidos[0]), F.calendario(medidos[0], hoje)]
+        blocos += [F.expectativas(medidos[0]), F.calendario(medidos[0], hoje)]
     elif 'economia' in p.temas or 'copom' in p.temas:
         blocos.append(F.expectativas(medidos[0] if medidos else ''))
     if 'memecoin' in p.mercados:
@@ -84,6 +85,9 @@ def escolher_blocos(p: Pedido, hoje: str) -> list[F.Bloco]:
         blocos.append(F.mercado(m))
     if pede_dinheiro or set(DERIVATIVOS[:2]) & set(p.mercados):
         blocos.append(F.fgv())
+    # O estudo do Copom e da linha do tempo mede o dólar, não o euro: dizer isso, em vez de responder só com o dólar.
+    if 'euro' in p.mercados and ('copom' in p.temas or any(t in p.temas for t in F.TIPOS)):
+        blocos.append(F.euro_sem_estudo())
     blocos = [b for b in blocos if b]
     if p.cambio:
         blocos = _cambio_primeiro(p, blocos)
@@ -93,20 +97,23 @@ def escolher_blocos(p: Pedido, hoje: str) -> list[F.Bloco]:
 
 
 def _cambio_primeiro(p: Pedido, blocos: list[F.Bloco]) -> list[F.Bloco]:
-    """Pergunta de câmbio: na frente, a conta com os números da pessoa, o euro nos turnos (se ela falou de eleição), o
-    que o mercado espera para o dólar e o caminho do euro. O resto segue na ordem de antes."""
-    titulo = lambda b: b.titulo  # noqa: E731
+    """Pergunta de câmbio: na frente, a conta com os números da pessoa; com eleição, o euro nos turnos e o que o mercado
+    espera para o dólar; sem eleição, o caminho do euro e o que o mercado espera. O resto segue na ordem de antes, sem a
+    expectativa de outro mercado (a da Selic, numa pergunta de euro e bolsa)."""
+    euro = 'euro' in p.mercados
+    expectativa = F.expectativas('euro' if euro else 'dolar')
     frente: list[F.Bloco] = []
     if p.conta_cambio:
         frente.append(F.conta_cambio(p.valor_moeda, p.moeda, p.gasto_mensal, p.gasto_moeda))
-    if 'euro' in p.mercados and p.eleicao:
-        frente.append(F.euro_turnos())
-    expectativa = next((b for b in blocos if titulo(b).startswith('O que o mercado espera')), None)
-    frente.append(expectativa or F.expectativas('dolar'))
-    if 'euro' in p.mercados:
-        frente.append(next((b for b in blocos if titulo(b) == F.historico('euro').titulo), None) or F.historico('euro'))
-    vistos = {titulo(b) for b in frente}
-    return frente + [b for b in blocos if titulo(b) not in vistos]
+    if euro and p.eleicao:
+        frente += [F.euro_turnos(), expectativa, F.historico('euro')]
+    elif euro:
+        frente += [F.historico('euro'), expectativa]
+    else:
+        frente.append(expectativa)
+    vistos = {b.titulo for b in frente}
+    resto = [b for b in blocos if b.titulo not in vistos and not b.titulo.startswith(F.TITULO_EXPECTATIVAS)]
+    return frente + resto
 
 
 def _abertura(p: Pedido, achou_repertorio: bool) -> list[str]:
@@ -138,9 +145,15 @@ def _curta(p: Pedido, blocos: list[F.Bloco], abertura: list[str]) -> list[str]:
     return linhas[:3]
 
 
+def _contrato_de_juros(pergunta: str) -> bool:
+    """'juros' é o mercado de renda fixa, Selic e DI futuro; só o DI futuro é derivativo (D4)."""
+    return bool(re.search(CONTRATO + r'|\bfuturos?\b', normalizar(pergunta)))
+
+
 def _avisos(r: Resposta) -> list[str]:
     avisos = []
-    if set(DERIVATIVOS) & set(r.pedido.mercados) or any(b.titulo.startswith('A taxa-base de quem faz day') for b in r.blocos):
+    derivativo = set(DERIVATIVOS[:2]) & set(r.pedido.mercados) or ('juros' in r.pedido.mercados and _contrato_de_juros(r.pergunta))
+    if derivativo or any(b.titulo.startswith('A taxa-base de quem faz day') for b in r.blocos):
         avisos.append(T.RISCO_DERIVATIVO)
     if {'cripto', 'memecoin'} & set(r.pedido.mercados) and not any(b.titulo == F.TITULO_CRIPTO for b in r.blocos):
         avisos.append(T.RISCO_CRIPTO)  # o bloco da cripto já traz o D5: não repete
