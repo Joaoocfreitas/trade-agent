@@ -37,10 +37,16 @@ const ABREVIACOES: ReadonlyMap<string, string> = new Map([
   ['subi', 'subir'], ['chace', 'chance'], ['chanse', 'chance'], ['ibov', 'ibovespa'], ['msm', 'mesmo'],
 ])
 
+// "Irã" (o país) e "irá" (o verbo) só se distinguem antes de tirar o acento. É o (?<!\w)irã(?!\w) do Python com re.I,
+// sobre o texto ainda com acento: lá o \w é Unicode (letra, número ou sublinhado) e o re.I também casa İ e ı com o i,
+// e aqui o \b do JS seria ASCII e falharia logo depois do "ã".
+const IRA = /(?<![\p{L}\p{N}_])[iIİı][rR][ãÃ](?![\p{L}\p{N}_])/gu
+
 /** Emoji e símbolo de moeda viram palavra, sai o acento, e a abreviação vira a palavra inteira. */
 export function normalizar(pergunta: string): string {
   for (const [e, palavra] of SIMBOLOS) pergunta = pergunta.replaceAll(e, palavra)
   for (const [e, palavra] of EMOJI) pergunta = pergunta.replaceAll(e, palavra)
+  pergunta = pergunta.replace(IRA, 'iran')
   const t = simples(pergunta)
   return t.replace(/\b\w+\b/g, (m) => ABREVIACOES.get(m) ?? m)
 }
@@ -64,8 +70,13 @@ export const MERCADOS = {
   // Logo depois do dólar: a ordem das chaves é a ordem de p.mercados, como no dict do Python.
   euro: rx(r`\beuros?\b|\beur\b`),
   petroleo: rx(
-    r`\bpetroleo\b|\bbrent\b|\bwti\b|\bpetrobras\b|\bpetr[34]\b|\bprio3?\b|\bopep\b|\bopec\b|\bcombustive(l|is)\b`,
-    r`|\bgasolina\b|\bdiesel\b|\bbarril\b|\bormuz\b|\bpetroleiras?\b`,
+    r`\bpetroleo\b|\bbrent\b|\bwti\b|\bpetrobras\b|\bpetr[34]\b|\bprio3?\b|\bopep\b|\bopec\b|\bdiesel\b|\bormuz\b`,
+    r`|\bpetroleiras?\b`,
+    // em sentido figurado não é petróleo: "o combustível da alta", "jogou gasolina no dólar", "barril de pólvora"
+    r`|\bcombustive(l|is)\b(?! (da|do|de|para|pra|pro) (alta|queda|rali|dolar|bolsa|mercado|ibovespa|juros|crise|eleicao)\b)`,
+    r`|(?<!\bjogou )(?<!\bjogar )(?<!\bjoga )(?<!\bjogam )(?<!\bjogando )(?<!\bjogaram )(?<!\bbotou )(?<!\bbotar )`,
+    r`\bgasolina\b(?! n[ao] (fogueira|fogo|incendio|brasa)\b)`,
+    r`|\bbarril\b(?! de polvora\b)`,
   ),
   juros: rx(r`\bjuros\b|\bdi1?\b|\bdi futuro\b|\bselic\b|\brenda fixa\b|\btesouro\b|\bprefixad\w*`),
   cripto: rx(
@@ -76,7 +87,24 @@ export const MERCADOS = {
   previsao: rx(r`\bpolymarket\b|\bkalshi\b|\bmercados? de previs\w*`),
 } satisfies Record<string, RegExp>
 
-export const CANDIDATOS = { flavio: rx(r`\bflavio\b|\bbolsonaro\b`), lula: rx(r`\blula\b`) } satisfies Record<string, RegExp>
+// "Jair Bolsonaro" não é o candidato.
+export const CANDIDATOS = {
+  flavio: rx(r`\bflavio\b|(?<!\bjair )\bbolsonaro\b`),
+  lula: rx(r`\blula\b`),
+} satisfies Record<string, RegExp>
+// Palavra que faz a pergunta ser de eleição mesmo citando cargo de empresa ("se o Lula ganhar, troca o presidente da
+// Petrobras?"). Sem ela, o presidente da Petrobras não é o da República, e o Bolsonaro que trocou o comando da Petrobras
+// não é o candidato.
+const ELEITORAL = rx(
+  r`\belei(cao|coes|toral|torais)\b|\bturnos?\b|\bcandidat\w*|\burnas?\b|\bpesquisas?\b|\bvot(o|ar)\b`,
+  r`|\b(ganhar|vencer|perder|eleito)\b|\bproximo presidente\b|\blula\b|\bflavio\b`,
+)
+// Com flag g, só para o replace (o re.sub do Python troca todas).
+const CARGO = new RegExp(
+  r`\b(presidente|presidencia|ceo|comando)\b( d[aoe]| na| no)? (petrobras|estatal|conselho|empresa|opep|banco central|bc)\b` +
+    r`|\b(petrobras|estatal)\b[^.?!]{0,30}\b(presidente|presidencia)\b`,
+  'g',
+)
 
 export const TEMAS = {
   eleicao: rx(
@@ -92,12 +120,16 @@ export const TEMAS = {
   legislativo: rx(r`\bcongresso\b|\bcamara\b|\bsenado\b|\bvotacao\b|\bpec\b|\breforma\b|\bimpeachment\b`),
   judicial: rx(r`\bstf\b|\bsupremo\b|\bjulgamento\b|\bprisao\b|\bcondenacao\b`),
   // "petróleo" sozinho não é geopolítica: tem mercado próprio, com os eventos de guerra que mexeram com o Brent
-  geopolitico: rx(r`\btarifas?\b|\bguerra\b|\bsancao\b|\bsancoes\b|\bira\b`),
+  geopolitico: rx(r`\btarifas?\b|\bguerra\b|\bsancao\b|\bsancoes\b|\biran\b|\b(o|do|no|ao|pro|pelo|com o|contra o) ira\b`),
   choque_externo: rx(r`\bpandemia\b|\bcovid\b|\bcrise (global|externa|internacional)\b`),
   escandalo: rx(r`\bescandalos?\b|\bdelacao\b|\blava ?jato\b|\bgrampo\b`),
   economia: rx(r`\beconomia\b|\binflacao\b|\bipca\b|\bdivida\b|\bpib\b|\bfiscal\b`),
   conceito: rx(r`\bo que (e|sao|significa)\b|\bcomo funciona\b|\bme explica\b|\bexplica\b`),
 } satisfies Record<string, RegExp>
+
+// Empresas e tickers da B3 ("PETR4", "PRIO3", "VALE3", "ITUB4", "BOVA11"), para a escolha entre eles.
+const EMPRESA = r`(petrobras|petr[34]|prio3?|vale3?|[a-z]{4}(3|4|5|6|11))`
+const EMPRESA_DITA = rx(r`\b`, EMPRESA, r`\b`)
 
 export const PROIBIDOS = {
   // "O que eu faço?", "que que eu faço?", "o que fazer agora?", "preciso tomar uma decisão", "e agora?" pedem ação.
@@ -119,6 +151,19 @@ export const PROIBIDOS = {
     r`|\b(tiro|boto)\b[^.?!]{0,40}\b(exchange|corretora|carteira)\b`,
     // como no "e agora", o \W* guloso come o \n final que o $ do Python aceitaria; o "." do Python só recusa o \n
     r`|(?<=[^\n]{10})\be ai(\?|\W*$)|\bconviene\b|\b(debo|deberia) (cambiar|traer|mandar|enviar)\b`,
+    // o que fazer com a posição, preso à 1ª pessoa ou à posse ("mantenho PETR4?", "zero minha petrobras?")
+    r`|\bmantenho\b|\bsegur(o|ar)\b (a |o )?(minha|meu|minhas|meus|posicao|petr\w*|acao|acoes|papel|papeis)\b`,
+    r`|\b(vale|devo|compensa|deveria) segurar\b`,
+    r`|\bzer(o|ar|ei)\b (a |o |as |os )?(minha|meu|minhas|meus|posicao|tudo|petr\w*|acoes)\b`,
+    r`|\b(aumento|aumentar|reduzo|reduzir|diminuo|diminuir|realizo|realizar)\b[^.?!]{0,20}\b(posicao|lucro|petr\w*|acoes`,
+    r`|minha|meu)\b`,
+    r`|\b(minha|meu) posicao\b|\bposicao (em|na|no)\b|\b(faco|fazer|faria|vale fazer) (o |um )?preco medio\b`,
+    r`|\baproveit(o|ar|aria) (a|o|essa|esse|esta|este)? ?(queda|alta|baixa|subida|desconto|tombo|crise|guerra)\b`,
+    r`|\b(e|seria) (uma )?(boa |otima |grande )?oportunidade\b`,
+    r`|\boportunidade (de|pra|para) (compra|entrada|comprar|entrar|vender|lucro|ganh\w*)\b`,
+    r`|\b(bom|otimo|melhor|pior) momento\b|\b(ta|esta|e|chegou) (na )?(hora|momento) de\b`,
+    r`|\blong ou short\b|\bshort ou long\b|\b(fico|ficar|entro|vou) (long|short)\b`,
+    r`|\b(e )?(um )?investimento (seguro|bom|ruim|arriscado)\b`,
   ),
   direcao: rx(
     r`\bvai (subir|cair|disparar|despencar|bombar|valorizar|explodir|fechar|abrir)\b|\bvao (subir|cair)\b|\bchances?\b`,
@@ -151,6 +196,12 @@ export const PROIBIDOS = {
     r`\branking\b|\bmelhores (acoes|ativos|moedas|criptos)\b|\btop ?\d+\b|\bmonta (uma )?carteira\b`,
     r`|\bcarteira (recomendada|sugerida|ideal)\b|\bquais (acoes|ativos)\b|\bqual (acao|ativo|papel|moeda|cripto)\b`,
     r`|\bque acao\b|\bsobe mais\b|\bmais se benefici\w*|\bmelhor (acao|ativo|cripto|moeda)\b`,
+    // escolher entre empresas ou tickers ("PETR4 ou PRIO3?", "PRIO é melhor que a Petrobras?") é ranking (M2)
+    r`|\b`, EMPRESA, r`\b[^\n]{0,25}\b(ou|x|vs|versus)\b[^\n]{0,25}\b`, EMPRESA, r`\b`,
+    r`|\b`, EMPRESA, r`\b[^\n]{0,30}\b(e )?melhor (do )?que\b`,
+    r`|\b(qual|que) (e )?(a )?(melhor |mais \w+ )?petroleiras?\b|\bmelhor(es)? petroleiras?\b`,
+    r`|\bpaga(m)? mais (dividendos?|proventos?)\b|\b(boa|otima|melhor|grande) pagadora\b`,
+    r`|\bpaga(m)? (bem|muito) (dividendos?|proventos?)\b|\b(mais|menos) (solid|segur|arriscad)[ao]s?\b`,
   ),
   seletivo: rx(
     r`\bso (os|as) (casos|vezes|anos|eleicoes|reunioes|dias|turnos)\b|\bso (as )?altas\b|\bso os positivos\b`,
@@ -201,27 +252,38 @@ export const PROIBIDOS = {
 const FUTURO = rx(
   r`\b(sobe|sobem|subir|suba|subira|subiria|desce|descer|cai|caem|cair|caia|caira|cairia|despenc\w*|dispar\w*|derret\w*`,
   r`|valoriz\w*|desvaloriz\w*|aprecia\w*|recua\w*|fecha|fechar|abre|abrir|pra cima|para cima|pra baixo|para baixo|topo`,
-  r`|fundo|barat[oa]|caro|vies|palpite|visao|acha|acham|opiniao|tendencia|provavel|esperado|retorno|potencial`,
-  r`|vai bem|vai mal|reage bem|reage mal|vai a \d+|chega a \d+|pra onde|para onde|go up|go down|rise|fall|rally`,
-  r`|bajar|probabilidad\w*|chances?`,
+  r`|fundo|barat[oa]s?|car[oa]s?|vies|palpite|visao|acha|acham|opiniao|tendencia|provavel|esperado|retorno|potencial`,
+  // o preço de uma ação contra o "justo" (valuation) também é opinião sobre para onde ela vai
+  r`|descontad[oa]s?|esticad[oa]s?|subvalorizad[oa]s?|sobrevalorizad[oa]s?|supervalorizad[oa]s?|upside|valuation`,
+  r`|preco justo`,
+  r`|vai bem|vai mal|reage bem|reage mal|pra onde|para onde|go up|go down|rise|fall|rally`,
+  r`|bajar|probabilidad\w*|chances?|voltar (pra|para|a)|continuar (subindo|caindo)`,
   // gíria de cripto, em formas fechadas: "bombardeio" e "pump and dump" (conceito) não entram
   r`|explod\w*|decol\w*|bombar|bombando|bombou|pumpa\w*|pumpar|pra lua|para a lua|to the moon)\b`,
+  // nível de preço no futuro ("vai a 150?", "chega a 200 mil?", "bate 50 reais?"): termina no 1º dígito, para valer com
+  // "150k" e "250 mil". "Passou de" fica de fora: é passado.
+  r`|\b(vai a|chega a|chegar a|vai (pra|para)|passa(r)? de|bate(r)?( os)?)( us\$)? ?\d`,
 )
 const CONDICIONAL = rx(
   r`\bse (o |a )?(\w+ ){0,2}(ganhar|vencer|perder|for eleito|for reeleito|cortar|cortarem|subir|aumentar|baixar|`,
   r`reduzir|mantiver|wins?)\b|\b(ganhando|vencendo|perdendo)\b|\bcom (o |a )?\w+ eleit[oa]\b|\bif \w+ wins?\b`,
 )
 // Pergunta sobre o que já aconteceu: não pede direção.
-const PASSADO = rx(r`\b(reagiu|reagiram|aconteceu|aconteceram|foi|foram|historico|historicamente|antes|passad[ao]s?|ja houve)\b`)
+const PASSADO = rx(
+  r`\b(reagiu|reagiram|aconteceu|aconteceram|foi|foram|ficou|ficaram|historico|historicamente|antes|passad[ao]s?|ja houve)\b`,
+)
 const FUTURO_EXPLICITO = rx(r`\b(vai|vao|agora|amanha|semana que vem|depois d[oa]|proxim\w*|pra onde|para onde)\b`)
 // Decisão de juros que ainda vai sair: "vai cortar os juros?", "o BC vai reduzir a Selic?", "vai ter corte?", "o Copom
 // cortará?", "corta na próxima reunião?". É futuro pela forma do verbo: não passa pelo filtro do PASSADO.
 const DECISAO = rx(
   r`\b(vai|vao|ira|irao|deve|devem|pode|podem)( \w+){0,2} (cortar|baixar|reduzir|manter|segurar|elevar|aumentar`,
-  r`|subir|mexer|parar|pausar|interromper)\b`,
+  r`|subir|mexer|parar|pausar|interromper|reajustar|pagar)\b`,
   r`|\b(cort|baix|segur|elev|aument)a(ra|rao|ria|riam)\b|\breduzi(ra|rao|ria|riam)\b|\bmante(ra|rao|ria|riam)\b`,
   r`|\b(vai ter|vai haver|vao ter|tera|havera|teremos)( \w+){0,2} (corte|cortes|alta|altas|aumento|reducao|elevacao`,
-  r`|manutencao|pausa|queda)\b`,
+  r`|manutencao|pausa|queda|reajuste|reajustes)\b`,
+  // a forma curta, no presente: "a OPEP corta?", "o Copom sobe?" (o \W* guloso come o \n que o $ do Python aceitaria)
+  r`|^(a |o )?(opep|opec|copom|bc|banco central)\+? (corta|cortam|mantem|sobe|eleva|aumenta|reduz|baixa)`,
+  r`( (a |os )?(producao|juros|selic|taxa))?\W*$`,
   r`|\b(corta|cortam|mantem|segura|eleva|aumenta|baixa|reduz|sobe)\b[^\n]{0,30}\b(proxim\w*|amanha|semana que vem)\b`,
 )
 // "Corta ou mantém?", "corte ou manutenção?": pode ser a decisão de amanhã ou a de ontem, então passa pelo filtro do PASSADO.
@@ -315,6 +377,25 @@ const QUANTO_TROCAR = rx(
   r`|\ball or (half|part)\b`,
 )
 const MULTIPLICA: ReadonlyMap<string, number> = new Map([['mil', 1e3], ['k', 1e3], ['milhao', 1e6], ['milhoes', 1e6], ['mi', 1e6]])
+// Em pergunta de petróleo, "100 dólares" é o preço do barril, não o dinheiro da pessoa, a não ser que ela diga que tem.
+// PRECO_EM_DOLAR e PRECO_OU_FATO com flag g, só para o replace (o re.sub do Python).
+const PRECO_EM_DOLAR = new RegExp(
+  r`(us\$|u\$|usd) ?\d[\d.,]*( ?(mil|k))?|\d[\d.,]*( ?(mil|k))? ?(dolares|dolar|dollars?|usd)\b`,
+  'g',
+)
+const POSSE = rx(r`\b(tenho|guardei|guardo|juntei|economizei|poupei|meus|minhas|recebi|ganhei)\b`)
+// Valor em reais que é preço ou fato ("dividendo de R$ 6,73 por ação", "os R$ 20 bilhões", "a gasolina a R$ 6,53"), não o
+// dinheiro da pessoa: não é capital.
+const PRECO_OU_FATO = new RegExp(
+  r`r\$ ?\d[\d.,]*( ?(mil|mi|bi|bilh\w*|milh\w*))? por (acao|litro|barril)\b` +
+    r`|r\$ ?\d[\d.,]* ?(bi|bilh\w*)\b|r\$ ?\d[\d.,]* ?milh\w* (de|em) (dividendo|lucro|juros)\w*` +
+    r`|\b(gasolina|diesel|etanol|dolar|euro|barril|litro|acao|petr[34]|petrobras|dividendo\w*) (a|de|em|por|chegou a` +
+    r`|bateu|custa\w*|esta a|ta a|foi a|foi de|pagou( dividendos?)?( de)?) r\$ ?\d[\d.,]*`,
+  'g',
+)
+// Lucro de uma empresa que ainda vai sair ("a Petrobras vai lucrar?") é projeção; o da pessoa é chance_dinheiro.
+const LUCRO_FUTURO = rx(r`\b(vai|vao|deve|devem|pode|podem)( \w+){0,2} lucr\w*`)
+const EU_OU_VOU = rx(r`\b(eu|vou)\b`)
 
 // Os mercados que o histórico das eleições, do Copom e da linha do tempo mede.
 export const MEDIDOS = ['ibovespa', 'dolar', 'juros'] as const
@@ -447,13 +528,23 @@ export function cambio(t: string): Cambio {
 
 export function analisar(pergunta: string): Pedido {
   const t = normalizar(pergunta)
-  const achou = (padroes: Record<string, RegExp>): string[] =>
-    Object.entries(padroes).filter(([, padrao]) => padrao.test(t)).map(([k]) => k)
+  const achou = (padroes: Record<string, RegExp>, texto = t): string[] =>
+    Object.entries(padroes).filter(([, padrao]) => padrao.test(texto)).map(([k]) => k)
+  // O presidente da Petrobras e o domingo da reunião da OPEP não são a eleição, a não ser que a pergunta cite a eleição
+  // de outro jeito.
+  let tEleicao = t
+  if (!ELEITORAL.test(t)) {
+    tEleicao = t.replace(CARGO, ' ')
+    if (/\bpetrobras\b/.test(t)) tEleicao = tEleicao.replace(/\bbolsonaro\b/g, ' ')
+  }
+  if (/\b(opep|opec)\b/.test(t)) tEleicao = tEleicao.replace(/\bdomingo\b/g, ' ')
+  const temas = Object.entries(TEMAS).filter(([k, padrao]) => padrao.test(k === 'eleicao' ? tEleicao : t)).map(([k]) => k)
   const p: Pedido = {
-    pergunta, mercados: achou(MERCADOS), candidatos: achou(CANDIDATOS), temas: achou(TEMAS), proibidos: achou(PROIBIDOS),
+    pergunta, mercados: achou(MERCADOS), candidatos: achou(CANDIDATOS, tEleicao), temas, proibidos: achou(PROIBIDOS),
     voto_informado: VOTO_INFORMADO.test(t), pontos: null, contratos: 1,
     valor_moeda: null, moeda: null, gasto_mensal: null, gasto_moeda: null,
   }
+  if (p.proibidos.includes('capital') && !PROIBIDOS.capital.test(t.replace(PRECO_OU_FATO, ' '))) tirar(p.proibidos, 'capital')
   if (p.voto_informado && !p.temas.includes('eleicao')) p.temas.push('eleicao')
   // Conceito de derivativo (margem, ajuste diário, alavancagem): a explicação está no bloco do mini-índice.
   if (DERIVATIVO.test(t) && p.mercados.length === 0) p.mercados.push('mini_indice')
@@ -467,7 +558,11 @@ export function analisar(pergunta: string): Pedido {
   // Decisão de juros que ainda vai sair ("vai cortar a Selic?", "corta ou mantém?") também é futuro de preço.
   const decisao = (p.mercados.length > 0 || SOBRE_JUROS.test(t) || curta) &&
     (DECISAO.test(t) || (DECISAO_OU.test(t) && !soPassado))
-  if (((sobrePreco && futuro && !soPassado) || decisao) && !p.proibidos.includes('direcao')) p.proibidos.push('direcao')
+  // Lucro de uma empresa que ainda vai sair ("a Petrobras vai lucrar?") é projeção; o da pessoa é chance_dinheiro.
+  const lucroFuturo = LUCRO_FUTURO.test(t) && !EU_OU_VOU.test(t)
+  if (((sobrePreco && futuro && !soPassado) || decisao || lucroFuturo) && !p.proibidos.includes('direcao')) {
+    p.proibidos.push('direcao')
+  }
   const contrato = p.mercados.some((x) => x === 'mini_indice' || x === 'mini_dolar') || CONTRATO.test(t)
   const hora = HORA.test(t)
   if (contrato && (hora || EM_CURSO.test(t))) {
@@ -477,6 +572,8 @@ export function analisar(pergunta: string): Pedido {
     if (MOVIMENTO.test(t) && !p.proibidos.includes('direcao')) p.proibidos.push('direcao')
   }
   if (p.proibidos.includes('voto') && p.proibidos.includes('comparar')) tirar(p.proibidos, 'comparar')
+  // Escolher entre empresas ("PETR4 ou PRIO3, qual é melhor?") é ranking (M2), não comparar classes de ativo (N5).
+  if (p.proibidos.includes('ranking') && p.proibidos.includes('comparar') && EMPRESA_DITA.test(t)) tirar(p.proibidos, 'comparar')
   if (p.proibidos.includes('aposta') && !p.mercados.includes('previsao')) p.mercados.push('previsao')
   if (p.proibidos.includes('binaria')) p.mercados = p.mercados.filter((m) => m !== 'previsao')
   // "Quais as chances pro dólar": é direção do mercado, não chance de candidato.
@@ -508,7 +605,12 @@ export function analisar(pergunta: string): Pedido {
   // Conta neutra de câmbio com o dinheiro que a pessoa contou (P4): o valor em reais, quanto muda a cada R$ 0,10 e
   // quantos meses de gasto cobre. Não entra quando ela pergunta quanto mover (alocação, N5) nem quando mover (N4): ao
   // lado da reação nos turnos, o valor dela viraria indicação de momento. Pergunta de contrato (mini-dólar) também não.
-  const [valor, moeda, gasto, gastoMoeda] = cambio(t)
+  const [valorLido, moeda, gasto, gastoMoeda] = cambio(t)
+  let valor = valorLido
+  if (p.mercados.includes('petroleo') && !POSSE.test(t)) {
+    valor = null // "o petróleo passou de 100 dólares?": é o preço do barril
+    if (p.mercados.includes('dolar') && !MERCADOS.dolar.test(t.replace(PRECO_EM_DOLAR, ' '))) tirar(p.mercados, 'dolar')
+  }
   const contratoFuturo = p.mercados.some((x) => x === 'mini_indice' || x === 'mini_dolar') || CONTRATO.test(t)
   const cripto = p.mercados.some((x) => x === 'cripto' || x === 'memecoin') // "10 mil dólares em USDT" é cripto, não câmbio
   if (valor !== null && moeda !== null && !contratoFuturo) {

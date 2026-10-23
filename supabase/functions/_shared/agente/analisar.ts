@@ -67,7 +67,8 @@ export function escolherCartao(p: Pedido): Cartao | null {
   if (p.temas.includes('copom')) return CARTOES.copom[p.mercados.length ? mercadosMedidos(p.mercados).join(',') : ''] ?? null
   // Petróleo: o cartão dos eventos de petróleo do tema (Brent), o mesmo bloco que o texto mostra; a guerra e o choque
   // externo da linha do tempo genérica (só Ibovespa) não aparecem no texto de uma pergunta de petróleo.
-  if (p.mercados.includes('petroleo')) return CARTOES.petroleo[temaPetroleo(normalizar(p.pergunta))] ?? null
+  // (o cartão é um por tema: o do 1º que a pergunta cita, na ordem do JSON)
+  if (p.mercados.includes('petroleo')) return CARTOES.petroleo[temaPetroleo(normalizar(p.pergunta))[0] ?? ''] ?? null
   for (const tipo of BASE.tipos) if (p.temas.includes(tipo)) return CARTOES.eventos[tipo] ?? null
   return null
 }
