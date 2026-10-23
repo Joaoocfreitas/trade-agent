@@ -336,9 +336,16 @@ export function numerosSemFonte(texto: string, fatos: string): string[] {
 
 // ---------- o que toda resposta precisa ter ----------
 
-// "futuro de bitcoin" (o contrato) pede o D4; "futuro de cripto é valor mobiliário" (a frase do D5) não
-const DERIVATIVO = new RegExp(String.raw`\bmini[- ]?(indice|dolar)\b|\bwin\b|\bwdo\b|\bdi futuro\b|\bfuturos? de (bitcoin|ether|solana)\b` +
-  String.raw`|\bopc(ao|oes) (de|sobre)[^.]*\bbitcoin\b`)
+// "futuro de bitcoin" (o contrato) pede o D4, também por ticker, no plural, com "sobre" e em inglês ("futuros de BTC",
+// "futuros do bitcoin", "contratos futuros sobre bitcoin", "bitcoin futures", "opções de ether"); "futuro de cripto é
+// valor mobiliário" (a frase do D5), "o futuro do bitcoin" (o porvir) e "uma opção de ter bitcoin" (alternativa) não
+const DERIVATIVO = new RegExp(
+  String.raw`\bmini[- ]?(indice|dolar)\b|\bwin\b|\bwdo\b|\bdi futuro\b` +
+    String.raw`|\b(contratos? )?futuros? (de|sobre)( o)? (bitcoins?|btcs?|ether|ethereum|eth|solana|sol)\b` +
+    String.raw`|\bfuturos do (bitcoin|btc|ether|ethereum|eth|solana)\b|\b(bitcoin|btc|ether|eth) futures\b` +
+    String.raw`|\bop(cao|coes)( de (compra|venda)| \(?calls?\)?| \(?puts?\)?)? (de|sobre)( o)? (bitcoins?|btc|ether|ethereum|eth` +
+    String.raw`|solana)\b`,
+)
 const AVISO_DE_PERDA = /perder mais do que|perda pode passar/
 const CRIPTO = /\bcripto|\bbitcoin\b/
 

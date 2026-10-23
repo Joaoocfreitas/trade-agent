@@ -40,7 +40,9 @@ Deno.test('os eventos têm fonte e tema, e o bloco mostra todos os dos temas cit
     const esperados = PETROLEO.eventos.filter((e) => !temas.length || temas.includes(e.tema)).length
     assertEquals(b.linhas.filter((ln) => ln.texto.includes(': no dia da reação')).length, esperados, q) // todos, nunca os maiores
     assert(b.limites.some((x) => x.includes('licença de dados da B3')), q)
-    assert(b.resumo.includes('a ação da Petrobras não foi medida'), q)
+    // a ação de nenhuma petroleira é medida, e a amostra exagera as reações grandes (L1 da rodada 2)
+    assert(b.resumo.includes('a ação da Petrobras e a das outras petroleiras não foram medidas'), q)
+    assert(b.resumo.includes('a amostra exagera as reações grandes'), q)
     assert(!('eventos' in b), q) // a chave dos índices não vai para o bloco montado
     for (const ln of b.linhas) assertEquals(frasesProibidas(ln.texto), [], ln.texto)
   }
@@ -69,10 +71,13 @@ Deno.test('os temas do petróleo: todos os que casam, na ordem do JSON', () => {
     assert(analisar(q).mercados.includes('petroleo'), q)
     assertEquals(temaPetroleo(normalizar(q)), temas, q)
   }
-  // o título de cada evento cai no próprio tema
+  // o título de cada evento cai no próprio tema, menos as manchetes sem palavra do tema (a emenda dos combustíveis e a
+  // liberação de estoques da AIE), que ficam sem tema
   for (const e of PETROLEO.eventos) {
     const temas = temaPetroleo(normalizar(e.titulo))
-    assert(!temas.length || temas.includes(e.tema), `${e.titulo}: ${temas}`)
+    if (['Emenda Constitucional 123', 'Agência Internacional de Energia anuncia'].some((x) => e.titulo.startsWith(x))) {
+      assertEquals(temas, [], e.titulo)
+    } else assert(temas.includes(e.tema), `${e.titulo}: ${temas}`)
   }
 })
 

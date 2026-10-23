@@ -2,7 +2,10 @@
 // (gerado por `python -m agente.exportar`); aqui só se escolhe, ordena, numera as fontes e passa pelo filtro.
 import base from '../base.json' with { type: 'json' }
 import { checar } from './filtro.ts'
-import { analisar, CONTRATO, ehCambio, ehEleicao, normalizar, temConta, temContaCambio } from './roteador.ts'
+import { search, sub } from './pyre.ts'
+import {
+  analisar, CONTRATO, ehCambio, ehEleicao, MERCADOS, normalizar, PRECO_EM_DOLAR, temConta, temContaCambio,
+} from './roteador.ts'
 import type { Pedido, Violacao } from './texto.ts'
 
 type Fonte = { nome: string; url: string }
@@ -15,6 +18,7 @@ type Textos = {
   RISCO_DERIVATIVO: string
   RISCO_DERIVATIVO_CRIPTO: string
   SEM_PRECO_CRIPTO: string
+  SEM_DEFASAGEM: string
   RISCO_CRIPTO: string
   POR_PEDIDO: Record<string, string>
   PEDEM_RECUSA: string[]
@@ -58,6 +62,9 @@ type Base = {
    * (na ordem do JSON, o 1º que casa vale) e os 4 títulos que _cripto_primeiro põe na frente. */
   cripto: {
     imposto: Bloco
+    /** o mesmo bloco, com o resumo da pergunta de ETF ou futuro e com o da pergunta de declaração (cripto_imposto(variante)) */
+    imposto_etf: Bloco
+    imposto_declaracao: Bloco
     riscos: Bloco
     marcos: Record<string, Bloco>
     temas: Record<string, string>
@@ -90,25 +97,59 @@ type Cotacoes = {
 }
 
 export const BASE = base as unknown as Base
+const r = String.raw
 // fatos.tema_cripto e fatos.tema_petroleo: as expressões do JSON, na ordem dele (a de inserção das chaves, que o
-// JSON.parse mantém).
-const TEMAS_CRIPTO = Object.entries(BASE.cripto.temas).map(([tema, padrao]) => [tema, new RegExp(padrao)] as const)
+// JSON.parse mantém). Os padrões, como os do roteador, têm o texto do Python e rodam pelo pyre.ts.
+const TEMAS_CRIPTO = Object.entries(BASE.cripto.temas)
+const TEMAS_PETROLEO = Object.entries(BASE.petroleo.temas)
 // As linhas da linha do tempo inteira (sem tema): a definição de um tema é a 1ª linha dele que não está nela.
 const MARCOS_DATADOS = new Set(BASE.cripto.marcos[''].linhas.map((ln) => ln.texto))
-// A pessoa falou do índice mesmo, e não só da B3 como lugar ("ETF de bitcoin na B3").
-// Em pergunta de petróleo: tarifa, sanção e guerra comercial não são a guerra do petróleo; a ação dita sem o petróleo não
-// recebe a história de um emissor; o combustível pede "do barril à bomba".
-const TARIFA_DITA = /\btarifa\w*|\bsanc(ao|oes)\b|\bguerra comercial\b/
-const ACAO_DITA = /\b(petrobras|petr[34]|prio3?|petroleiras?|acao|acoes)\b/
-const PETROLEO_DITO = /\b(petroleo|brent|wti|barril|opep|opec|ormuz|combustive(l|is)|gasolina|diesel)\b/
-const COMBUSTIVEL_DITO = new RegExp(String.raw`\b(gasolina|diesel|etanol|combustive(l|is)|bomba|posto|litro|reajust\w*|ipca|` +
-  String.raw`inflacao|defasa\w*|paridade|politica de preco\w*)\b`)
-const IBOV_DITO = /\bibov\w*|\bbovespa\b|\bacoes\b|\bacao\b|\bbova11\b/
-const IMPOSTO_DITO = /\bimpost\w*|\bdeclar\w*|\birpf?\b|\bdarf\b|\bleao\b|\btribut\w*|\bisen\w*/
+// A pessoa falou do índice mesmo, e não só da B3 como lugar. "Bolsa de cripto", "índice de medo" e "stock-to-flow" são
+// da cripto.
+const IBOV_DITO = r`\bibov\w*|\bbovespa\b|\bacoes\b|\bacao\b|\bbova11\b|\bbolsa\b(?! de (cripto|bitcoin))` +
+  r`|\bstocks?\b(?![- ]to[- ]flow)|\bindices?\b(?! de (medo|dominancia))`
+// "bitcoin na bolsa", "ETF de bitcoin na bolsa": a bolsa como lugar da cripto, igual à B3. Também a escolha do lugar
+// ("corretora ou bolsa, onde compro bitcoin?", "bolsa ou exchange?") e o "fundo de índice" (o ETF), que não são o Ibovespa.
+const LUGAR_DITO = r`\b(cripto\w*|bitcoins?|btc|ethereum|eth|hash11|etfs?|futuros?)( de \w+)? (na|pela|da|via) (bolsa|b3)\b` +
+  r`|\b(corretora|exchange|direto) (ou|vs|x|versus) (a |na |pela )?bolsa\b` +
+  r`|\bbolsa (ou|vs|x|versus) (a |o |na |no |pela |pelo )?(corretora|exchange|direto)\b` +
+  r`|\b(fundos?|etfs?) de indices?\b`
+const TARIFA_DITA = r`\btarifa(s|co|cos|sso)?\b|\bsobretaxa\w*|\btaxac\w* (d[aoe]s?) (trump|eua|estados unidos)\b` +
+  r`|\btaxac\w* (do )?trump\b|\btaxac\w* americana\b(?![^.?!]{0,40}\b(dividend|stock|aco|renda)\w*)` +
+  r`|\bsanc(ao|oes)\b|\bguerra comercial\b`
+const ACAO_DITA = r`\b(petrobras|petr[34]|prio3?|petroleiras?|acao|acoes)\b`
+const PETROLEO_DITO = r`\b(petroleo|brent|wti|barril|opep|opec|ormuz|combustive(l|is)|gasolina|diesel)\b`
+const COMBUSTIVEL_DITO = r`\b(gasolina|diesel|etanol|combustive(l|is)|bomba|posto|litro|reajust\w*|ipca|inflacao|defasa\w*|paridade` +
+  r`|politica de preco\w*)\b`
+// "declarar" e "declaração" (não "declarou", nem "declarar guerra"); o "IR" dito com verbo ou preposição ("bitcoin paga IR?",
+// "o IR da cripto"), sem "de ir" ("é hora de ir pro bitcoin?").
+const DECLARACAO_DITA = r`\bdeclar(ar|o|a|as|amos|ei|ando|ado|ados|acao|acoes)\b(?! guerra\b)|\bbens e direitos\b`
+// "quanto pago de IR no ETF?", "IR no ETF de bitcoin", "IR de cripto"; sem "ir no/na + cripto", que é o verbo
+// ("posso ir no bitcoin?")
+const IMPOSTO_DITO = r`\bimpost\w*|` +
+  DECLARACAO_DITA +
+  r`|\birpf?\b|\bdarf\b|\bleao\b|\btribut\w*|\bisen\w*` +
+  r`|\b(paga|pagar|pago|pagam|pagou|pagando|cobra|cobram|cobrar|incide|tem|o|do|no) ir\b` +
+  r`|\b(pag\w*|quanto|qnt|qto|qnto) de ir\b` +
+  r`|\bir (da|do|de|sobre|em|no|na|nos|nas) (etfs?|hash11|cotas?|futuros?)\b` +
+  r`|\bir (da|do|de|sobre|em) (cripto\w*|bitcoins?|btc|ether|eth)\b`
+const FUTURO_CRIPTO = r`\bfuturos? (de|do) (bitcoins?|btc|cripto\w*|ether|ethereum|eth)\b` +
+  r`|\b(bitcoins?|btc|cripto\w*|ether|ethereum|eth) futuros?\b`
+// O "o que é" do próprio termo do tema ("o que é halving?", "me explica o halving", "halving, o que é?").
+const TERMO_CRIPTO = r`(halvings?|stablecoins?|usdt|usdc|tether|etfs?|hash11|ftx|fundos? de indice)`
+const CONCEITO_CRIPTO = r`\bo que (e|sao|significa|foi|quer dizer) (o |a |os |as |um |uma )?${TERMO_CRIPTO}` +
+  r`\b|\bme explica\w* (o |a |os |as )?${TERMO_CRIPTO}\b|\b${TERMO_CRIPTO}` +
+  r`\b\W+o que (e|significa)\b|\bcomo funciona (o |a |os |as )?${TERMO_CRIPTO}\b`
+// A pergunta fala da defasagem do preço da Petrobras, que o repertório não calcula: dizer isso no topo (D8).
+const DEFASAGEM_DITA = r`\bdefasa\w*|\bparidade\b|\babaixo do preco internacional\b`
 // Pergunta de preço ou de movimento de cripto: o repertório não tem a cotação.
-const PRECO_CRIPTO = new RegExp(String.raw`\b(quanto (ta|esta|vale|custa)|preco|cotacao|caiu|subiu|cai|sobe|reagiu|valoriz\w*|` +
-  String.raw`desvaloriz\w*)\b|\bo que aconteceu com o (bitcoin|btc|cripto)`)
-const TEMAS_PETROLEO = Object.entries(BASE.petroleo.temas).map(([tema, padrao]) => [tema, new RegExp(padrao)] as const)
+// Também o gerúndio, o plural, os sinônimos e o internetês ("tá caindo?", "despencou?", "as criptos caíram?", "qnt tá?").
+// "qual o valor do bitcoin?", "vale quanto?", "quanto é?", "afundou?", "tombou?", "recuou?", "dumpando?"
+const PRECO_CRIPTO = r`\b((quanto|qnt|qto|qnto) (ta|esta|vale|custa)|preco|cotacao|caiu|cairam|subiu|subiram|cai|caem|sobe` +
+  r`|sobem|caindo|subindo|em (alta|queda|baixa)|despenc\w*|desab\w*|derret\w*|dispar\w*|reagiu|valoriz\w*` +
+  r`|desvaloriz\w*|(qual|quale) (o )?valor|(vale|valendo|ta|esta|e) quanto|quanto e|afund\w*|tomb\w*|recu\w*` +
+  r`|dump\w*)\b|\bo que (aconteceu|houve|rolou) com (o |os |a |as )?(bitcoins?|btc|cripto\w*|ether(eum)?|eth` +
+  r`|solana)\b`
 // O mercado da pergunta e a série que mede o caminho dele (MEDIDO do Python).
 const MEDIDO: Readonly<Record<string, string>> = { mini_indice: 'ibovespa', mini_dolar: 'dolar', petroleo: 'brent' }
 const T = BASE.textos
@@ -361,7 +402,7 @@ export function escolherBlocos(p: Pedido, hoje: string): Bloco[] {
   const t = normalizar(p.pergunta)
   const temasPetroleo = p.mercados.includes('petroleo') ? temaPetroleo(t) : []
   const coberto: Record<string, boolean> = {
-    geopolitico: temasPetroleo.includes('guerra') && !TARIFA_DITA.test(t),
+    geopolitico: temasPetroleo.includes('guerra') && !search(TARIFA_DITA, t),
     choque_externo: temasPetroleo.includes('choque'),
   }
   const tipos = BASE.tipos.filter((x) => p.temas.includes(x) && !coberto[x])
@@ -380,9 +421,18 @@ export function escolherBlocos(p: Pedido, hoje: string): Bloco[] {
     const alvo = MEDIDO[m] ?? m
     if (BASE.historico[alvo] && !medidos.includes(alvo)) medidos.push(alvo)
   }
-  // "ETF de bitcoin na B3": a B3 é o lugar da cripto, não o Ibovespa. Sem caminho nem dois lados do índice.
-  const b3SoLugar = p.mercados.includes('cripto') && !IBOV_DITO.test(normalizar(p.pergunta))
+  // "ETF de bitcoin na B3", "bitcoin na bolsa": a B3 é o lugar da cripto, não o Ibovespa. Sem caminho nem dois lados do
+  // índice. "Bitcoin ou bolsa?", "bitcoin ou WIN?" citam o índice: os dois mercados.
+  const b3SoLugar = p.mercados.includes('cripto') && !p.mercados.includes('mini_indice') &&
+    !search(IBOV_DITO, sub(LUGAR_DITO, ' ', t))
   if (b3SoLugar) tirarTodos(medidos, 'ibovespa')
+  // "10 mil dólares em bitcoin": o dólar é a unidade do valor, não o mercado da pergunta (como no petróleo, no roteador).
+  // O mini-dólar (WDO) mede o dólar de verdade.
+  // O dólar em stablecoin ("10 mil dólares em USDT") e a conversão ("quanto dá em reais?") ficam: a cotação é a resposta.
+  if (p.mercados.includes('cripto') && !p.mercados.includes('mini_dolar') && !search(MERCADOS.dolar, sub(PRECO_EM_DOLAR, ' ', t)) &&
+    !search(r`\b(usdt|usdc|tether|stablecoins?)\b|\b(em|pra|para) reais\b|\bquanto (da|vale|valem|e)\b`, t)) {
+    tirarTodos(medidos, 'dolar')
+  }
   if (!temEvento && medidos.length) {
     for (const m of medidos) blocos.push(copia(BASE.historico[m]))
     // Quem pede o que fazer ou para onde vai recebe os dois lados do que já aconteceu, não uma recomendação. Em contrato
@@ -405,6 +455,7 @@ export function escolherBlocos(p: Pedido, hoje: string): Bloco[] {
   if (p.mercados.includes('previsao')) blocos.push(copia(BASE.previsao))
   if (p.proibidos.includes('binaria')) blocos.push(copia(BASE.binaria))
   if (temConta(p)) blocos.push(conta(p.pontos as number, p.contratos, p.mercados.includes('mini_indice') ? 'mini_indice' : 'mini_dolar'))
+  let eventosPetroleoNaResposta = false // o estudo dos eventos de petróleo também mede o dólar, não o euro
   for (const m of p.mercados) {
     // contrato (WIN) ou cripto na B3: a regra de IR das ações à vista não vale
     if (m === 'ibovespa' && (p.mercados.includes('mini_indice') || b3SoLugar)) continue
@@ -413,41 +464,84 @@ export function escolherBlocos(p: Pedido, hoje: string): Bloco[] {
     // Petróleo: não há bloco de mercado (o fatos.mercado do Python devolve None). Quem cita só a ação ("vale a pena
     // PETR4?", "PETR4 ou PRIO3?") não recebe a história de um emissor (Res. CVM 20): os eventos entram quando a pergunta
     // cita o fato ou o petróleo. Do barril à bomba, quando ela fala de combustível, ou do petróleo sem tema.
+    // Com pedido de dica, direção, momento ou ranking que cita a ação ("compro PETR4 antes do dividendo extraordinário?"), ou
+    // com escolha entre ativos ("petróleo ou dólar, qual é melhor?"), os eventos da Petrobras não entram nem com o fato
+    // citado: ficam os do petróleo, quando a pergunta cita o petróleo (Mapa legal, seção 8, item 10).
     if (m === 'petroleo') {
-      const soAcao = !temasPetroleo.length && ACAO_DITA.test(t) && !PETROLEO_DITO.test(t)
-      if (!soAcao) blocos.push(eventosPetroleo(temasPetroleo))
-      if (COMBUSTIVEL_DITO.test(t) || (!temasPetroleo.length && !soAcao)) blocos.push(copia(BASE.petroleo.barril))
+      let temasEv = temasPetroleo
+      if (algum(p.proibidos, PEDEM_RECUSA) && (search(ACAO_DITA, t) || algum(['ranking', 'comparar'], p.proibidos))) {
+        const semEmissor = (ts: string[]) => ts.filter((x) => x !== 'petrobras')
+        temasEv = semEmissor(temasPetroleo)
+        if (!temasEv.length) {
+          temasEv = search(PETROLEO_DITO, t) || !search(ACAO_DITA, t) ? semEmissor(Object.keys(BASE.petroleo.temas)) : []
+        }
+      }
+      const soAcao = !temasEv.length && Boolean(search(ACAO_DITA, t)) && !search(PETROLEO_DITO, t)
+      if (!soAcao) {
+        blocos.push(eventosPetroleo(temasEv))
+        eventosPetroleoNaResposta = true
+      }
+      if (search(COMBUSTIVEL_DITO, t) || (!temasPetroleo.length && !soAcao)) blocos.push(copia(BASE.petroleo.barril))
     }
     if (m === 'cripto') {
       // Regras, imposto, riscos e a linha do tempo. Tema citado (halving, FTX, ETF...): a linha do tempo antes das regras,
       // com a definição primeiro se a pessoa perguntou "o que é". Pergunta de imposto: o imposto primeiro (o blocos[-1:-1]
       // do Python: logo antes do último, que é o das regras). O `t` é a pergunta normalizada, a mesma do começo.
-      const tema = temaCripto(t)
-      const [imposto, riscos] = [copia(BASE.cripto.imposto), copia(BASE.cripto.riscos)]
-      if (IMPOSTO_DITO.test(t)) {
+      let tema = temaCripto(t)
+      // Quem escolhe ou avalia uma corretora pelo nome não recebe a história de uma delas no topo (N7): a linha do tempo
+      // inteira vai para o fim, como em qualquer pergunta de cripto sem tema.
+      if (tema === 'binance' && p.proibidos.includes('plataforma')) tema = ''
+      // Pergunta de imposto do ETF ou do futuro: o resumo diz que a isenção de R$ 35 mil não vale para eles; de declaração:
+      // quem declara e como. O que o celular mostra primeiro não pode omitir isso (CDC, art. 37, §3º).
+      const impostoDito = Boolean(search(IMPOSTO_DITO, t))
+      const variante = impostoDito && (tema === 'etf' || search(FUTURO_CRIPTO, t))
+        ? 'etf'
+        : search(DECLARACAO_DITA, t) ? 'declaracao' : ''
+      const imposto = copia(variante === 'etf'
+        ? BASE.cripto.imposto_etf
+        : variante === 'declaracao' ? BASE.cripto.imposto_declaracao : BASE.cripto.imposto)
+      const riscos = copia(BASE.cripto.riscos)
+      if (impostoDito) {
         blocos.splice(blocos.length - 1, 0, imposto)
         blocos.push(riscos)
       } else {
         blocos.push(imposto, riscos)
       }
       if (tema) {
-        const i = blocos.findIndex((x) => x !== null && (x.titulo === BASE.titulo_cripto || x.titulo === imposto.titulo))
+        // em pergunta de imposto, a linha do tempo vem depois do imposto; a definição só vira a 1ª linha quando o "o que
+        // é" é do próprio termo ("o que é a lei das stablecoins nos EUA?" quer a lei, não a stablecoin)
+        const antes = impostoDito ? [BASE.titulo_cripto] : [BASE.titulo_cripto, imposto.titulo]
+        const i = blocos.findIndex((x) => x !== null && antes.includes(x.titulo))
         if (i < 0) throw new Error('sem o bloco das regras nem o do imposto') // o next() do Python levantaria StopIteration
-        blocos.splice(i, 0, criptoMarcos(tema, p.temas.includes('conceito')))
+        // com um marco depois do termo ("o que é o ETF de bitcoin aprovado pela SEC?", "... nos EUA?", "de 2024?"), o
+        // marco fica nas 3 linhas, e não a definição brasileira
+        const conceito = p.temas.includes('conceito') && Boolean(search(CONCEITO_CRIPTO, t)) &&
+          !search(r`\b${TERMO_CRIPTO}\b[^?]*\b(aprovad\w*|sec|eua|estados unidos|genius|lei|20\d\d)\b`, t)
+        blocos.splice(i, 0, criptoMarcos(tema, conceito))
       } else {
         blocos.push(copia(BASE.cripto.marcos['']))
       }
     }
   }
   if (pedeDinheiro || algum(BASE.derivativos.slice(0, 2), p.mercados)) blocos.push(copia(BASE.fgv))
-  // O estudo do Copom e da linha do tempo mede o dólar, não o euro: dizer isso, em vez de responder só com o dólar.
-  if (p.mercados.includes('euro') && (p.temas.includes('copom') || BASE.tipos.some((t) => p.temas.includes(t)))) {
+  // O estudo do Copom, da linha do tempo e dos eventos de petróleo mede o dólar, não o euro: dizer isso, em vez de
+  // responder só com o dólar.
+  if (p.mercados.includes('euro') &&
+    (p.temas.includes('copom') || BASE.tipos.some((x) => p.temas.includes(x)) || eventosPetroleoNaResposta)) {
     blocos.push(euroSemEstudo())
   }
   blocos = blocos.filter((b) => b)
   if (ehCambio(p)) blocos = cambioPrimeiro(p, blocos as Bloco[])
   // em pergunta de câmbio ("exchange my euros"), o câmbio continua na frente
   else if (p.mercados.includes('cripto')) blocos = criptoPrimeiro(blocos as Bloco[])
+  // A linha do pedido promete a taxa-base da FGV "logo abaixo": ela vai em 2º, depois de qualquer reordenamento.
+  if (pedeDinheiro) {
+    const fgv = (blocos as Bloco[]).find((b) => b.titulo === BASE.fgv.titulo)
+    if (fgv) {
+      blocos = blocos.filter((b) => b!.titulo !== BASE.fgv.titulo)
+      blocos.splice(Math.min(1, blocos.length), 0, fgv)
+    }
+  }
   if (!blocos.length) blocos.push(copia(BASE.economia))
   return blocos as Bloco[]
 }
@@ -455,7 +549,7 @@ export function escolherBlocos(p: Pedido, hoje: string): Bloco[] {
 /** fatos.tema_petroleo: todos os temas dos eventos de petróleo que a pergunta (já normalizada) cita, na ordem do JSON
  * ("a OPEP e a guerra": os dois); nenhum, se ela não cita. */
 export function temaPetroleo(perguntaNormalizada: string): string[] {
-  return TEMAS_PETROLEO.filter(([, padrao]) => padrao.test(perguntaNormalizada)).map(([tema]) => tema)
+  return TEMAS_PETROLEO.filter(([, padrao]) => search(padrao, perguntaNormalizada)).map(([tema]) => tema)
 }
 
 /** fatos.petroleo_eventos(temas), montado da base: as linhas dos eventos do bloco (cada uma guardada uma vez só, em
@@ -468,16 +562,16 @@ function eventosPetroleo(temas: string[]): Bloco {
 
 /** fatos.tema_cripto: o 1º tema da linha do tempo que a pergunta (já normalizada) cita ('halving', 'ftx'...), ou ''. */
 export function temaCripto(perguntaNormalizada: string): string {
-  return TEMAS_CRIPTO.find(([, padrao]) => padrao.test(perguntaNormalizada))?.[0] ?? ''
+  return TEMAS_CRIPTO.find(([, padrao]) => search(padrao, perguntaNormalizada))?.[0] ?? ''
 }
 
-/** fatos.cripto_marcos(tema, conceito): os marcos do tema, prontos na base. `conceito` (a pessoa perguntou "o que é..."):
- * a definição do tema, quando há, vira o resumo. Ela é a 1ª linha do bloco, e a única que não está na linha do tempo
- * inteira. */
+/** fatos.cripto_marcos(tema, conceito): os marcos do tema, prontos na base. `conceito` (a pessoa perguntou "o que é...")
+ * ou o tema da FTX: a definição do tema, quando há, vira o resumo. Ela é a 1ª linha do bloco, e a única que não está na
+ * linha do tempo inteira. */
 function criptoMarcos(tema: string, conceito: boolean): Bloco {
   const b = copia(BASE.cripto.marcos[tema])
   const definicao = b.linhas.length && !MARCOS_DATADOS.has(b.linhas[0].texto) ? b.linhas[0].texto : null
-  if (conceito && definicao) b.resumo = definicao
+  if (definicao && (conceito || tema === 'ftx')) b.resumo = definicao
   return b
 }
 
@@ -524,7 +618,8 @@ function abertura(p: Pedido, achouRepertorio: boolean): string[] {
   if (p.mercados.includes('memecoin') && algum(p.proibidos, PEDEM_RECUSA) && !p.proibidos.includes('plataforma')) {
     linhas.push(T.POR_PEDIDO.plataforma)
   }
-  if (p.mercados.includes('cripto') && PRECO_CRIPTO.test(normalizar(p.pergunta))) linhas.push(T.SEM_PRECO_CRIPTO)
+  if (p.mercados.includes('cripto') && search(PRECO_CRIPTO, normalizar(p.pergunta))) linhas.push(T.SEM_PRECO_CRIPTO)
+  if (p.mercados.includes('petroleo') && search(DEFASAGEM_DITA, normalizar(p.pergunta))) linhas.push(T.SEM_DEFASAGEM)
   if (p.voto_informado) linhas.push(T.VOTO_INFORMADO)
   if (!achouRepertorio) linhas.push(T.SEM_REPERTORIO)
   return linhas
@@ -544,12 +639,12 @@ function curta(blocos: Bloco[], abertura: string[]): string[] {
 }
 
 // _contrato_de_juros do Python: 'juros' é o mercado de renda fixa, Selic e DI futuro; só o DI futuro é derivativo (D4).
-const CONTRATO_DE_JUROS = new RegExp(CONTRATO.source + String.raw`|\bfuturos?\b`)
+const CONTRATO_DE_JUROS = CONTRATO + r`|\bfuturos?\b`
 
 function avisos(r: Resposta): string[] {
   const lista: string[] = []
   const derivativo = algum(BASE.derivativos.slice(0, 2), r.pedido.mercados) ||
-    (r.pedido.mercados.includes('juros') && CONTRATO_DE_JUROS.test(normalizar(r.pergunta))) ||
+    (r.pedido.mercados.includes('juros') && Boolean(search(CONTRATO_DE_JUROS, normalizar(r.pergunta)))) ||
     r.blocos.some((b) => b.titulo === BASE.cripto.imposto.titulo) // ele cita o futuro de bitcoin
   if (derivativo || r.blocos.some((b) => b.titulo.startsWith('A taxa-base de quem faz day'))) {
     lista.push(r.pedido.mercados.includes('cripto') ? T.RISCO_DERIVATIVO_CRIPTO : T.RISCO_DERIVATIVO)
@@ -637,7 +732,7 @@ function fatosTexto(r: Resposta): string {
     if (b.limites.length) partes.push('Limitações: ' + b.limites.join(' '))
   }
   const fixos = [T.AVISO, T.RECUSA, T.FECHO, T.RISCO_DERIVATIVO, T.RISCO_CRIPTO, T.SEM_REPERTORIO, T.NORMAS, T.VOTO_INFORMADO,
-    T.SEM_PRECO_CRIPTO, T.RISCO_DERIVATIVO_CRIPTO,
+    T.SEM_PRECO_CRIPTO, T.RISCO_DERIVATIVO_CRIPTO, T.SEM_DEFASAGEM,
     ...Object.values(T.POR_PEDIDO)]
   return [...partes, '## Textos fixos', ...fixos].join('\n')
 }

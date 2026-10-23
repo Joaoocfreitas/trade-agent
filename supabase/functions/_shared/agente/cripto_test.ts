@@ -39,7 +39,9 @@ Deno.test('o tema da linha do tempo: o 1º que casa, e a linha do tempo vem ante
     assertEquals(temaCripto(normalizar(q)), tema, q)
     const r = montar(q, undefined, HOJE)
     assertEquals(r.violacoes, [], q)
-    if (tema) {
+    // a da FTX abre com a definição: era corretora, e o fundador foi acusado (L13 da rodada 2)
+    if (tema === 'ftx') assert(r.curta[0].startsWith('Corretora também quebra: a FTX'), `${q}: ${r.curta[0]}`)
+    else if (tema) {
       assert(r.curta[0].startsWith('Na linha do tempo da cripto:'), `${q}: ${r.curta[0]}`)
       assertEquals(r.blocos[0], BASE.cripto.marcos[tema], q)
     }
