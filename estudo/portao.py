@@ -24,6 +24,9 @@ import pandas as pd
 TRAVAS = {
     'ptax': {'faixa': (2.0, 15.0), 'salto_pct': 4.0, 'revisao_dias': 7},
     'euro': {'faixa': (2.0, 15.0), 'salto_pct': 4.0, 'revisao_dias': 7},
+    # Brent (EIA, semanal): 15% segura 11 dias em 2016–2026, 9 no colapso de 2020 e o +18% de 02/10/2026, que o WTI não
+    # acompanhou (a conferir na fonte antes de liberar).
+    'brent': {'faixa': (5.0, 400.0), 'salto_pct': 15.0, 'revisao_dias': 14},
     'selic_meta': {'faixa': (2.0, 30.0), 'salto_abs': 1.5, 'multiplo': 0.25, 'revisao_dias': 7},
     'ipca_12m': {'faixa': (-5.0, 30.0), 'salto_abs': 1.5, 'revisao_dias': 100},
     'divida_bruta': {'faixa': (40.0, 150.0), 'salto_abs': 3.0, 'revisao_dias': 100},

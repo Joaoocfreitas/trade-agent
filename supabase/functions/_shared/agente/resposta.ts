@@ -65,6 +65,13 @@ type Base = {
   }
   /** fatos.dois_lados de cada mercado medido: quando caiu e quando subiu nos últimos 12 meses. */
   dois_lados: Record<string, Bloco | null>
+  /** Petróleo: os eventos de cada tema ('' sem tema, todos), a expressão que acha o tema (na ordem do JSON, o 1º que casa
+   * vale) e do barril à bomba. O caminho do Brent está em historico.brent, dois_lados.brent e agenda.brent. */
+  petroleo: {
+    eventos: Record<string, Bloco>
+    temas: Record<string, string>
+    barril: Bloco
+  }
   titulo_dois_lados: string
   /** O começo do resumo da economia (fatos.RESUMO_HOJE): ele vai por último nas 3 linhas. */
   resumo_hoje: string
@@ -82,7 +89,8 @@ type Cotacoes = {
 }
 
 export const BASE = base as unknown as Base
-// fatos.tema_cripto: as expressões do JSON, na ordem dele (a de inserção das chaves, que o JSON.parse mantém).
+// fatos.tema_cripto e fatos.tema_petroleo: as expressões do JSON, na ordem dele (a de inserção das chaves, que o
+// JSON.parse mantém).
 const TEMAS_CRIPTO = Object.entries(BASE.cripto.temas).map(([tema, padrao]) => [tema, new RegExp(padrao)] as const)
 // As linhas da linha do tempo inteira (sem tema): a definição de um tema é a 1ª linha dele que não está nela.
 const MARCOS_DATADOS = new Set(BASE.cripto.marcos[''].linhas.map((ln) => ln.texto))
@@ -92,6 +100,9 @@ const IMPOSTO_DITO = /\bimpost\w*|\bdeclar\w*|\birpf?\b|\bdarf\b|\bleao\b|\btrib
 // Pergunta de preço ou de movimento de cripto: o repertório não tem a cotação.
 const PRECO_CRIPTO = new RegExp(String.raw`\b(quanto (ta|esta|vale|custa)|preco|cotacao|caiu|subiu|cai|sobe|reagiu|valoriz\w*|` +
   String.raw`desvaloriz\w*)\b|\bo que aconteceu com o (bitcoin|btc|cripto)`)
+const TEMAS_PETROLEO = Object.entries(BASE.petroleo.temas).map(([tema, padrao]) => [tema, new RegExp(padrao)] as const)
+// O mercado da pergunta e a série que mede o caminho dele (MEDIDO do Python).
+const MEDIDO: Readonly<Record<string, string>> = { mini_indice: 'ibovespa', mini_dolar: 'dolar', petroleo: 'brent' }
 const T = BASE.textos
 const PEDEM_RECUSA = new Set(T.PEDEM_RECUSA)
 const MEDIDOS = ['ibovespa', 'dolar', 'juros']
@@ -308,7 +319,8 @@ const TITULO_EXPECTATIVAS = 'O que o mercado espera'
 const EURO_SEM_ESTUDO = 'O estudo do Copom e da linha do tempo mede o dólar (a cotação oficial do Banco Central), não o euro: ' +
   'os números de câmbio abaixo são do dólar.'
 
-/** fatos.expectativas, pronto na base: '' (nenhum mercado medido), dólar, euro, juros ou Ibovespa. */
+/** fatos.expectativas, pronto na base: '' (nenhum mercado medido), dólar, euro, juros, Ibovespa ou Brent (este igual ao
+ * de '': o Focus não pergunta pelo petróleo; só entra em pergunta de petróleo com Copom ou economia). */
 function expectativas(mercado: string): Bloco {
   return copia(BASE.expectativas[mercado])
 }
@@ -336,19 +348,21 @@ export function escolherBlocos(p: Pedido, hoje: string): Bloco[] {
     if (!ehEleicao(p)) blocos.push(copia(BASE.economia))
     blocos.push(copom(medidosDoCambio))
   }
-  for (const tipo of BASE.tipos) {
-    if (p.temas.includes(tipo)) blocos.push(copia(BASE.eventos[tipo]))
-  }
+  // Em pergunta de petróleo, guerra e choque externo vêm pelo bloco do petróleo, que mede também o Brent.
+  const tipos = BASE.tipos.filter((t) =>
+    p.temas.includes(t) && !(p.mercados.includes('petroleo') && (t === 'geopolitico' || t === 'choque_externo'))
+  )
+  for (const tipo of tipos) blocos.push(copia(BASE.eventos[tipo]))
   const temEconomia = () => blocos.some((b) => b && b.titulo.startsWith('A economia hoje'))
   if (p.temas.includes('economia') && !temEconomia()) blocos.unshift(copia(BASE.economia))
   // Pedido de direção sobre um mercado sem evento no repertório ("é topo?", "qual o viés?"): ao menos o nível de hoje.
   if (p.mercados.length && algum(p.proibidos, PEDEM_RECUSA) && !temEconomia()) blocos.unshift(copia(BASE.economia))
   // Mercado sem evento no repertório ("devo comprar dólar?", "como está o Ibovespa?"): o caminho que ele já fez, o que o
   // mercado espera (Focus, atribuído) e as datas marcadas que já mexeram com ele.
-  const temEvento = ehEleicao(p) || p.temas.includes('copom') || BASE.tipos.some((t) => p.temas.includes(t))
+  const temEvento = ehEleicao(p) || p.temas.includes('copom') || tipos.length > 0
   const medidos: string[] = []
   for (const m of p.mercados) {
-    const alvo = ({ mini_indice: 'ibovespa', mini_dolar: 'dolar' } as Record<string, string>)[m] ?? m
+    const alvo = MEDIDO[m] ?? m
     if (BASE.historico[alvo] && !medidos.includes(alvo)) medidos.push(alvo)
   }
   // "ETF de bitcoin na B3": a B3 é o lugar da cripto, não o Ibovespa. Sem caminho nem dois lados do índice.
@@ -365,7 +379,8 @@ export function escolherBlocos(p: Pedido, hoje: string): Bloco[] {
         blocos.push(lados ? copia(lados) : null)
       }
     }
-    blocos.push(expectativas(medidos[0]), calendario(medidos[0], hoje))
+    // O Focus não pergunta pelo petróleo: sem expectativa quando o mercado é o Brent.
+    blocos.push(medidos[0] !== 'brent' ? expectativas(medidos[0]) : null, calendario(medidos[0], hoje))
   } else if (p.temas.includes('economia') || p.temas.includes('copom')) {
     blocos.push(expectativas(medidos.length ? medidos[0] : ''))
   }
@@ -378,6 +393,10 @@ export function escolherBlocos(p: Pedido, hoje: string): Bloco[] {
     if (m === 'ibovespa' && (p.mercados.includes('mini_indice') || b3SoLugar)) continue
     const b = BASE.mercado[m]
     blocos.push(b ? copia(b) : null)
+    // petróleo: não há bloco de mercado (o fatos.mercado do Python devolve None), e sim os eventos do tema e o barril
+    if (m === 'petroleo') {
+      blocos.push(copia(BASE.petroleo.eventos[temaPetroleo(normalizar(p.pergunta))]), copia(BASE.petroleo.barril))
+    }
     if (m === 'cripto') {
       // Regras, imposto, riscos e a linha do tempo. Tema citado (halving, FTX, ETF...): a linha do tempo antes das regras,
       // com a definição primeiro se a pessoa perguntou "o que é". Pergunta de imposto: o imposto primeiro (o blocos[-1:-1]
@@ -411,6 +430,11 @@ export function escolherBlocos(p: Pedido, hoje: string): Bloco[] {
   else if (p.mercados.includes('cripto')) blocos = criptoPrimeiro(blocos as Bloco[])
   if (!blocos.length) blocos.push(copia(BASE.economia))
   return blocos as Bloco[]
+}
+
+/** fatos.tema_petroleo: o 1º tema dos eventos de petróleo que a pergunta (já normalizada) cita, ou ''. */
+export function temaPetroleo(perguntaNormalizada: string): string {
+  return TEMAS_PETROLEO.find(([, padrao]) => padrao.test(perguntaNormalizada))?.[0] ?? ''
 }
 
 /** fatos.tema_cripto: o 1º tema da linha do tempo que a pergunta (já normalizada) cita ('halving', 'ftx'...), ou ''. */

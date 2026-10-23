@@ -63,6 +63,10 @@ export const MERCADOS = {
   ),
   // Logo depois do dólar: a ordem das chaves é a ordem de p.mercados, como no dict do Python.
   euro: rx(r`\beuros?\b|\beur\b`),
+  petroleo: rx(
+    r`\bpetroleo\b|\bbrent\b|\bwti\b|\bpetrobras\b|\bpetr[34]\b|\bprio3?\b|\bopep\b|\bopec\b|\bcombustive(l|is)\b`,
+    r`|\bgasolina\b|\bdiesel\b|\bbarril\b|\bormuz\b|\bpetroleiras?\b`,
+  ),
   juros: rx(r`\bjuros\b|\bdi1?\b|\bdi futuro\b|\bselic\b|\brenda fixa\b|\btesouro\b|\bprefixad\w*`),
   cripto: rx(
     r`\bcripto\w*|\bbitcoins?\b|\bbtc\b|\bethereum\b|\bethers?\b|\beth\b|\bxrp\b|\bexchanges?\b|\bstablecoins?\b`,
@@ -87,7 +91,8 @@ export const TEMAS = {
   fiscal: rx(r`\bfiscal\b|\barcabouco\b|\bgastos? publicos?\b|\borcamento\b|\bministro da fazenda\b|\bhaddad\b`),
   legislativo: rx(r`\bcongresso\b|\bcamara\b|\bsenado\b|\bvotacao\b|\bpec\b|\breforma\b|\bimpeachment\b`),
   judicial: rx(r`\bstf\b|\bsupremo\b|\bjulgamento\b|\bprisao\b|\bcondenacao\b`),
-  geopolitico: rx(r`\btarifas?\b|\bguerra\b|\bsancao\b|\bsancoes\b|\bira\b|\bpetroleo\b`),
+  // "petróleo" sozinho não é geopolítica: tem mercado próprio, com os eventos de guerra que mexeram com o Brent
+  geopolitico: rx(r`\btarifas?\b|\bguerra\b|\bsancao\b|\bsancoes\b|\bira\b`),
   choque_externo: rx(r`\bpandemia\b|\bcovid\b|\bcrise (global|externa|internacional)\b`),
   escandalo: rx(r`\bescandalos?\b|\bdelacao\b|\blava ?jato\b|\bgrampo\b`),
   economia: rx(r`\beconomia\b|\binflacao\b|\bipca\b|\bdivida\b|\bpib\b|\bfiscal\b`),

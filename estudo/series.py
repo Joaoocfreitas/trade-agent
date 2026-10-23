@@ -6,12 +6,16 @@
 - Dólar PTAX venda (SGS 1), euro PTAX venda (SGS 21619), Selic meta (SGS 432), IPCA em 12 meses (SGS 13522) e
   dívida bruta do governo geral em % do PIB (SGS 13762): API do Banco Central.
 - Juros prefixados: CSV de taxas do Tesouro Direto (Tesouro Prefixado e Prefixado com Juros Semestrais).
+- Petróleo Brent à vista: EIA (U.S. Energy Information Administration), série RBRTE, tabela diária em HTML. Domínio
+  público, com crédito; publicada toda semana (quarta, com dados até terça). O Brent do Ipeadata (EIA366_PBRENT366) tem
+  datas deslocadas e não é usado.
 
 O Yahoo Finance foi descartado de propósito: o robots.txt de query1.finance.yahoo.com proíbe qualquer robô.
 Poucos pedidos, um por vez, robots.txt checado em cada endereço e em cada redirecionamento.
 """
 import io
 import json
+import re
 import time
 from datetime import date
 from pathlib import Path
@@ -124,6 +128,31 @@ class Cliente:
             r.close()
         tmp.replace(destino)
         return destino
+
+
+EIA_BRENT = 'https://www.eia.gov/dnav/pet/hist/RBRTED.htm'
+MESES_EN = {m: i for i, m in enumerate(('Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'), 1)}
+
+
+# ---------- leitura (funções puras, testadas) ----------
+
+def ler_eia(html: str) -> pd.Series:
+    """Tabela diária da EIA: uma linha por semana ('AAAA Mmm-dd to Mmm-dd') com 5 células, de segunda a sexta; célula
+    vazia é dia sem cotação. Só expressão regular: o arquivo baixado é dado, nada dele é executado."""
+    pontos = {}
+    for linha in re.findall(r"<tr>\s*<td class='B6'>(.*?)</tr>", html, re.S):
+        cabeca = re.sub(r'&nbsp;', ' ', linha.split('</td>')[0])
+        m = re.search(r'(\d{4})\s+(\w{3})-\s*(\d{1,2})\s+to', cabeca)
+        if not m:
+            continue
+        segunda = pd.Timestamp(int(m.group(1)), MESES_EN[m.group(2)], int(m.group(3)))
+        for k, v in enumerate(re.findall(r"<td class='B3'>(.*?)</td>", linha)):
+            v = re.sub(r'<[^>]+>|&nbsp;', '', v).strip()
+            if v:
+                pontos[segunda + pd.Timedelta(days=k)] = float(v.replace(',', ''))
+    if not pontos:
+        raise ValueError('a tabela da EIA veio sem nenhum ponto: o formato da página mudou')
+    return pd.Series(pontos, dtype=float).sort_index()
 
 
 # ---------- leitura (funções puras, testadas) ----------
@@ -248,6 +277,12 @@ def baixar_tudo(pasta: Path, inicio: date, fim: date, pular: frozenset = frozens
                                                                    f'Banco Central SGS {codigo}'))
     if not {'pre_2a', 'pre_5a'} <= pular:
         passo('tesouro', tesouro)
+    if 'brent' not in pular:
+        def brent() -> None:
+            bruto = c.arquivo(EIA_BRENT, pasta / 'brutos' / 'eia_rbrted.htm')
+            guardar('brent', ler_eia(bruto.read_text(encoding='utf-8', errors='replace')),
+                    'EIA, Brent à vista (série RBRTE), domínio público')
+        passo('brent', brent)
 
     manifesto['_baixado_em'] = pd.Timestamp.now(tz='America/Sao_Paulo').isoformat(timespec='seconds')
     (pasta / 'manifesto.json').write_text(json.dumps(manifesto, ensure_ascii=False, indent=1), encoding='utf-8')

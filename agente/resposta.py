@@ -18,6 +18,8 @@ from .filtro import Violacao, checar
 from .roteador import CONTRATO, Pedido, analisar, normalizar
 
 DERIVATIVOS = ('mini_indice', 'mini_dolar', 'juros')
+# O mercado da pergunta e a série que mede o caminho dele.
+MEDIDO = {'mini_indice': 'ibovespa', 'mini_dolar': 'dolar', 'petroleo': 'brent'}
 
 
 @dataclass
@@ -52,9 +54,10 @@ def escolher_blocos(p: Pedido, hoje: str) -> list[F.Bloco]:
         if not p.eleicao:
             blocos.append(F.economia())
         blocos.append(F.copom(medidos_cambio))
-    for tipo in F.TIPOS:
-        if tipo in p.temas:
-            blocos.append(F.eventos(tipo))
+    # Em pergunta de petróleo, guerra e choque externo vêm pelo bloco do petróleo, que mede também o Brent.
+    tipos = [t for t in F.TIPOS if t in p.temas and not ('petroleo' in p.mercados and t in ('geopolitico', 'choque_externo'))]
+    for tipo in tipos:
+        blocos.append(F.eventos(tipo))
     tem_economia = lambda: any(b and b.titulo.startswith('A economia hoje') for b in blocos)  # noqa: E731
     if 'economia' in p.temas and not tem_economia():
         blocos.insert(0, F.economia())
@@ -63,9 +66,8 @@ def escolher_blocos(p: Pedido, hoje: str) -> list[F.Bloco]:
         blocos.insert(0, F.economia())
     # Mercado sem evento no repertório ("devo comprar dólar?", "como está o Ibovespa?"): o caminho que ele já fez, o que o
     # mercado espera (Focus, atribuído) e as datas marcadas que já mexeram com ele.
-    tem_evento = p.eleicao or 'copom' in p.temas or any(t in p.temas for t in F.TIPOS)
-    medidos = [m for m in dict.fromkeys({'mini_indice': 'ibovespa', 'mini_dolar': 'dolar'}.get(m, m) for m in p.mercados)
-               if m in F.HISTORICO]
+    tem_evento = p.eleicao or 'copom' in p.temas or bool(tipos)
+    medidos = [m for m in dict.fromkeys(MEDIDO.get(m, m) for m in p.mercados) if m in F.HISTORICO]
     # "ETF de bitcoin na B3": a B3 é o lugar da cripto, não o Ibovespa. Sem caminho nem dois lados do índice.
     b3_so_lugar = 'cripto' in p.mercados and not re.search(IBOV_DITO, normalizar(p.pergunta))
     if b3_so_lugar:
@@ -76,7 +78,10 @@ def escolher_blocos(p: Pedido, hoje: str) -> list[F.Bloco]:
         # (WIN, WDO) não: o lado que importa é a taxa-base da FGV, que precisa caber nas 3 linhas.
         if {'dica', 'direcao', 'momento'} & set(p.proibidos) and not {'mini_indice', 'mini_dolar'} & set(p.mercados):
             blocos += [F.dois_lados(m) for m in medidos]  # de cada mercado citado, não só do primeiro
-        blocos += [F.expectativas(medidos[0]), F.calendario(medidos[0], hoje)]
+        # O Focus não pergunta pelo petróleo. Sem o Brent, a expectativa vai para o outro mercado medido; só com o Brent e
+        # pergunta de economia (inflação, IPCA, PIB), vai a do tema.
+        alvo = next((m for m in medidos if m != 'brent'), '' if 'economia' in p.temas else None)
+        blocos += [F.expectativas(alvo) if alvo is not None else None, F.calendario(medidos[0], hoje)]
     elif 'economia' in p.temas or 'copom' in p.temas:
         blocos.append(F.expectativas(medidos[0] if medidos else ''))
     if 'memecoin' in p.mercados:
@@ -91,6 +96,8 @@ def escolher_blocos(p: Pedido, hoje: str) -> list[F.Bloco]:
         if m == 'ibovespa' and ('mini_indice' in p.mercados or b3_so_lugar):
             continue  # contrato (WIN) ou cripto na B3: a regra de IR das ações à vista não vale
         blocos.append(F.mercado(m))
+        if m == 'petroleo':
+            blocos += [F.petroleo_eventos(F.tema_petroleo(normalizar(p.pergunta))), F.barril_bomba()]
         if m == 'cripto':
             # Regras, imposto, riscos e a linha do tempo. Tema citado (halving, FTX, ETF...): a linha do tempo antes das
             # regras, com a definição primeiro se a pessoa perguntou "o que é". Pergunta de imposto: o imposto primeiro.

@@ -11,8 +11,10 @@ import pandas as pd
 from . import fatos as F
 
 JANELA = 5  # pregões antes e depois do dia da reação
-SERIE = {'ibovespa': ('ibov', '%', 2), 'dolar': ('ptax', '%', 2), 'juros': ('pre_5a', ' p.b.', 1), 'juros_2a': ('pre_2a', ' p.b.', 1)}
-NOME = {'ibovespa': 'Ibovespa', 'dolar': 'Dólar (PTAX)', 'juros': 'Juros de 5 anos', 'juros_2a': 'Juros de 2 anos'}
+SERIE = {'ibovespa': ('ibov', '%', 2), 'dolar': ('ptax', '%', 2), 'juros': ('pre_5a', ' p.b.', 1), 'juros_2a': ('pre_2a', ' p.b.', 1),
+         'brent': ('brent', '%', 2)}
+NOME = {'ibovespa': 'Ibovespa', 'dolar': 'Dólar (PTAX)', 'juros': 'Juros de 5 anos', 'juros_2a': 'Juros de 2 anos',
+        'brent': 'Petróleo Brent (EIA)'}
 
 
 def _caminho(mercado: str, d0) -> list[float]:
@@ -98,3 +100,13 @@ def eventos(tipo: str) -> dict:
               'caminho': _caminho('ibovespa', r.dia0)} for _, r in sel.iterrows()]
     return _cartao(f'{F.TIPOS[tipo][0].upper() + F.TIPOS[tipo][1:]} na linha do tempo 2016–2026', 'ibovespa', casos,
                    'Linha do tempo do repertório e séries oficiais (Ipeadata, Banco Central); cálculo próprio')
+
+
+def petroleo(tema: str = '') -> dict:
+    """Os eventos de petróleo e Petrobras do tema, com a reação do Brent no dia (o mesmo número do texto) e o caminho."""
+    nome_tema = F._petroleo()['temas'][tema]['nome'] if tema else 'petróleo e Petrobras'
+    evs = [e for e in F._reacao_petroleo() if (not tema or e['tema'] == tema) and e['brent_dia'] is not None]
+    casos = [{'data': e['data'], 'dia_da_reacao': str(e['brent_dia'].date()), 'titulo': e['titulo'],
+              'valor': round(float(e['brent']), 2), 'caminho': _caminho('brent', e['brent_dia'])} for e in evs]
+    return _cartao(f'{nome_tema[0].upper() + nome_tema[1:]} desde 2016', 'brent', casos,
+                   'Fonte primária de cada evento (CVM, Planalto, OPEP) e EIA (Brent à vista, domínio público); cálculo próprio')

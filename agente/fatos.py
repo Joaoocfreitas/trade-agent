@@ -3,6 +3,7 @@
 Nada aqui é escrito pela IA. O modo com IA recebe estes blocos prontos e só pode citar os números que estão neles (D8).
 """
 import json
+import math
 import re
 from dataclasses import dataclass, field
 from decimal import ROUND_HALF_EVEN, Decimal
@@ -131,6 +132,8 @@ def _sgs(codigo: int, nome: str) -> Fonte:
 F_SELIC = _sgs(432, 'meta da Selic')
 F_PTAX = _sgs(1, 'dólar PTAX de venda')
 F_EURO = _sgs(21619, 'euro PTAX de venda')
+F_BRENT = Fonte('EIA (U.S. Energy Information Administration), petróleo Brent à vista, série RBRTE (domínio público)',
+                'https://www.eia.gov/dnav/pet/hist/RBRTED.htm')
 F_IPCA = _sgs(13522, 'IPCA em 12 meses, do IBGE')
 F_DIVIDA = _sgs(13762, 'dívida bruta do governo geral, % do PIB')
 F_IBOV = Fonte('Ipeadata, série GM366_IBVSP366 (fechamento do Ibovespa na B3)',
@@ -225,6 +228,7 @@ def _proximo_pregao(d) -> pd.Timestamp:
 
 # Taxa-base de cada mercado medido: série, limite de "dia grande" e unidade. Juros em pontos-base (p.b.).
 TAXA = {'ibovespa': ('ibov', 4.0, '%', F_IBOV), 'dolar': ('ptax', 1.0, '%', F_PTAX), 'euro': ('euro', 1.0, '%', F_EURO),
+        'brent': ('brent', 5.0, '%', F_BRENT),
         'juros': ('pre_5a', 30.0, ' p.b.', F_TESOURO)}
 
 
@@ -258,6 +262,7 @@ HISTORICO = {
     'ibovespa': ('o Ibovespa', 'ibov', F_IBOV, lambda v: f'{num(v, 0)} pontos'),
     'dolar': ('o dólar', 'ptax', F_PTAX, lambda v: f'R$ {num(v, 4)}'),
     'euro': ('o euro', 'euro', F_EURO, lambda v: f'R$ {num(v, 4)}'),
+    'brent': ('o petróleo Brent', 'brent', F_BRENT, lambda v: f'US$ {num(v, 2)} o barril'),
     'juros': ('o juro prefixado de 5 anos', 'pre_5a', F_TESOURO, lambda v: f'{num(v, 2)}% ao ano'),
 }
 
@@ -289,6 +294,8 @@ def historico(mercado: str) -> Bloco:
                          'de dólar, que tem vencimento e preço próprios.')
     if mercado == 'euro':
         b.limites.append(LIMITE_PTAX_EURO)
+    if mercado == 'brent':
+        b.limites.append(LIMITE_BRENT)
     # Para quem está começando: o nível arredondado, o ano em palavras e a faixa dos 12 meses.
     nivel = (lambda v: f'R$ {num(curto(v, 4, 2), 2)}') if mercado in ('dolar', 'euro') else fmt
     nome_cap = nome[0].upper() + nome[1:]
@@ -300,6 +307,8 @@ def historico(mercado: str) -> Bloco:
     return b
 
 
+LIMITE_BRENT = ('O Brent é o preço à vista publicado pela EIA uma vez por semana, com os dias até a terça anterior: o '
+                'último número pode ter até 8 dias.')
 LIMITE_PTAX_EURO = ('Os números do euro são da PTAX de venda do Banco Central. Na troca de verdade (banco, corretora, '
                     'app de remessa), a cotação é outra e pode haver tarifa, spread e IOF.')
 
@@ -1038,6 +1047,84 @@ def cripto_marcos(tema: str = '', conceito: bool = False) -> Bloco:
 
 
 TITULO_FGV = 'A taxa-base de quem faz day trade (fato)'
+
+
+# ---------- petróleo: Brent (EIA), os eventos de petróleo e Petrobras e do barril à bomba ----------
+
+def _petroleo() -> dict:
+    return _json('agente/petroleo.json')
+
+
+def tema_petroleo(pergunta_normalizada: str) -> str:
+    return next((k for k, t in _petroleo()['temas'].items() if re.search(t['regex'], pergunta_normalizada)), '')
+
+
+@cache
+def _reacao_petroleo() -> list[dict]:
+    """Para cada evento: o Brent no seu próprio calendário (o 1º dia com cotação a partir do dia da reação) e o Ibovespa e
+    o dólar no pregão da reação da B3, pelo método do estudo (estudo/janelas.py)."""
+    from estudo.janelas import calendario, dia_zero, medir_preco, no_calendario
+    brent = serie('brent')
+    cal = calendario(serie('ibov'))
+    ibov, ptax = serie('ibov').reindex(cal), no_calendario(serie('ptax'), cal)
+    saida = []
+    for e in _petroleo()['eventos']:
+        ib = dia_zero(e['reacao'], brent.index)
+        ix = dia_zero(e['reacao'], cal)
+        mb = medir_preco(brent, ib) if ib is not None else {}
+        mi = medir_preco(ibov, ix) if ix is not None else {}
+        mp = medir_preco(ptax, ix) if ix is not None else {}
+        saida.append({**e, 'brent_dia': brent.index[ib] if mb else None, 'b3_dia': cal[ix] if mi else None,
+                      'brent': mb.get('d0', math.nan) * 100, 'ibov': mi.get('d0', math.nan) * 100,
+                      'dolar': mp.get('d0', math.nan) * 100})
+    return saida
+
+
+def petroleo_eventos(tema: str = '') -> Bloco:
+    """Todos os eventos do tema que a pessoa citou (sem tema, todos), com a reação no dia, e a faixa de cada medida."""
+    p = _petroleo()
+    nome_tema = p['temas'][tema]['nome'] if tema else 'petróleo e Petrobras'
+    evs = [e for e in _reacao_petroleo() if not tema or e['tema'] == tema]
+    b = Bloco(f'O que aconteceu antes: {nome_tema} desde 2016 (fato)')
+    for e in evs:
+        partes = []
+        if e['brent_dia'] is not None:
+            partes.append(f'o Brent {mov(e["brent"], 2)} ({dia(e["brent_dia"])})')
+        if e['b3_dia'] is not None:
+            partes.append(f'na B3 ({dia(e["b3_dia"])}), o Ibovespa {mov(e["ibov"], 2)} e o dólar {mov(e["dolar"], 2)}')
+        reacao = '; '.join(partes) if partes else 'sem dado da reação ainda'
+        b.add(f'{dia(e["data"])}, {e["titulo"]}: no dia da reação, {reacao}.', Fonte(e['fonte']['nome'], e['fonte']['url']),
+              F_BRENT, F_IBOV, F_PTAX, F_ESTUDO)
+    med = lambda k: [e[k] for e in evs if not math.isnan(e[k])]  # noqa: E731
+    br, ib, dl = med('brent'), med('ibov'), med('dolar')
+    if br and ib:
+        b.add(f'Nos {len(evs)} eventos, no dia da reação: o Brent {faixa_mov(min(br), max(br), 2)}; o Ibovespa '
+              f'{faixa_mov(min(ib), max(ib), 2)}; o dólar {faixa_mov(min(dl), max(dl), 2)}.', F_ESTUDO)
+        b.resumo = (f'Nos {len(evs)} eventos de {nome_tema} desde 2016, no dia da reação o Brent {faixa_mov(min(br), max(br), 2)} '
+                    f'e o Ibovespa {faixa_mov(min(ib), max(ib), 2)}. São casos marcantes, não sorteados: a amostra exagera as '
+                    f'reações grandes.')
+    b.linhas.append(taxa_base('brent', 'petróleo Brent'))
+    b.limites += ['A reação das ações de petróleo (Petrobras, PRIO e outras) fica fora: a licença de dados da B3 para uso em '
+                  'produto ainda está pendente.',
+                  'Os eventos foram escolhidos por terem sido marcantes, não sorteados: a amostra exagera as reações grandes.']
+    incertos = sum(e['reacao_incerta'] for e in evs)
+    if incertos:
+        b.limites.append(f'Em {incertos} eventos o horário do anúncio não foi confirmado: a reação pode ter sido no pregão seguinte.')
+    return b
+
+
+def barril_bomba() -> Bloco:
+    """Do barril à bomba: a composição do preço (Petrobras), o peso na inflação (IBGE) e a conta do barril em reais."""
+    b = _bloco_json(_petroleo()['barril'])
+    d_b, brent = _ultimo('brent')
+    ptax = serie('ptax')
+    ptax = ptax[ptax.index <= d_b]
+    d_p, dolar = ptax.index[-1], float(ptax.iloc[-1])
+    reais = brent * dolar
+    b.add(f'Com o Brent a US$ {num(brent, 2)} (EIA, {dia(d_b)}) e o dólar a R$ {num(dolar, 4)} (PTAX, {dia(d_p)}), um barril custa '
+          f'R$ {num(reais, 2)}; com 158,987 litros por barril, são R$ {num(reais / 158.987, 2)} por litro de petróleo cru, antes '
+          f'de refino, impostos e margens.', F_BRENT, F_PTAX)
+    return b
 
 
 def fgv() -> Bloco:

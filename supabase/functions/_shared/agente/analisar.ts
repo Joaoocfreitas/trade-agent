@@ -8,8 +8,8 @@
 import type Anthropic from 'npm:@anthropic-ai/sdk@0.132.1'
 import { lerPergunta } from './agente.ts'
 import { iaSemVoto, leituraSemVoto, semDadoPessoal, violacoesSemDinheiro } from './registro.ts'
-import { BASE, mercadosMedidos, montar } from './resposta.ts'
-import { ehEleicao } from './roteador.ts'
+import { BASE, mercadosMedidos, montar, temaPetroleo } from './resposta.ts'
+import { ehEleicao, normalizar } from './roteador.ts'
 import type { Pedido, Violacao } from './texto.ts'
 
 export type Mercado = 'b3' | 'crypto' | 'global'
@@ -27,7 +27,9 @@ type Cartao = {
   indice_d0: number
   fonte: string
 }
-type Cartoes = { eleicoes: Record<string, Cartao>; copom: Record<string, Cartao>; eventos: Record<string, Cartao> }
+type Cartoes = {
+  eleicoes: Record<string, Cartao>; copom: Record<string, Cartao>; eventos: Record<string, Cartao>; petroleo: Record<string, Cartao>
+}
 const CARTOES = (BASE as unknown as { cartoes: Cartoes }).cartoes
 
 export type AnalysisResponse = {
@@ -63,6 +65,9 @@ export type Auditoria = {
 export function escolherCartao(p: Pedido): Cartao | null {
   if (ehEleicao(p)) return CARTOES.eleicoes[mercadosMedidos(p.mercados).join(',')] ?? null
   if (p.temas.includes('copom')) return CARTOES.copom[p.mercados.length ? mercadosMedidos(p.mercados).join(',') : ''] ?? null
+  // Petróleo: o cartão dos eventos de petróleo do tema (Brent), o mesmo bloco que o texto mostra; a guerra e o choque
+  // externo da linha do tempo genérica (só Ibovespa) não aparecem no texto de uma pergunta de petróleo.
+  if (p.mercados.includes('petroleo')) return CARTOES.petroleo[temaPetroleo(normalizar(p.pergunta))] ?? null
   for (const tipo of BASE.tipos) if (p.temas.includes(tipo)) return CARTOES.eventos[tipo] ?? null
   return null
 }

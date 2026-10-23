@@ -67,7 +67,7 @@ def base() -> dict:
         'eventos': {t: _bloco(F.eventos(t)) for t in F.TIPOS},
         'mercado': {k: _bloco(F.mercado(k)) for k in ('mini_indice', 'mini_dolar', 'juros', 'ibovespa', 'cripto')},
         'historico': {k: _bloco(F.historico(k)) for k in F.HISTORICO},
-        'expectativas': {k: _bloco(F.expectativas(k)) for k in ('', 'dolar', 'euro', 'juros', 'ibovespa')},
+        'expectativas': {k: _bloco(F.expectativas(k)) for k in ('', 'dolar', 'euro', 'juros', 'ibovespa', 'brent')},
         'agenda': {k: [{'tipo': i['tipo'], 'data': i['data'], 'curto': i['curto'],
                         'fontes': [_fonte(f) for f in i['fontes']]} for i in F.agenda(k)] for k in F.HISTORICO},
         'titulo_cripto': F.TITULO_CRIPTO,
@@ -82,6 +82,7 @@ def base() -> dict:
             'eleicoes': {','.join(a): C.eleicoes(a) for a in ALVOS},
             'copom': {'': C.copom(None), **{','.join(a): C.copom(a) for a in ALVOS}},
             'eventos': {t: C.eventos(t) for t in F.TIPOS},
+            'petroleo': {'': C.petroleo(), **{t: C.petroleo(t) for t in F._petroleo()['temas']}},
         },
         'conta': {'mini_indice': {'valor': 0.20, 'nome': 'mini-índice', 'fonte': _fonte(F.F_B3_WIN)},
                   'mini_dolar': {'valor': 10.0, 'nome': 'mini-dólar', 'fonte': _fonte(F.F_B3_WDO)}},
@@ -100,6 +101,11 @@ def base() -> dict:
             'titulos': [F.TITULO_MARCOS, F.TITULO_CRIPTO, F.TITULO_CRIPTO_IMPOSTO, F.TITULO_CRIPTO_RISCOS],
         },
         'dois_lados': {k: _bloco(F.dois_lados(k)) for k in F.HISTORICO},
+        'petroleo': {
+            'eventos': {'': _bloco(F.petroleo_eventos()), **{t: _bloco(F.petroleo_eventos(t)) for t in F._petroleo()['temas']}},
+            'temas': {t: v['regex'] for t, v in F._petroleo()['temas'].items()},
+            'barril': _bloco(F.barril_bomba()),
+        },
         'titulo_dois_lados': F.TITULO_DOIS_LADOS,
         'resumo_hoje': F.RESUMO_HOJE,
     }
@@ -161,6 +167,11 @@ EXTRAS = [
     'futuro de bitcoin na B3 vale a pena?', 'devo comprar bitcoin?', 'should I exchange my euros now?',
     'tenho 10 mil dólares em USDT, quanto dá em reais?', 'o dólar vai cair? e o ibovespa?', 'dá pra ficar rico com bitcoin?',
     'a china proibiu bitcoin?', 'e se a exchange quebrar?',
+    # 23/10/2026: petróleo (Brent da EIA, eventos de petróleo e Petrobras, do barril à bomba).
+    'vale a pena comprar Petrobras?', 'o que a OPEP fez com o petróleo?', 'como o petróleo chega na bomba?',
+    'o petróleo vai subir com a guerra?', 'quais ações de petróleo comprar?', 'compro PETR4 amanhã?',
+    'o imposto do diesel mudou?', 'como está o petróleo?', 'Brent e dólar', 'troca de presidente da Petrobras',
+    'a covid derrubou o petróleo?', 'Tarifas dos EUA e o Ibovespa', 'A guerra no Irã derrubou a bolsa?',
 ]
 
 

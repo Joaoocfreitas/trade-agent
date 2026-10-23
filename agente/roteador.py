@@ -53,6 +53,8 @@ MERCADOS = {
              r'|\b(trazer|traz|trago|mandar|mando|enviar|envio|levar|transferir)\b[^.?!]{0,30}\b(pro brasil|para o brasil|pra fora'
              r'|para fora|do exterior|de fora|para o exterior|pro exterior)\b',
     'euro': r'\beuros?\b|\beur\b',
+    'petroleo': r'\bpetroleo\b|\bbrent\b|\bwti\b|\bpetrobras\b|\bpetr[34]\b|\bprio3?\b|\bopep\b|\bopec\b|\bcombustive(l|is)\b'
+                r'|\bgasolina\b|\bdiesel\b|\bbarril\b|\bormuz\b|\bpetroleiras?\b',
     'juros': r'\bjuros\b|\bdi1?\b|\bdi futuro\b|\bselic\b|\brenda fixa\b|\btesouro\b|\bprefixad\w*',
     'cripto': r'\bcripto\w*|\bbitcoins?\b|\bbtc\b|\bethereum\b|\bethers?\b|\beth\b|\bxrp\b|\bexchanges?\b|\bstablecoins?\b'
               r'|\bsolana\b|\bhalving\b|\bftx\b|\busdt\b|\busdc\b|\btether\b|\bhash11\b|\bdoge\w*|\bshiba\b|' + rf'\b{EXCH}\b',
@@ -71,7 +73,8 @@ TEMAS = {
     'fiscal': r'\bfiscal\b|\barcabouco\b|\bgastos? publicos?\b|\borcamento\b|\bministro da fazenda\b|\bhaddad\b',
     'legislativo': r'\bcongresso\b|\bcamara\b|\bsenado\b|\bvotacao\b|\bpec\b|\breforma\b|\bimpeachment\b',
     'judicial': r'\bstf\b|\bsupremo\b|\bjulgamento\b|\bprisao\b|\bcondenacao\b',
-    'geopolitico': r'\btarifas?\b|\bguerra\b|\bsancao\b|\bsancoes\b|\bira\b|\bpetroleo\b',
+    # "petróleo" sozinho não é geopolítica: tem mercado próprio, com os eventos de guerra que mexeram com o Brent
+    'geopolitico': r'\btarifas?\b|\bguerra\b|\bsancao\b|\bsancoes\b|\bira\b',
     'choque_externo': r'\bpandemia\b|\bcovid\b|\bcrise (global|externa|internacional)\b',
     'escandalo': r'\bescandalos?\b|\bdelacao\b|\blava ?jato\b|\bgrampo\b',
     'economia': r'\beconomia\b|\binflacao\b|\bipca\b|\bdivida\b|\bpib\b|\bfiscal\b',
