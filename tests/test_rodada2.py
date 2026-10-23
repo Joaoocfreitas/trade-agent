@@ -2879,3 +2879,14 @@ def test_g3_todas_as_perguntas_estao_nos_extras():
     from agente.exportar import EXTRAS
     faltam = [q for q in TODAS_G3 if q not in EXTRAS]
     assert not faltam, faltam
+
+
+@pytest.mark.parametrize('base', ['1', ', ', 'e ', '1.', '1,', 'us$ 1 ', '10 dolares ', 'barril a '])
+def test_pergunta_longa_nao_trava_o_roteador(base):
+    """O site aceita até 2.000 caracteres. Padrão de número sem âncora à esquerda recomeçava em cada posição e deixava a
+    conta quadrática (0,2 s); o teto aqui é folgado para não falhar em máquina lenta, mas pega a volta do defeito."""
+    import time
+    s = (base * 2000)[:2000]
+    t = time.perf_counter()
+    analisar(s)
+    assert time.perf_counter() - t < 0.5

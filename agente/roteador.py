@@ -1000,7 +1000,9 @@ QUANTO_TROCAR = (r'\bquanto (\w+ ){0,4}?(coloco|ponho|invisto|aplico|boto|trago|
                  r'|\ball or (half|part)\b')
 MULTIPLICA = {'mil': 1e3, 'k': 1e3, 'milhao': 1e6, 'milhoes': 1e6, 'mi': 1e6}
 # Em pergunta de petróleo, "100 dólares" é o preço do barril, não o dinheiro da pessoa, a não ser que ela diga que tem.
-PRECO_EM_DOLAR = r'(us\$|u\$|usd) ?\d[\d.,]*( ?(mil|k))?|\d[\d.,]*( ?(mil|k))? ?(de )?(dolares|dolar|dollars?|usd)\b'
+# O número começa onde não há outro dígito antes ((?<![\d.,])): sem isso, "1111..." recomeça em cada posição e a
+# conta fica quadrática no tamanho da pergunta (2.000 caracteres = 0,2 s).
+PRECO_EM_DOLAR = r'(us\$|u\$|usd) ?\d[\d.,]*( ?(mil|k))?|(?<![\d.,])\d[\d.,]*( ?(mil|k))? ?(de )?(dolares|dolar|dollars?|usd)\b'
 POSSE = r'\b(tenho|guardei|guardo|juntei|economizei|poupei|meus|minhas|recebi|ganhei)\b'
 # Pôr o dinheiro num mercado ("invisto em petróleo?", "compro ações da Petrobras com isso?"). Sem "compra" (substantivo):
 # "poder de compra" é câmbio.
@@ -1009,7 +1011,7 @@ INVESTE = (r'\b((re)?invisto|investir|investiria|aplico|aplicar|aplicaria|compro
 # O preço do barril ou do litro em moeda estrangeira ("o Brent a 100 dólares", "90 dólares o barril") sai do texto antes de
 # achar o dinheiro da pessoa (_so_o_dinheiro_dela).
 _DINHEIRO = (r'(?:(?:euros|eur|usd|us\$|u\$) ?\d[\d.,]*(?: ?(?:mil|k|milhao|milhoes|mi)\b)?'
-             r'|\d[\d.,]*(?: ?(?:mil|k|milhao|milhoes|mi)\b)? ?(?:de |em )?(?:euros?|eur|dolares|dolar|dollars?|usd|us\$|u\$)(?![\w$]))')
+             r'|(?<![\d.,])\d[\d.,]*(?: ?(?:mil|k|milhao|milhoes|mi)\b)? ?(?:de |em )?(?:euros?|eur|dolares|dolar|dollars?|usd|us\$|u\$)(?![\w$]))')
 PRECO_DO_BARRIL = (r'\b(?:petroleo|brent|wti|barril|barris|opep|opec|gasolina|diesel|etanol|combustive(?:l|is)|litro)\b'
                    r'(?: (?:a|de|em|por|o|esta|ta|foi|vai|passou|passa|passar|bateu|bater|chegou|chega|chegar|acima|abaixo'
                    r'|perto|caiu|cai|subiu|sobe|custa|custava|custando|cotado|para|pra))* ?' + _DINHEIRO
