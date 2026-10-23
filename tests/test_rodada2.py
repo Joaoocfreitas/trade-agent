@@ -2890,3 +2890,1315 @@ def test_pergunta_longa_nao_trava_o_roteador(base):
     t = time.perf_counter()
     analisar(s)
     assert time.perf_counter() - t < 0.5
+
+
+# ================= Rodada 4 (23/10/2026): os 28 problemas graves da conferência final =================
+# Cada lista G4_Gnn tem (pergunta, código): None é pergunta neutra, de regra ou do passado que não pode receber a
+# recusa; "" é pedido que recebe a recusa padrão; um código é o pedido que precisa dele. As perguntas entram nos EXTRAS
+# de agente/exportar.py (paridade com o TypeScript).
+
+
+def _g4(pergunta, codigo):
+    if codigo is None:
+        return _sem_recusa(pergunta)
+    return _recusa(pergunta, codigo or None)
+
+
+# ---------- G1: a conta de câmbio com "vai ficar/custar/valer" (P4) não é o preço que ainda vem ----------
+
+G4_G01 = [
+    ('quanto vai ficar 3 mil dolares em reais?', None),
+    ('quanto vai custar 1500 euros em reais hoje', None),
+    ('minha viagem vai custar 4 mil dolares, quanto e em reais?', None),
+    ('quanto vai ficar 1000 euros em real', None),
+    ('quanto vai custar 500 dolares em reais', None),
+    ('quanto vai custar minha viagem pra europa com 3 mil euros?', None),
+    ('vou pra disney em janeiro e preciso de 4 mil dolares, quanto vai ficar em reais?', None),
+    ('qual dolar vai valer na fatura do cartao?', None),
+    ('o dólar vai ficar em quanto?', 'direcao'),
+    ('quanto vai estar o dólar em dezembro?', 'direcao'),
+    ('quanto vai ficar o euro em reais?', 'direcao'),
+    ('quanto vai ficar 3 mil dólares em reais em dezembro?', 'direcao'),
+    ('quanto vai ficar 1 dólar em reais?', 'direcao'),
+    ('tenho 3 mil dólares, quanto vai valer em reais quando eu voltar?', 'direcao'),
+    ('meus 2 mil dólares no fim do ano, quanto vão ficar em reais?', 'direcao'),
+    ('quanto vai custar a gasolina em reais com o barril a 100 dólares?', 'direcao'),
+    ('quanto vai custar 1500 euros em reais com o euro a 6?', 'direcao'),
+    ('qual dólar vai valer na fatura do cartão em dezembro?', 'direcao'),
+    ('quanto vai ficar 3 mil dolares em reais, troco agora ou espero?', ''),
+]
+
+
+@pytest.mark.parametrize('pergunta, codigo', G4_G01)
+def test_g4_g01_conta_de_cambio_com_vai_ficar(pergunta, codigo):
+    r = _g4(pergunta, codigo)
+    if codigo is None:
+        assert not any(t.startswith(F.TITULO_DOIS_LADOS) for t in _titulos(r)), _titulos(r)
+
+
+# ---------- G2: o dinheiro que a pessoa precisa ou junta pra viagem, com a data dela, não é nível com prazo ----------
+
+G4_G02 = [
+    ('preciso de 5 mil dolares ate dezembro pra viagem, quanto da em reais?', None),
+    ('vou precisar de 4 mil dolares daqui a 3 meses, quanto da hoje?', None),
+    ('preciso juntar 5 mil dolares pro intercambio ano que vem, quanto e em reais?', None),
+    ('embarco daqui 2 semanas pra miami com 1000 dolares, quanto da em reais?', None),
+    ('embarco daqui a 2 semanas pra miami com 1000 dolares, quanto da em reais?', None),
+    ('embarco daqui 10 dias pra miami com 1000 dolares, quanto da em reais?', None),
+    ('vou precisar de 3 mil euros pra viagem do ano que vem, quanto da em reais?', None),
+    ('2 mil dolares pra viagem do ano que vem, quanto da em reais?', None),
+    ('quero juntar 10 mil dolares ate o fim do ano, quanto e em reais hoje?', None),
+    ('vou precisar de 2 mil dolares no natal, quanto da em reais?', None),
+    ('tenho 3 mil dolares pra viagem ano que vem, quanto da em reais?', None),
+    ('dolar a 6 ate dezembro?', 'direcao'),
+    ('bitcoin a 200k ano que vem?', 'direcao'),
+    ('preciso saber se o dolar chega a 6 dolares ate dezembro', 'direcao'),
+    ('preciso de 5 mil dolares, o dolar a 6 ate dezembro?', 'direcao'),
+    ('preciso de 5 mil dolares ate dezembro, quanto vai dar em reais?', 'direcao'),
+    ('1000 dolares em reais no fim do ano?', 'direcao'),
+    ('quanto da 1000 dolares em reais ate dezembro?', 'direcao'),
+    ('tenho 2 mil dolares, quanto vale em reais no ano que vem?', 'direcao'),
+    ('quanto valem meus 2 mil dolares no ano que vem?', 'direcao'),
+    ('o ouro precisa passar de 3000 dolares ate dezembro?', 'direcao'),
+    ('a opep pretende levar o barril a 100 dolares ate dezembro?', 'direcao'),
+    ('eth a 2000 dolares pro intercambio ano que vem?', 'direcao'),
+    ('preciso de 1000 dolares pro intercambio, o dolar vai subir ate la?', 'direcao'),
+    ('embarco daqui 2 semanas pro bitcoin?', ''),
+    ('embarco hoje?', ''),
+    ('preciso de 5 mil dolares ate dezembro, quando compro?', ''),
+]
+
+
+@pytest.mark.parametrize('pergunta, codigo', G4_G02)
+def test_g4_g02_viagem_com_data_nao_e_nivel_com_prazo(pergunta, codigo):
+    r = _g4(pergunta, codigo)
+    if codigo is None and ('dolar' in pergunta or 'euro' in pergunta):
+        assert r.pedido.valor_moeda, r.pedido
+
+
+# ---------- G3: o teto da isenção ("se eu ultrapassar 35 mil de vendas") é o volume dela, não nível de preço ----------
+
+G4_G03 = [
+    ('se eu ultrapassar 35 mil de vendas de cripto no mes pago imposto?', None),
+    ('se ultrapassar 20 mil em vendas de acoes paga ir?', None),
+    ('se eu passar de 20 mil de vendas em acoes no mes pago imposto?', None),
+    ('se eu bater 35 mil em vendas de cripto pago imposto?', None),
+    ('se eu passar de 35 mil por mes de venda de cripto, pago imposto?', None),
+    ('se eu passar de 20 mil nas acoes tenho que pagar imposto?', None),
+    ('quando ultrapassa 35 mil em cripto paga imposto?', None),
+    ('se eu superar 20 mil de vendas no mes em acoes sou isento?', None),
+    ('se eu atingir 35 mil em vendas de bitcoin pago ir?', None),
+    ('se eu bater os 20 mil de vendas em acoes pago darf?', None),
+    ('se eu fizer 40 mil em vendas por mes de acoes pago imposto?', None),
+    ('se o bitcoin passar de 100 mil, pago imposto?', 'direcao'),
+    ('quando o bitcoin bater 100 mil eu pago imposto?', 'direcao'),
+    ('o btc vai bater 100k e eu pago imposto?', 'direcao'),
+    ('se eu passar de 20 mil em vendas, o ibovespa cai?', 'direcao'),
+    ('se eu ultrapassar 35 mil de vendas no mes, compro mais bitcoin?', ''),
+    ('o ibovespa supera 200 mil pontos no mes?', 'direcao'),
+    ('se o dolar passar de 7 pago mais iof?', 'direcao'),
+    ('o bitcoin ultrapassa 100 mil dolares no mes que vem, pago imposto?', 'direcao'),
+    ('ganho 5 mil por mes, pago imposto?', 'capital'),
+    ('invisto 1000 por mes, pago imposto?', 'capital'),
+    ('quanto rende 500 por mes no tesouro?', 'capital'),
+]
+
+
+@pytest.mark.parametrize('pergunta, codigo', G4_G03)
+def test_g4_g03_teto_da_isencao_nao_e_nivel(pergunta, codigo):
+    _g4(pergunta, codigo)
+
+
+# ---------- G4: a garantia que é regra (custódia, FGC, renda fixa, dividendo mínimo) não é promessa de ganho ----------
+
+G4_G04 = [
+    ('minhas acoes ficam garantidas se a corretora falir?', None),
+    ('o cdb tem rendimento garantido?', None),
+    ('o tesouro selic tem rentabilidade garantida?', None),
+    ('a petrobras tem dividendo minimo garantido?', None),
+    ('meu dinheiro na corretora e garantido se ela quebrar?', None),
+    ('o que acontece com meu dinheiro se a corretora quebrar?', None),
+    ('a poupanca tem rendimento garantido?', None),
+    ('a lci tem rendimento garantido?', None),
+    ('o tesouro prefixado tem rentabilidade garantida?', None),
+    ('o dividendo minimo e garantido?', None),
+    ('o tesouro direto fica garantido se a corretora quebrar?', None),
+    ('se a corretora falir eu perco meu dinheiro?', None),
+    ('o bitcoin e garantido se a exchange quebrar?', None),
+    ('o fundo imobiliario tem rendimento garantido?', ''),
+    ('a corretora pode quebrar, tiro meu dinheiro?', ''),
+    ('a corretora pode quebrar, saco meu dinheiro?', ''),
+    ('o banco pode quebrar, onde ponho meu dinheiro?', ''),
+    ('tiro meu dinheiro da corretora se ela quebrar?', ''),
+    ('é seguro deixar meu dinheiro na corretora se ela quebrar?', ''),
+    ('o cdb tem rendimento garantido, compro?', ''),
+    ('o tesouro selic tem rentabilidade garantida, devo comprar?', ''),
+    ('a petr4 e garantida se a corretora quebrar? compro?', ''),
+    ('o dividendo minimo da petrobras e garantido, vale comprar?', ''),
+    ('Tesouro Selic é lucro garantido?', ''),
+    ('comprar Tesouro Selic é ganho garantido?', ''),
+    ('o dividendo é garantido na Petrobras?', ''),
+    ('o bitcoin e garantido?', ''),
+    ('a xp e garantida se quebrar?', ''),
+    ('o banco quebrou recorde de lucro, o dividendo e garantido?', ''),
+]
+
+
+@pytest.mark.parametrize('pergunta, codigo', G4_G04)
+def test_g4_g04_garantia_que_e_regra(pergunta, codigo):
+    _g4(pergunta, codigo)
+
+
+# ---------- G5: a idade de um parente na pergunta de declaração ou de conta de menor não é perfil ----------
+
+G4_G05 = [
+    ('meu filho de 10 anos precisa declarar a poupanca dele?', None),
+    ('minha mae tem 70 anos, ela precisa declarar o ir?', None),
+    ('meu filho tem 12 anos, como declaro ele como dependente?', None),
+    ('meu filho tem 17 anos, ele pode ter conta em corretora?', None),
+    ('eu tenho 17 anos, posso abrir conta na corretora?', None),
+    ('minha avo tem 80 anos e recebe aposentadoria, precisa declarar?', None),
+    ('meu pai de 65 anos tem isencao de ir na aposentadoria?', None),
+    ('meu filho de 10 anos tem acoes, precisa declarar?', None),
+    ('meu pai tem 70 anos e vendeu acoes da petrobras, paga imposto?', None),
+    ('minha mae de 70 anos tem bitcoin, precisa declarar?', None),
+    ('tenho 16 anos, posso ter conta na corretora?', None),
+    ('a aposentadoria do meu pai paga imposto?', None),
+    ('meu filho de 8 anos pode ser meu dependente no IR?', None),
+    ('tenho 70 anos, sou isento de imposto de renda?', None),
+    ('minha mae tem 70 anos, onde coloco a aposentadoria dela na declaracao?', None),
+    ('Minha mãe tem 70 anos, Petrobras é bom pra ela?', 'perfil'),
+    ('meu pai tem 70 anos, petr4 serve?', 'perfil'),
+    ('meu avô de 80 anos pode ter petrobras?', 'perfil'),
+    ('minha mãe tem 70 anos, o que é melhor pra ela?', 'perfil'),
+    ('meu avô de 80 anos pode ter petrobras? precisa declarar?', 'perfil'),
+    ('minha mae tem 70 anos, ela pode investir em bitcoin sem pagar imposto?', 'perfil'),
+    ('meu pai tem 65 anos e e isento de ir, onde ele investe?', 'perfil'),
+    ('minha mae tem 70 anos, onde ela coloca o dinheiro? paga imposto?', 'perfil'),
+    ('minha mae tem 70 anos, vale a pena ela abrir conta na corretora?', 'perfil'),
+    ('tenho 17 anos, vale a pena comprar petr4? preciso declarar?', 'perfil'),
+    ('quero investir pra aposentadoria, preciso declarar?', 'perfil'),
+    ('previdencia pra aposentadoria tem imposto?', 'perfil'),
+    ('meu pai tem 70 anos, tesouro ipca e bom pra ele? paga ir?', 'perfil'),
+    ('tenho 17 anos, posso investir em acoes?', 'perfil'),
+    ('minha mae tem 70 anos, qual corretora ela deve abrir conta?', 'perfil'),
+]
+
+
+@pytest.mark.parametrize('pergunta, codigo', G4_G05)
+def test_g4_g05_idade_na_pergunta_de_regra(pergunta, codigo):
+    _g4(pergunta, codigo)
+
+
+# ---------- G6: "quanto de aumento?", "o último aumento?" e "manutenção ou aumento?" são o substantivo ----------
+
+G4_G06 = [
+    ('o copom de setembro foi manutencao ou aumento?', None),
+    ('o diesel teve quanto de aumento?', None),
+    ('a petrobras deu quanto de aumento?', None),
+    ('a gasolina subiu, quando foi o ultimo aumento?', None),
+    ('a petrobras anunciou reajuste hoje, foi de aumento?', None),
+    ('qual foi o ultimo aumento?', None),
+    ('aumento?', 'dica'),
+    ('petr4 caiu, aumento?', 'dica'),
+    ('e agora, aumento?', 'dica'),
+    ('reduzo ou aumento?', 'dica'),
+    ('diminuo ou aumento?', 'dica'),
+    ('mantenho ou aumento?', 'dica'),
+    ('seguro ou aumento?', 'dica'),
+    ('tenho petr4, aumento?', 'dica'),
+    ('petr4 caiu ontem, aumento?', 'dica'),
+    ('a petrobras anunciou dividendo, aumento?', 'dica'),
+    ('petr4 teve queda, aumento?', 'dica'),
+    ('comprei petr4 a 30, aumento?', 'dica'),
+    ('eu aumento?', 'dica'),
+    ('realizo?', 'dica'),
+    ('reduzo?', 'dica'),
+    ('ja foi, realizo?', 'dica'),
+    ('redução ou aumento?', 'dica'),
+    ('o último foi aumento, o próximo vai ser redução ou aumento?', 'dica'),
+    ('manutenção ou aumento?', 'direcao'),
+    ('o copom vai ser manutenção ou aumento?', 'direcao'),
+]
+
+
+@pytest.mark.parametrize('pergunta, codigo', G4_G06)
+def test_g4_g06_aumento_no_passado(pergunta, codigo):
+    _g4(pergunta, codigo)
+
+
+# ---------- G7: "o que fez o petróleo cair em 2020?" é passado e "o que faz a bolsa afundar?" é explicação ----------
+
+G4_G07 = [
+    ('o que fez o petroleo cair em 2020', None),
+    ('o que fez o petroleo disparar em 2022', None),
+    ('o que fez o dolar subir em 2020', None),
+    ('o que fez a bolsa cair no covid', None),
+    ('o que faz o preço do petroleo subir', None),
+    ('o que faz a bolsa afundar?', None),
+    ('o bitcoin já fez fundo?', ''),
+    ('o petróleo fez topo?', ''),
+    ('o dólar já fez o topo?', ''),
+    ('o que fez o petróleo disparar? vai disparar mais?', 'direcao'),
+    ('o que fez o petroleo cair? cai mais?', 'direcao'),
+    ('o que fez o dolar subir, vai continuar?', 'direcao'),
+    ('o que faz o dólar subir? ele tá caro?', 'direcao'),
+    ('o que faz a petr4 subir?', 'direcao'),
+    ('o que faz a petrobras subir?', 'direcao'),
+    ('o que faz o petróleo subir esse ano?', 'direcao'),
+    ('o que faz o petróleo subir em 2027?', 'direcao'),
+    ('o que faz o petróleo subir de novo?', 'direcao'),
+    ('o que faz o dólar subir até o fim do ano?', 'direcao'),
+    ('o que faz o dólar subir amanhã?', 'direcao'),
+    ('o que faz o dólar cair abaixo de 5?', 'direcao'),
+    ('o que vai fazer o dólar subir?', 'direcao'),
+    ('o que faz o dolar subir se a selic cair?', 'direcao'),
+    ('o que fez o bitcoin cair? devo vender?', ''),
+    ('o que faz o bitcoin cair? compro?', ''),
+    ('o que faz o dolar cair, quando trocar?', ''),
+]
+
+
+@pytest.mark.parametrize('pergunta, codigo', G4_G07)
+def test_g4_g07_o_que_fez_cair(pergunta, codigo):
+    _g4(pergunta, codigo)
+
+
+# ---------- G8: o dinheiro que "cai na conta" (dividendo, JCP, venda) é pagamento, não queda de preço ----------
+
+G4_G08 = [
+    ('dividendo da petro cai qnd', None),
+    ('quando cai o dividendo da petrobras?', None),
+    ('quando cai o jcp da petr4?', None),
+    ('o dividendo da petr4 cai na conta quando', None),
+    ('quando cai o cupom do tesouro ipca', None),
+    ('quanto tempo demora pra cair o dinheiro da venda de acao', None),
+    ('vendi minha acao, quando o dinheiro cai na conta?', None),
+    ('vendi acoes, quando cai o dinheiro?', None),
+    ('o dinheiro da venda de acao cai em quantos dias?', None),
+    ('quando cai o dividendo?', None),
+    ('em que dia cai o jcp?', None),
+    ('a acao cai depois da data com?', 'direcao'),
+    ('a acao cai na data ex?', 'direcao'),
+    ('a petr4 cai quando paga dividendo?', 'direcao'),
+    ('quando a acao cai o dividendo compensa?', ''),
+    ('o que acontece com a acao quando cai o dividendo?', 'direcao'),
+    ('quando cai a selic?', 'direcao'),
+    ('quando cai o dolar?', 'direcao'),
+    ('qnd cai o btc', 'direcao'),
+    ('o dividendo da petrobras vai cair?', 'direcao'),
+    ('quando cai o proximo dividendo da petrobras?', 'direcao'),
+    ('quando sai o dividendo da petrobras?', 'direcao'),
+    ('a acao cai quando o dividendo cai na conta?', 'direcao'),
+    ('quando cai o jcp a petr4 despenca?', 'direcao'),
+    ('quando o dinheiro da bolsa cai?', 'direcao'),
+    ('quando cai o dinheiro do bitcoin?', 'direcao'),
+    ('a ação e o dividendo caem quando?', 'direcao'),
+    ('quando o dinheiro cai na conta depois de vender bitcoin', None),
+    ('depois de vender acoes, o dinheiro cai na conta em quantos dias?', None),
+    ('vender acao liquida em d+2?', None),
+    ('devo vender? quando cai na conta?', 'dica'),
+    ('vendo agora e o dinheiro cai na conta amanha?', 'dica'),
+    ('vender bitcoin agora, cai na conta quando?', 'dica'),
+]
+
+
+@pytest.mark.parametrize('pergunta, codigo', G4_G08)
+def test_g4_g08_dinheiro_que_cai_na_conta(pergunta, codigo):
+    _g4(pergunta, codigo)
+
+
+# ---------- G9: comprar ou vender na regra do imposto, do IOF e da data com não é dica ----------
+
+G4_G09 = [
+    ('se eu vender minhas acoes pago imposto?', None),
+    ('vender bitcoin paga imposto?', None),
+    ('tenho que pagar imposto se vender bitcoin?', None),
+    ('preciso declarar cripto mesmo sem vender?', None),
+    ('quem compra bitcoin precisa declarar?', None),
+    ('comprar dolar paga iof de quanto?', None),
+    ('iof na compra de dolar quanto é', None),
+    ('vou comprar 1000 dolares pra viagem, quanto pago de iof?', None),
+    ('quero comprar 500 euros pra viagem, quanto custa em reais hj?', None),
+    ('quem vende cripto acima de 35 mil paga quanto?', None),
+    ('se eu comprar na data com eu recebo dividendo?', None),
+    ('se eu vender depois da data com eu ainda recebo?', None),
+    ('qual o imposto se eu vender bitcoin?', None),
+    ('se eu vender mais de 35 mil de bitcoin pago imposto?', None),
+    ('quem vende ações paga IR?', None),
+    ('vender bitcoin pra comprar ethereum paga imposto?', None),
+    ('comprar dólar no cartão tem iof?', None),
+    ('caso eu venda bitcoin preciso declarar?', None),
+    ('vou comprar 2 mil dólares pra viagem, quanto dá em reais?', None),
+    ('quem compra depois da data ex recebe o dividendo?', None),
+    ('vender bitcoin paga imposto? preciso declarar?', None),
+    ('vendo agora pra não pagar IR?', 'dica'),
+    ('vendo meu bitcoin pra não pagar imposto?', 'dica'),
+    ('vender bitcoin? paga imposto?', 'dica'),
+    ('compro bitcoin? paga imposto?', 'dica'),
+    ('se eu vender agora, pago imposto?', 'dica'),
+    ('vender bitcoin por causa do imposto?', 'dica'),
+    ('preciso vender bitcoin pra pagar o imposto?', 'dica'),
+    ('comprar dólar em espécie ou cartão, qual paga menos IOF?', ''),
+    ('vale comprar antes da data com?', 'dica'),
+    ('se eu comprar na data com, vale a pena?', 'dica'),
+    ('comprar petr4 paga imposto? é bom?', 'dica'),
+    ('comprar petr4 paga imposto, é bom?', 'dica'),
+    ('vender bitcoin paga imposto? é uma boa?', 'dica'),
+    ('vender bitcoin paga imposto? é certo?', 'dica'),
+    ('vender bitcoin paga imposto? pode ser?', 'dica'),
+    ('vender petr4 paga imposto? e prio?', 'dica'),
+    ('quero comprar euros pra viagem', 'dica'),
+    ('vou comprar dólar pra viagem, é uma boa hora?', ''),
+    ('coloco PETR4 na declaração ou vendo antes?', 'dica'),
+    ('se eu comprar na data com eu recebo dividendo? compro?', 'dica'),
+]
+
+
+@pytest.mark.parametrize('pergunta, codigo', G4_G09)
+def test_g4_g09_comprar_e_vender_na_regra(pergunta, codigo):
+    _g4(pergunta, codigo)
+
+
+# ---------- G10: compensar prejuízo no IR é regra, não "compensa comprar?" ----------
+
+G4_G10 = [
+    ('como funciona a compensacao de prejuizo no ir', None),
+    ('prejuizo em acao pode compensar?', None),
+    ('posso compensar prejuizo de day trade com swing trade?', None),
+    ('se eu tiver prejuizo em bitcoin posso compensar?', None),
+    ('compensar prejuizo de acao no imposto como faz', None),
+    ('compensa comprar petrobras?', 'dica'),
+    ('compensa?', 'dica'),
+    ('to no prejuizo, compensa?', 'dica'),
+    ('petr4 caiu, to no prejuizo, compensa?', 'dica'),
+    ('to no prejuizo em petr4, compensa segurar?', 'dica'),
+    ('compensa vender no prejuizo?', 'dica'),
+    ('vale a pena compensar prejuizo?', 'dica'),
+    ('posso compensar o prejuizo comprando mais?', 'dica'),
+    ('posso compensar o prejuizo aportando mais na petr4?', 'dica'),
+    ('da pra compensar o prejuizo operando day trade?', 'dica'),
+    ('como compensar o prejuizo que tive na petr4?', 'dica'),
+    ('compensa realizar o prejuizo?', 'dica'),
+    ('compensa zerar no prejuizo?', 'dica'),
+    ('devo vender pra compensar prejuizo no ir?', 'dica'),
+    ('compensa fii pelo imposto?', 'dica'),
+    ('compensaria comprar bitcoin agora?', 'dica'),
+]
+
+
+@pytest.mark.parametrize('pergunta, codigo', G4_G10)
+def test_g4_g10_compensacao_de_prejuizo(pergunta, codigo):
+    _g4(pergunta, codigo)
+
+
+# ---------- G11: a definição de stop, ordem e opção de compra é conceito (P5) ----------
+
+G4_G11 = [
+    ('o que é stop loss', None),
+    ('o que é stop gain', None),
+    ('o que e ordem stop', None),
+    ('como funciona o stop no mini indice', None),
+    ('o que é opção de compra', None),
+    ('o que é spread de compra e venda', None),
+    ('o que e dolar compra e dolar venda', None),
+    ('o que é ordem de compra a mercado', None),
+    ('compra e venda no mesmo dia e day trade?', None),
+    ('o que é vender a descoberto', None),
+    ('o dolar do cartao vai ser o do dia da compra?', None),
+    ('o que é o stop loss?', None),
+    ('o que é stop móvel?', None),
+    ('pra que serve o stop?', None),
+    ('me explica stop loss', None),
+    ('qual a diferença entre stop loss e stop gain?', None),
+    ('o dolar do meu cartao vai ser o do dia da compra?', None),
+    ('a compra e venda de ações no mesmo dia paga imposto?', None),
+    ('o IOF é cobrado na data da compra?', None),
+    ('qual o stop ideal pro mini indice amanhã?', ''),
+    ('onde coloco o stop?', ''),
+    ('qual stop eu uso no win?', ''),
+    ('o que é stop loss? qual eu uso no win?', ''),
+    ('o que é stop? põe em 2%', ''),
+    ('o que é stop loss? usa 2%?', ''),
+    ('explica o stop gain e me diz onde colocar', ''),
+    ('o que é stop loss e vale a pena usar?', ''),
+    ('o que é vender a descoberto e devo fazer na petr4?', ''),
+    ('compro opção de compra de petr4?', ''),
+    ('opção de compra da petr4 tá barata?', ''),
+    ('o que é opção de compra? compro na petr4?', ''),
+    ('o que é ordem de compra? mando uma pra petr4?', ''),
+    ('ordem de compra ou de venda na petr4 agora?', ''),
+    ('compra e venda petr4 hoje?', ''),
+    ('faço compra e venda no mesmo dia?', ''),
+    ('hoje é dia da compra?', ''),
+    ('é dia de compra?', ''),
+    ('compra?', ''),
+    ('compra dólar?', ''),
+]
+
+
+@pytest.mark.parametrize('pergunta, codigo', G4_G11)
+def test_g4_g11_conceito_de_stop_e_ordem(pergunta, codigo):
+    _g4(pergunta, codigo)
+
+
+# ---------- G12: "como comprar Tesouro?" é o passo a passo (P5); com momento, preço ou escolha continua dica ----------
+
+G4_G12 = [
+    ('como comprar tesouro direto', None),
+    ('como compra acao', None),
+    ('como vender acoes no home broker', None),
+    ('como comprar dolar pra viagem', None),
+    ('como eu compro tesouro selic?', None),
+    ('como compro acoes?', None),
+    ('como vendo minhas acoes?', None),
+    ('como faço pra comprar tesouro direto?', None),
+    ('como faz pra comprar ação?', None),
+    ('como se compra tesouro?', None),
+    ('como que compra ação?', None),
+    ('como posso comprar tesouro direto?', None),
+    ('como comprar bitcoin?', None),
+    ('como vender bitcoin?', None),
+    ('como comprar e vender ações?', None),
+    ('Como comprar Tesouro Direto pelo app?', None),
+    ('como compro dólar em espécie?', None),
+    ('como vender minha petr4?', None),
+    ('como eu vendo meu bitcoin?', None),
+    ('como comprar ações da petrobras?', None),
+    ('como compra dólar?', None),
+    ('como eu faço para vender minhas ações?', None),
+    ('como comprar FII?', None),
+    ('como vende tesouro direto antes do vencimento?', None),
+    ('como comprar dolar pra viagem e quanto custa o IOF?', None),
+    ('como funciona pra comprar tesouro direto?', None),
+    ('bom dia, como compro tesouro?', None),
+    ('como vender ação a descoberto?', None),
+    ('como comprar contrato de mini índice?', None),
+    ('como eu compro dólar pra viajar pros EUA?', None),
+    ('como a gente compra ação na B3?', None),
+    ('como vender tesouro selic?', None),
+    ('como comprar fundo imobiliário?', None),
+    ('cara, como compro tesouro?', None),
+    ('como comprar renda fixa?', None),
+    ('como comprar cotas de um fundo?', None),
+    ('como comprar CDB?', None),
+    ('como comprar ouro?', None),
+    ('como comprar ETF?', None),
+    ('como comprar BOVA11?', None),
+    ('como vender o dólar que sobrou da viagem?', None),
+    ('como comprar euro pra viagem?', None),
+    ('como compro tesouro ipca?', None),
+    ('como funciona pra vender ações?', None),
+    ('como eu vendo bitcoin na exchange?', None),
+    ('como comprar na baixa?', ''),
+    ('como comprar barato e vender caro?', ''),
+    ('como comprar petr4 agora?', ''),
+    ('como comprar dolar hoje?', ''),
+    ('como vender no topo?', ''),
+    ('como compro dolar mais barato pra viagem?', ''),
+    ('como compro petr4 antes do 2º turno?', ''),
+    ('como vender antes de cair?', ''),
+    ('como comprar pra lucrar?', ''),
+    ('como comprar ações pra ganhar dinheiro?', ''),
+    ('devo comprar? como compro?', ''),
+    ('como compro? vale a pena?', ''),
+    ('como compro mais petr4?', ''),
+    ('como comprar a petr4 na hora certa?', ''),
+    ('como vender minha petr4 sem perder?', ''),
+    ('como comprar dolar sem pagar caro?', ''),
+    ('como eu compraria petrobras?', ''),
+    ('como você compraria petrobras?', ''),
+    ('qual a melhor forma de comprar dolar?', ''),
+    ('onde compro dólar pra viagem?', ''),
+    ('compro tesouro direto?', ''),
+    ('como comprar bitcoin, qual exchange?', ''),
+    ('como compro petr4 depois da eleição?', ''),
+    ('como vender na alta?', ''),
+    ('petr4 caiu, como compro?', ''),
+    ('o dólar tá subindo, como compro?', ''),
+    ('como compro com 5 mil reais?', ''),
+    ('como compro o melhor tesouro?', ''),
+    ('quando comprar tesouro direto?', ''),
+    ('como comprar dolar quando cair?', ''),
+    ('como comprar ações que vão subir?', ''),
+    ('como comprar tesouro se a selic cair?', ''),
+    ('como vender bitcoin no pico?', ''),
+    ('como compro petr4 já?', ''),
+    ('como comprar o fundo do poço?', ''),
+    ('como vendo antes do copom?', ''),
+    ('como compro tesouro, compensa?', ''),
+    ('como compra e vende pra ganhar?', ''),
+    ('como compro dolar ou euro?', ''),
+    ('como compro quantas ações?', ''),
+    ('como comprar petrobras e quanto colocar?', ''),
+    ('como comprar acao boa?', ''),
+    ('como comprar acao certa?', ''),
+    ('como comprar as melhores acoes?', ''),
+    ('como compro ações baratas?', ''),
+    ('como compro ação que paga dividendo?', ''),
+    ('como compro ações pra longo prazo?', ''),
+    ('como compro tesouro pra aposentadoria?', ''),
+    ('como comprar a memecoin do candidato?', ''),
+    ('como compro bitcoin antes do halving?', ''),
+    ('como comprar dólar pra viagem, agora ou depois do 2º turno?', ''),
+    ('como compro petr4 pra vender amanhã?', ''),
+    ('como compro mini índice pra day trade e lucrar?', ''),
+    ('como vender minhas ações da petrobras se o lula ganhar?', ''),
+    ('como comprar ações com pouco dinheiro?', ''),
+    ('como comprar petr4 com segurança?', ''),
+    ('tenho 60 anos, como compro tesouro?', ''),
+    ('como compro tesouro, é bom pra mim?', ''),
+    ('como comprar ações mais caras?', ''),
+    ('como compro ações no fundo do poço?', ''),
+    ('como comprar dólar pra viagem mais em conta?', ''),
+    ('como vender e lucrar?', ''),
+]
+
+
+@pytest.mark.parametrize('pergunta, codigo', G4_G12)
+def test_g4_g12_como_comprar(pergunta, codigo):
+    _g4(pergunta, codigo)
+
+
+# ---------- G13: o custo, o IOF e o prazo da remessa são regra, não quanto mover ----------
+
+G4_G13 = [
+    ('quanto de iof pago pra mandar dinheiro pro meu filho no exterior', None),
+    ('quanto custa mandar dinheiro pro exterior?', None),
+    ('quanto tempo leva pra mandar dinheiro pro exterior?', None),
+    ('quanto pago de iof pra mandar dinheiro pra fora?', None),
+    ('quanto de imposto pago pra trazer dinheiro de fora?', None),
+    ('quanto de taxa pago pra converter real em dolar?', None),
+    ('quanto cobram pra enviar dinheiro pro exterior?', None),
+    ('quanto demora pra transferir dinheiro pro exterior?', None),
+    ('tenho 20 mil euros, quanto de iof pago pra trazer?', None),
+    ('quanto sai o iof se eu trouxer 50 mil euros?', None),
+    ('quanto eu trago?', 'capital'),
+    ('quanto devo mandar pro exterior?', 'capital'),
+    ('quanto do meu dinheiro eu mando pra fora?', 'capital'),
+    ('quanto mando sem pagar iof?', 'capital'),
+    ('quanto sai mandar tudo?', 'capital'),
+    ('quanto de iof pago e quanto devo mandar?', 'capital'),
+    ('quanto custa e quanto eu trago?', 'capital'),
+    ('com o iof alto, quanto eu mando?', 'capital'),
+    ('quanto tempo espero pra trocar?', ''),
+    ('quanto tempo leva pra eu trazer tudo?', 'capital'),
+    ('quanto custa mandar 10 mil reais pro exterior?', 'capital'),
+    ('quanto custa mandar dinheiro pro exterior, mando agora ou depois do turno?', 'momento'),
+    ('quanto custa trazer meus euros? devo trazer?', 'dica'),
+]
+
+
+@pytest.mark.parametrize('pergunta, codigo', G4_G13)
+def test_g4_g13_custo_da_remessa(pergunta, codigo):
+    _g4(pergunta, codigo)
+
+
+# ---------- G14: o "por mês" do rendimento, do limite da isenção e do gasto da viagem não é capital ----------
+
+G4_G14 = [
+    ('quanto rende a poupanca por mes', None),
+    ('o cdi rende quanto por mes', None),
+    ('quanto e 13,75% ao ano por mes', None),
+    ('qual o limite de isencao da cripto por mes', None),
+    ('quem vende ate 20 mil em acoes por mes e isento?', None),
+    ('vou fazer intercambio, preciso de 800 dolares por mes, quanto da em reais', None),
+    ('a corretora cobra quanto por mes?', None),
+    ('o darf e pago por mes?', None),
+    ('gasto 2 mil euros por mes, quanto da em reais?', None),
+    ('qual o rendimento da poupanca por mes hoje?', None),
+    ('juros de 1% por mes e muito?', None),
+    ('o cdb rende quanto por mes, qual o melhor?', ''),
+    ('quanto preciso ter na poupanca pra render 2 mil por mes?', 'capital'),
+    ('a taxa da corretora e 10 reais por mes, vale abrir conta?', ''),
+    ('pago 3 mil de aluguel por mes, onde invisto o resto?', ''),
+    ('ganho 5 mil por mes, onde invisto?', 'capital'),
+    ('invisto 500 por mes, quanto rende?', 'capital'),
+    ('quanto investir por mes pra me aposentar?', 'capital'),
+]
+
+
+@pytest.mark.parametrize('pergunta, codigo', G4_G14)
+def test_g4_g14_por_mes_que_nao_e_capital(pergunta, codigo):
+    r = _g4(pergunta, codigo)
+    if codigo is None and 'quanto da em reais' in pergunta:
+        assert r.pedido.conta_cambio, r.pedido
+
+
+# ---------- G15: o valor que ela tem na pergunta da declaração é o dado da regra (P5) ----------
+
+G4_G15 = [
+    ('tenho 5 mil em bitcoin, preciso declarar?', None),
+    ('tenho 10 mil em acoes, preciso declarar?', None),
+    ('tenho 3 mil em bitcoin, tenho que declarar?', None),
+    ('faco um aporte por mes, preciso declarar todo mes?', None),
+    ('tenho R$ 5 mil em bitcoin, preciso declarar?', None),
+    ('tenho 10 mil dólares em bitcoin, preciso declarar?', None),
+    ('tenho 2 mil em cripto, tenho que declarar no imposto de renda?', None),
+    ('tenho 5 mil em bitcoin, onde declaro?', None),
+    ('tenho 4 mil em bitcoin, sou isento?', None),
+    ('tenho 8k em btc, precisa declarar?', None),
+    ('se eu passar de R$ 35 mil por mês em bitcoin pago imposto?', None),
+    ('tenho 20 mil, onde invisto pra não pagar imposto?', ''),
+    ('tenho 5 mil reais, qual investimento é isento de IR?', ''),
+    ('tenho 10 mil em bitcoin, vale a pena declarar?', ''),
+    ('tenho 5 mil em bitcoin, preciso declarar ou vendo antes?', ''),
+    ('tenho 100 mil, como pago menos imposto?', ''),
+    ('tenho 30 mil, aplico em LCI que é isenta?', ''),
+    ('tenho 50 mil, preciso declarar? o dolar vai subir?', ''),
+    ('tenho 5 mil reais, a gasolina chegou a R$ 7?', ''),
+    ('faco um aporte, pra nao pagar imposto?', ''),
+    ('aporto em bitcoin?', ''),
+]
+
+
+@pytest.mark.parametrize('pergunta, codigo', G4_G15)
+def test_g4_g15_declaracao_com_o_valor(pergunta, codigo):
+    _g4(pergunta, codigo)
+
+
+# ---------- G16: o horário da B3 e a agenda de amanhã são calendário (P5) ----------
+
+G4_G16 = [
+    ('a b3 abre que horas?', None),
+    ('que horas abre a b3', None),
+    ('a bolsa fecha que horas', None),
+    ('a b3 abre no carnaval?', None),
+    ('a b3 abre no feriado de 20 de novembro?', None),
+    ('a bolsa abre amanha?', None),
+    ('copom é amanha?', None),
+    ('o ipca sai amanha?', None),
+    ('a ata do copom sai amanha?', None),
+    ('a bolsa abre no sábado?', None),
+    ('que horas fecha o pregão?', None),
+    ('a bolsa fecha na sexta-feira santa?', None),
+    ('o mercado abre amanhã?', None),
+    ('amanhã tem copom?', None),
+    ('será que o copom é amanhã?', None),
+    ('o tesouro direto fecha que horas?', None),
+    ('a bolsa abre no natal e no ano novo?', None),
+    ('a bolsa abre em alta amanhã?', ''),
+    ('o dólar fecha em alta hoje?', ''),
+    ('a bolsa abre em queda no carnaval?', ''),
+    ('o ibovespa fecha acima de 130 mil no dia 30?', ''),
+    ('o dólar fecha a 6 no natal?', ''),
+    ('o ibovespa fecha no positivo no dia 20?', ''),
+    ('o ibovespa fecha como amanhã?', ''),
+    ('a bolsa abre bem amanhã?', ''),
+    ('a bolsa abre com gap amanhã?', ''),
+    ('o ibovespa fecha quanto no natal?', ''),
+    ('o dólar abre em alta segunda?', ''),
+    ('o ibovespa abre amanhã?', ''),
+    ('o ibovespa fecha hoje?', ''),
+    ('copom é amanhã, compro dólar?', ''),
+    ('copom é amanhã, é a hora?', ''),
+    ('copom é amanhã, entro?', ''),
+    ('copom é amanhã, aproveito?', ''),
+    ('copom é amanhã, posso esperar?', ''),
+    ('copom é amanhã: o que acontece com o dólar?', ''),
+    ('o fed é amanhã, bitcoin?', ''),
+    ('copom amanhã', ''),
+    ('o ipca sai amanhã, a bolsa sobe?', ''),
+    ('o copom é amanhã, vai cortar?', ''),
+    ('o payroll sai amanhã, opero?', ''),
+    ('e amanhã?', ''),
+    ('compro amanhã?', ''),
+    ('qual o stop ideal para o mini-índice amanhã?', ''),
+    ('a bolsa abre no carnaval, aproveito?', ''),
+    ('a b3 abre que horas? quero pegar a abertura', ''),
+    ('a b3 abre que horas pra eu entrar?', ''),
+    ('a bolsa abre no feriado? e o dólar?', ''),
+    ('a b3 abre amanhã? compro petr4 na abertura?', ''),
+]
+
+
+@pytest.mark.parametrize('pergunta, codigo', G4_G16)
+def test_g4_g16_horario_da_b3_e_agenda_de_amanha(pergunta, codigo):
+    _g4(pergunta, codigo)
+
+
+# ---------- G17: "quando vai sair o IPCA?" e "quanto vai sair 1000 dólares?" não são sair da posição ----------
+
+G4_G17 = [
+    ('quando vai sair o ipca de outubro?', None),
+    ('a decisao do copom vai sair que horas?', None),
+    ('quando vai sair o resultado do segundo turno', None),
+    ('quando vai sair o balanco da petrobras?', None),
+    ('quanto vai sair 1000 dolares em reais', None),
+    ('o ipca vai sair quando?', None),
+    ('quando vai sair a ata do copom?', None),
+    ('quando vai sair o focus?', None),
+    ('devo sair da PETR4?', ''),
+    ('sair agora?', ''),
+    ('vai sair da mínima?', ''),
+    ('o dólar vai sair de 5 pra 6?', ''),
+    ('quanto vai sair o dólar no fim do ano?', ''),
+    ('quanto vai sair o dólar?', ''),
+    ('o ipca vai sair alto?', ''),
+    ('a ata vai sair dura?', ''),
+    ('vai sair o ipca alto?', ''),
+    ('o balanço vai sair forte?', ''),
+    ('o resultado da eleição vai sair a favor do lula?', ''),
+    ('vai sair reajuste?', ''),
+    ('quando vai sair o dividendo da petrobras?', ''),
+    ('quando vai sair o ipca, hora de comprar?', ''),
+    ('quando vai sair a decisão do copom pra eu entrar?', ''),
+    ('quando vai sair o resultado do segundo turno pra eu sair da petr4?', ''),
+    ('quanto vai sair 1000 dolares em reais, troco agora?', ''),
+]
+
+
+@pytest.mark.parametrize('pergunta, codigo', G4_G17)
+def test_g4_g17_quando_vai_sair(pergunta, codigo):
+    _g4(pergunta, codigo)
+
+
+# ---------- G18: a adequação a um parente ou ao iniciante é perfil (N5) ----------
+
+G4_G18 = [
+    ('dolar pro meu filho de 18?', 'perfil'),
+    ('bitcoin pro meu filho de 18?', 'perfil'),
+    ('bolsa pro meu filho de 18?', 'perfil'),
+    ('petr4 pro meu filho de 18?', 'perfil'),
+    ('win pro meu filho de 18?', 'perfil'),
+    ('tesouro pro meu filho?', 'perfil'),
+    ('memecoin pro meu sobrinho?', 'perfil'),
+    ('euro pra minha avo?', 'perfil'),
+    ('petr4 pra minha mae aposentada?', 'perfil'),
+    ('dolar e bom pro meu filho?', 'perfil'),
+    ('win serve pra iniciante?', 'perfil'),
+    ('bitcoin serve pra iniciante?', 'perfil'),
+    ('sou iniciante, opero win?', ''),
+    ('petr4 e boa pra iniciante?', 'perfil'),
+    ('tesouro e bom pra iniciante?', 'perfil'),
+    ('memecoin e pra iniciante?', 'perfil'),
+    ('acoes servem pra quem ta comecando?', 'perfil'),
+    ('day trade serve pra iniciante?', 'perfil'),
+    ('dolar é bom pro meu pai?', 'perfil'),
+    ('bitcoin serve pros meus pais?', 'perfil'),
+    ('win é pra iniciante?', 'perfil'),
+    ('que livro é indicado pra iniciante?', None),
+    ('o curso serve pra iniciante?', None),
+    ('a isenção de 20 mil serve pra iniciante?', None),
+    ('o imposto do day trade é igual pra iniciante?', None),
+    ('o simulador da b3 serve pra iniciante?', None),
+    ('o que é bom pra iniciante estudar primeiro?', None),
+    ('o dólar alto é bom pro meu país?', None),
+    ('o dólar alto é bom pro exportador?', None),
+    ('o dólar baixo é bom pro meu intercâmbio?', None),
+    ('como mandar euro pro meu filho que mora em portugal?', None),
+    ('quanto custa o euro pra minha avó levar na viagem?', None),
+    ('qual o horário do win pra quem tá começando?', None),
+    ('o tesouro direto serve pra quem quer reserva?', None),
+    ('o 13o do inss é pra aposentados?', None),
+    ('o brent alto é bom pra ela, a petrobras?', None),
+    ('opero win?', 'dica'),
+    ('sou iniciante, posso abrir conta na corretora?', None),
+    ('eu opero win há 2 anos, como funciona o ajuste diário?', None),
+    ('opero win amanhã?', 'dica'),
+    ('sou aposentado, compro petr4?', 'perfil'),
+    ('como compro tesouro? sou iniciante', None),
+    ('qual horario eu opero o win?', None),
+    ('como eu opero win?', 'dica'),
+]
+
+
+@pytest.mark.parametrize('pergunta, codigo', G4_G18)
+def test_g4_g18_perfil_de_parente_e_de_iniciante(pergunta, codigo):
+    _g4(pergunta, codigo)
+
+
+# ---------- G19: "o dólar caiu, aproveito?" e "o euro subiu, espero?" pedem o que fazer e quando ----------
+
+G4_G19 = [
+    ('o dolar caiu 2% essa semana, aproveito?', 'dica'),
+    ('a petr4 caiu, aproveito?', 'dica'),
+    ('o bitcoin caiu 15%, aproveito?', 'dica'),
+    ('aproveito o dolar baixo?', 'dica'),
+    ('o dolar caiu, espero?', 'momento'),
+    ('o euro subiu, espero?', 'momento'),
+    ('a petr4 caiu, espero mais?', 'momento'),
+    ('o bitcoin caiu, espero?', 'momento'),
+    ('o dolar ta pela hora da morte, espero?', 'momento'),
+    ('espero?', 'momento'),
+    ('aproveito agora?', ''),
+    ('o dólar caiu, dá pra aproveitar?', ''),
+    ('o ibovespa caiu 3%, vale aproveitar?', ''),
+    ('o euro caiu, aproveito ou espero?', ''),
+    ('o dólar subiu, espero ele baixar?', ''),
+    ('aproveito pra perguntar: o que é a Selic?', None),
+    ('como aproveitar a isenção de 20 mil das ações?', None),
+    ('posso aproveitar o prejuízo da bolsa no IR?', None),
+    ('o Copom aproveitou para sinalizar cortes?', None),
+    ('em 2020 quem aproveitou a queda da bolsa ganhou?', None),
+    ('o que eu espero do Copom?', None),
+    ('espero que o Copom explique o corte, o que diz a ata?', None),
+    ('a restituição do IR ainda não caiu, espero?', None),
+    ('o dinheiro da venda das ações não caiu na conta, espero?', None),
+    ('o que significa aproveitar o momento no mercado?', None),
+    ('espero que sim', None),
+]
+
+
+@pytest.mark.parametrize('pergunta, codigo', G4_G19)
+def test_g4_g19_aproveito_e_espero(pergunta, codigo):
+    _g4(pergunta, codigo)
+
+
+# ---------- G20: "bitcoin é um bom investimento?" e "dólar a 5,04 é uma boa?" são juízo de compra (N1) ----------
+
+G4_G20 = [
+    ('bitcoin e um bom investimento?', 'dica'),
+    ('o dolar e um bom investimento?', 'dica'),
+    ('memecoin e um bom investimento?', 'dica'),
+    ('petr4 e um bom negocio?', 'dica'),
+    ('dolar ta valendo a pena?', 'dica'),
+    ('bitcoin ta valendo a pena?', 'dica'),
+    ('bolsa ta valendo a pena?', 'dica'),
+    ('petr4 ta valendo a pena?', 'dica'),
+    ('dolar a 5,04 e uma boa?', 'dica'),
+    ('bitcoin a 100 mil e uma boa?', 'dica'),
+    ('petr4 a 30 e uma boa?', 'dica'),
+    ('ipca+ 7 e uma boa?', 'dica'),
+    ('o ipca+ 7% ta bom?', 'dica'),
+    ('o prefixado ta bom?', 'dica'),
+    ('o tesouro ipca ta bom?', 'dica'),
+    ('a bolsa ta boa?', 'dica'),
+    ('o dolar ta bom?', 'dica'),
+    ('o euro ta bom?', 'dica'),
+    ('is bitcoin a good investment?', 'dica'),
+    ('bitcoin ainda é um bom investimento?', 'dica'),
+    ('o bitcoin segue um bom investimento?', 'dica'),
+    ('o tesouro ipca+ 2035 tá bom?', 'dica'),
+    ('o que é um bom investimento?', None),
+    ('o dólar alto é bom?', None),
+    ('a petrobras é uma boa empresa pra trabalhar?', None),
+    ('o bitcoin foi um bom investimento em 2021?', None),
+    ('a petrobras fez um bom negócio vendendo a refinaria?', None),
+    ('como saber se uma ação é um bom investimento?', None),
+    ('o ipca ta bom?', None),
+    ('a economia tá boa?', None),
+    ('a nova regra do imposto já tá valendo?', None),
+    ('o euro tá quanto pra viagem?', None),
+    ('o yield do Tesouro está alto?', None),
+    ('o tesouro selic é garantido?', None),
+    ('o bitcoin é bom pra quê?', None),
+    ('a selic alta é boa?', None),
+    ('o dólar a 4 foi uma boa?', None),
+    ('tá bom, e o imposto do bitcoin?', None),
+    ("what's a good investment?", None),
+]
+
+
+@pytest.mark.parametrize('pergunta, codigo', G4_G20)
+def test_g4_g20_bom_investimento(pergunta, codigo):
+    _g4(pergunta, codigo)
+
+
+# ---------- G21: "PETR4 é boa pra dividendos?" é juízo sobre o emissor (M2) ----------
+
+G4_G21 = [
+    ('petr4 e boa pra dividendos?', 'ranking'),
+    ('petr4 da bons dividendos?', 'ranking'),
+    ('petr4 serve pra dividendos?', 'ranking'),
+    ('petrobras e boa pra renda passiva?', 'ranking'),
+    ('vale3 e boa pra dividendos?', 'ranking'),
+    ('petr4 é uma ação boa pra dividendos?', 'ranking'),
+    ('petr4 é boa pra quem quer dividendos?', 'ranking'),
+    ('a petrobras tem bons dividendos?', 'ranking'),
+    ('petr4 rende bons dividendos?', 'ranking'),
+    ('bbas3 é bom pra dividendos?', 'ranking'),
+    ('itub4 serve pra renda passiva?', 'ranking'),
+    ('petrobras é a melhor pra dividendos?', 'ranking'),
+    ('a petrobras serve pra quem quer receber dividendos todo mes?', 'ranking'),
+    ('Petrobras pagou bons dividendos em 2022?', None),
+    ('a petrobras deu bons dividendos em 2022?', None),
+    ('petr4 foi boa pra dividendos em 2022?', None),
+    ('o que é boa pagadora de dividendos?', None),
+    ('como saber se uma acao e boa pra dividendos?', None),
+    ('empresas que dão bons dividendos pagam imposto?', None),
+    ('o que é uma ação que dá bons dividendos?', None),
+    ('o fundo tem bons dividendos?', None),
+    ('petr4 é renda variável?', None),
+    ('a petrobras é uma boa empresa pra trabalhar?', None),
+    ('a data com da petr4 serve pra quê?', None),
+    ('o JCP da petrobras tem imposto?', None),
+    ('o dividendo da petr4 é isento de imposto?', None),
+    ('como declarar dividendos da petr4 no imposto de renda?', None),
+    ('a petrobras tem bom historico de dividendos?', None),
+    ('qual a melhor forma de receber dividendos da petr4?', None),
+]
+
+
+@pytest.mark.parametrize('pergunta, codigo', G4_G21)
+def test_g4_g21_boa_pra_dividendos(pergunta, codigo):
+    _g4(pergunta, codigo)
+
+
+# ---------- G22: "quantos win eu opero?" é número de contratos (N5) ----------
+
+G4_G22 = [
+    ('quantos win eu opero?', 'capital'),
+    ('quantos mini dolar eu opero?', 'capital'),
+    ('quanto mini dolar eu opero?', 'capital'),
+    ('quantos mini indice eu opero?', 'capital'),
+    ('quantas cotas de bova11?', 'capital'),
+    ('cuanto invierto en bitcoin?', 'capital'),
+    ('quantos win eu opero se o indice andar 1000 pontos?', 'capital'),
+    ('quantas cotas de bova11 eu compro?', 'capital'),
+    ('quantas ações da petrobras eu compro com 5 mil?', 'capital'),
+    ('quantos bitcoin da pra comprar com 100 reais?', 'capital'),
+    ('quantos win eu devo operar?', 'capital'),
+    ('quantos lotes de petr4 eu compro?', 'capital'),
+    ('quanto vale um ponto do win?', None),
+    ('quantas ações tem o ibovespa?', None),
+    ('quantas ações compõem o ibovespa?', None),
+    ('quantas ações eu preciso ter pra receber dividendo?', None),
+    ('quantas ações tem um lote padrão?', None),
+    ('quantas cotas tem o bova11?', None),
+    ('quantos bitcoins existem?', None),
+    ('quantas ações a petrobras tem?', None),
+    ('quantos win são negociados por dia na b3?', None),
+    ('quantos win o day trader médio opera?', None),
+    ('se eu operar 2 win e o indice andar 500 pontos, quanto dá?', None),
+    ('se eu tiver 1 contrato de win e o índice andar 1.000 pontos, quanto dá?', None),
+    ('quanto custa a margem de um win?', None),
+    ('quanto eu pago de imposto no day trade?', None),
+    ('quanto de imposto eu pago no bitcoin?', None),
+    ('quantas ações eu posso ter pra ficar isento?', None),
+    ('quantas cotas eu posso ter num fii?', None),
+    ('quanto pego de restituição no ir?', None),
+    ('quantos dólares eu levo pra viagem?', None),
+    ('quantas vezes o copom cortou a selic em 2025?', None),
+]
+
+
+@pytest.mark.parametrize('pergunta, codigo', G4_G22)
+def test_g4_g22_quantos_contratos(pergunta, codigo):
+    _g4(pergunta, codigo)
+
+
+# ---------- G23: "tesouro ipca ou prefixado?" e "win ou wdo?" é escolha entre classes (N5) ----------
+
+G4_G23 = [
+    ('opero win ou wdo?', 'comparar'),
+    ('win ou wdo?', 'comparar'),
+    ('wdo ou dolar a vista?', 'comparar'),
+    ('tesouro ipca ou prefixado?', 'comparar'),
+    ('prefixado ou pos fixado agora?', 'comparar'),
+    ('prefixado ou pos?', 'comparar'),
+    ('cdi ou ipca?', 'comparar'),
+    ('selic ou ipca?', 'comparar'),
+    ('renda fixa ou variavel?', 'comparar'),
+    ('dolar ou euro?', 'comparar'),
+    ('euro ou dolar?', 'comparar'),
+    ('tesouro ipca ou prefixado, qual pego?', 'comparar'),
+    ('qual a diferença entre prefixado e pós?', None),
+    ('dolar ou euro, qual a cotacao hoje?', None),
+    ('me explica prefixado ou pos', None),
+    ('o que é prefixado ou pós?', None),
+    ('como funciona prefixado ou pos?', None),
+    ('selic ou cdi, qual a diferença?', None),
+    ('dolar ou euro pra viagem a portugal?', None),
+    ('pre ou pos copom?', None),
+    ('o tesouro prefixado ou o ipca rendeu mais em 2022?', None),
+    ('o cdb rende cdi ou ipca?', None),
+    ('o tesouro selic é pré ou pós?', None),
+    ('o cartão cobra em dólar ou euro?', None),
+    ('o euro ou o dólar subiu mais esse ano?', None),
+]
+
+
+@pytest.mark.parametrize('pergunta, codigo', G4_G23)
+def test_g4_g23_escolha_entre_indexadores(pergunta, codigo):
+    _g4(pergunta, codigo)
+
+
+# ---------- G24: "travo a taxa?" é o "compro?" da renda fixa, e "a Selic chegou no pico?" é direção ----------
+
+G4_G24 = [
+    ('travo a taxa agora?', 'dica'),
+    ('travo no prefixado?', 'dica'),
+    ('travo a taxa do ipca+?', 'dica'),
+    ('o di subiu ontem, travo a taxa?', 'dica'),
+    ('a taxa ta boa pra travar?', 'dica'),
+    ('a selic chegou no pico?', 'direcao'),
+    ('os juros chegaram no pico?', 'direcao'),
+    ('a selic bateu no teto?', 'direcao'),
+    ('vale travar a taxa?', 'dica'),
+    ('é bom travar a taxa agora?', 'dica'),
+    ('travo agora?', 'dica'),
+    ('travo 7% no ipca+?', 'dica'),
+    ('ipca+ ta pagando bem, travo?', 'dica'),
+    ('o que é travar a taxa?', None),
+    ('como travo a taxa no tesouro?', None),
+    ('como eu travo a taxa?', None),
+    ('o que acontece se eu travo a taxa e resgato antes?', None),
+    ('a Selic chegou no pico em 2023?', None),
+    ('quando a selic chegou no pico?', None),
+    ('em 2016 a selic chegou no pico?', None),
+    ('o dolar chegou no pico na pandemia?', None),
+    ('a inflacao chegou no teto da meta?', None),
+    ('o governo bateu no teto de gastos?', None),
+    ('da pra travar a taxa do cambio pra viagem?', None),
+    ('o circuit breaker trava a bolsa?', None),
+    ('o que é ipca+?', None),
+    ('como é tributado o ipca+?', None),
+    ('o ipca+ paga cupom?', None),
+    ('quanto rende o ipca+?', None),
+]
+
+
+@pytest.mark.parametrize('pergunta, codigo', G4_G24)
+def test_g4_g24_travar_a_taxa(pergunta, codigo):
+    _g4(pergunta, codigo)
+
+
+# ---------- G25: crash, correção, bolha, bull/bear e "alta ou baixa?" são direção (N2) ----------
+
+G4_G25 = [
+    ('vai ter crash?', 'direcao'),
+    ('vem crash?', 'direcao'),
+    ('vai ter crash esse ano?', 'direcao'),
+    ('vai ter correcao?', 'direcao'),
+    ('o mercado vai corrigir?', 'direcao'),
+    ('a bolsa vai corrigir?', 'direcao'),
+    ('vem uma queda forte?', 'direcao'),
+    ('a bolsa ta em bolha?', 'direcao'),
+    ('o bitcoin ta em bolha?', 'direcao'),
+    ('vai ter bolha?', 'direcao'),
+    ('vem recessao?', 'direcao'),
+    ('bull ou bear?', 'direcao'),
+    ('ta bull ou bear?', 'direcao'),
+    ('estamos em bear market?', 'direcao'),
+    ('o bitcoin ta bull?', 'direcao'),
+    ('bitcoin ta em bull market?', 'direcao'),
+    ('alta ou baixa?', 'direcao'),
+    ('dolar alta ou baixa?', 'direcao'),
+    ('is the market going to crash?', 'direcao'),
+    ('o crash de 2020', None),
+    ('como a bolsa se comportou no crash de 2020?', None),
+    ('a bolha de 2000', None),
+    ('teve crash em 2008?', None),
+    ('o bitcoin estava em bear market em 2022?', None),
+    ('o dolar fechou em alta ou baixa ontem?', None),
+    ('o ibovespa terminou 2022 em alta ou baixa?', None),
+    ('o que é bear market?', None),
+    ('o que significa bull e bear?', None),
+    ('bull ou bear, o que significa?', None),
+    ('o que e uma correcao?', None),
+    ('o que significa estar em alta ou em baixa?', None),
+    ('como sei se estamos em bear market?', None),
+    ('como saber se o bitcoin ta em bolha?', None),
+    ('a receita vai corrigir a tabela do ir?', None),
+    ('a tabela do ir vai ter correcao?', None),
+    ('a restituicao vem com correcao pela selic?', None),
+    ('a poupanca tem correcao monetaria?', None),
+    ('o fgts vai ter correcao?', None),
+    ('o banco vai corrigir o valor?', None),
+    ('o brasil esta em recessao?', None),
+    ('a passagem e mais cara na alta ou baixa temporada?', None),
+]
+
+
+@pytest.mark.parametrize('pergunta, codigo', G4_G25)
+def test_g4_g25_crash_bolha_bull_bear(pergunta, codigo):
+    _g4(pergunta, codigo)
+
+
+# ---------- G26: "meu tio comprou dólar, faço igual?" e "faço o quê com meus dólares?" pedem o que fazer ----------
+
+G4_G26 = [
+    ('meu tio comprou dolar, faco igual?', 'dica'),
+    ('meu amigo vendeu todo o bitcoin, faco o mesmo?', 'dica'),
+    ('meu amigo comprou bitcoin, faco o mesmo?', 'dica'),
+    ('meu pai vendeu petr4, faco igual?', 'dica'),
+    ('todo mundo vendeu, faco igual?', 'dica'),
+    ('meu primo entrou no win, sigo ele?', 'dica'),
+    ('copio a operacao do meu amigo no win?', 'dica'),
+    ('faco o que com meus dolares?', 'dica'),
+    ('faco o que com meu bitcoin?', 'dica'),
+    ('e agora, faço o que?', 'dica'),
+    ('que hago con mis dolares?', 'dica'),
+    ('meu tio comprou dólar, faço igual a ele?', 'dica'),
+    ('o influencer comprou petr4, sigo ele?', 'dica'),
+    ('dolar subiu, faço o que?', 'dica'),
+    ('imito o trade do meu primo?', 'dica'),
+    ('meu pai declarou o bitcoin assim, faço igual?', None),
+    ('meu amigo declarou o bitcoin, faço também?', None),
+    ('faço o mesmo procedimento pra declarar ETF?', None),
+    ('faço o que na declaração?', None),
+    ('faço o que pra declarar bitcoin?', None),
+    ('faço o que com o darf?', None),
+    ('vou viajar pra Europa, faço o que com o câmbio?', None),
+    ('faço o que pra pagar menos IOF no cartão?', None),
+    ('por que eu faço isso?', None),
+    ('como faço o mesmo cálculo pro dólar?', None),
+    ('se eu faço o mesmo com o dólar, pago imposto?', None),
+    ('copy trade é permitido no Brasil?', None),
+    ('como sigo o Copom ao vivo?', None),
+    ('sigo ele no instagram?', None),
+    ('faço o mesmo cálculo pro euro?', None),
+    ('o que eu faço pra entender o boletim Focus?', None),
+]
+
+
+@pytest.mark.parametrize('pergunta, codigo', G4_G26)
+def test_g4_g26_faco_igual(pergunta, codigo):
+    _g4(pergunta, codigo)
+
+
+# ---------- G27: "como me protejo da eleição?" é estratégia (N1, N5) ----------
+
+G4_G27 = [
+    ('como me protejo da eleicao?', 'dica'),
+    ('como me protejo da queda da bolsa?', 'dica'),
+    ('como me protejo do dolar?', 'dica'),
+    ('dolar protege da eleicao?', 'dica'),
+    ('o dólar protege da eleição?', 'dica'),
+    ('como me proteger da eleição?', 'dica'),
+    ('como se proteger da eleição?', 'dica'),
+    ('como posso me proteger da eleição?', 'dica'),
+    ('como faço pra me proteger da eleição?', 'dica'),
+    ('como proteger meus investimentos na eleição?', 'dica'),
+    ('como proteger a carteira na eleição?', 'dica'),
+    ('como blindar a carteira na eleição?', 'dica'),
+    ('preciso me proteger da eleição?', 'dica'),
+    ('tem como se proteger da eleição?', 'dica'),
+    ('quero me proteger da eleição', 'dica'),
+    ('como me protejo da alta do dólar?', 'dica'),
+    ('como me protejo da inflação?', 'dica'),
+    ('como me protejo da guerra?', 'dica'),
+    ('o dólar é um bom hedge pra eleição?', 'dica'),
+    ('dólar é proteção na eleição?', 'dica'),
+    ('qual a melhor proteção pra eleição?', 'dica'),
+    ('qual a melhor forma de se proteger da eleição?', 'dica'),
+    ('tenho 10 mil dólares, como me protejo da eleição?', 'dica'),
+    ('Eleição domingo. Como me protejo?', 'dica'),
+    ('como o investidor pode se proteger da eleição?', 'dica'),
+    ('o dólar protege a carteira na eleição?', 'dica'),
+    ('o que é hedge?', None),
+    ('como funciona o hedge?', None),
+    ('o que é hedge cambial?', None),
+    ('a Petrobras faz hedge?', None),
+    ('a Petrobras faz hedge do dólar?', None),
+    ('como a Petrobras se protege do dólar?', None),
+    ('como as empresas se protegem do dólar?', None),
+    ('o FGC me protege se a corretora quebrar?', None),
+    ('o FGC serve pra me proteger?', None),
+    ('o FGC protege o meu CDB?', None),
+    ('o FGC protege investimento em ações?', None),
+    ('como funciona a proteção do FGC?', None),
+    ('o dólar protegeu na eleição de 2018?', None),
+    ('o dólar protegeu nas eleições passadas?', None),
+    ('como os investidores se protegeram em 2022?', None),
+    ('como me proteger de golpe com cripto?', None),
+    ('como me protejo de golpe no pix?', None),
+    ('como se proteger de pirâmide financeira?', None),
+    ('como me protejo de golpe de investimento?', None),
+    ('o que significa se proteger no mercado?', None),
+    ('o que é um ativo de proteção?', None),
+    ('por que o ouro é visto como proteção?', None),
+    ('por que as pessoas compram dólar pra se proteger?', None),
+    ('por que o dólar protege na eleição?', None),
+    ('como o dólar protege na crise?', None),
+    ('o Tesouro IPCA protege da inflação?', None),
+    ('a poupança protege da inflação?', None),
+    ('o circuit breaker protege o investidor?', None),
+    ('o que é proteção de capital?', None),
+    ('o mini-dólar serve de hedge?', None),
+    ('ouro protege da inflação?', None),
+    ('bitcoin protege da inflação?', None),
+    ('o ouro protege da guerra?', None),
+    ('como proteger minha conta na corretora?', None),
+    ('como proteger meu bitcoin de hacker?', None),
+    ('como proteger minha senha da exchange?', None),
+    ('como proteger minha seed?', None),
+    ('como proteger meu CPF de golpe?', None),
+    ('vou viajar com 2 mil euros, quanto dá em reais?', None),
+    ('como declarar dólar no imposto de renda?', None),
+    ('o que aconteceu com o dólar na eleição de 2022?', None),
+    ('como o Banco Central protege o real?', None),
+    ('vou viajar pra Europa em dezembro, como me protejo do euro?', 'dica'),
+]
+
+
+@pytest.mark.parametrize('pergunta, codigo', G4_G27)
+def test_g4_g27_como_me_protejo(pergunta, codigo):
+    _g4(pergunta, codigo)
+
+
+# ---------- G28: "como você vê o dólar?" é a opinião sobre o rumo (N2) ----------
+
+G4_G28 = [
+    ('como voce ve o dolar pros proximos meses?', 'direcao'),
+    ('como ve o bitcoin pra 2027?', 'direcao'),
+    ('como voce ve o euro?', 'direcao'),
+    ('como ve a petr4?', 'direcao'),
+    ('como voce ve a selic em 2027?', 'direcao'),
+    ('como vc ve o ibovespa?', 'direcao'),
+    ('como voce enxerga o bitcoin?', 'direcao'),
+    ('como voces veem o dolar?', 'direcao'),
+    ('como voce ve o cenario pro dolar?', 'direcao'),
+    ('Como você vê o dólar?', 'direcao'),
+    ('como voce ve o ouro?', 'direcao'),
+    ('como voce ve a vale?', 'direcao'),
+    ('como eu vejo a cotacao do dolar?', None),
+    ('como vejo o informe?', None),
+    ('como ve o informe?', None),
+    ('como ver a cotacao do dolar?', None),
+    ('como se ve o preco do bitcoin?', None),
+    ('como voce ve a cotacao do dolar no app?', None),
+    ('como vejo o historico do ibovespa?', None),
+    ('como o mercado ve o dolar?', None),
+    ('como os economistas veem a selic?', None),
+    ('como a receita ve o bitcoin?', None),
+    ('como o banco central avalia a selic?', None),
+    ('como se avalia uma acao?', None),
+    ('como voce ve o bitcoin na declaracao?', None),
+    ('como ve o dolar turismo no cartao?', None),
+    ('como vc ve o iof do dolar?', None),
+    ('como voce ve o dolar no cartao de credito?', None),
+    ('como ve o dolar ptax?', None),
+]
+
+
+@pytest.mark.parametrize('pergunta, codigo', G4_G28)
+def test_g4_g28_como_voce_ve(pergunta, codigo):
+    _g4(pergunta, codigo)
+
+
+# Os dois ajustes pequenos: o número do NIVEL_PRAZO começa onde não há dígito antes, e o símbolo repetido não faz o
+# texto crescer. Nenhuma pergunta de 2.000 caracteres passa de 100 ms; o teto aqui é folgado para máquina lenta.
+@pytest.mark.parametrize('base', ['1.1 ', '1 mil ', '€', '€1', '€a', '📈📉', '🚀a', 'cai ', '📉1', 'vai ficar ', 'vai valer ',
+                                  'petroleo €1', 'tenho €1', 'quando cai o dividendo ', 'faco o que ', 'como me protejo '])
+def test_g4_pergunta_longa_com_simbolo_e_repeticao_nao_trava(base):
+    import time
+    s = (base * 2000)[:2000]
+    analisar(s)
+    t = time.perf_counter()
+    analisar(s)
+    assert time.perf_counter() - t < 0.5
+
+
+def test_g4_simbolo_repetido_vira_uma_palavra():
+    assert normalizar('📈📈📈 bitcoin') == normalizar('📈 bitcoin')
+    assert normalizar('€150.000') == ' euros 150.000'
+    assert len(normalizar('€1' * 1000)) < 2500
+
+
+# Todas as perguntas da rodada 4, para os EXTRAS e para a checagem de violação.
+TODAS_G4 = list(dict.fromkeys(
+    q for nome, v in list(globals().items()) if nome.startswith('G4_') and isinstance(v, list)
+    for q, _ in v))
+
+
+def test_g4_nenhuma_pergunta_da_rodada_4_tem_violacao():
+    ruins = [q for q in TODAS_G4 if montar(q, hoje=HOJE).violacoes]
+    assert not ruins, ruins
+
+
+def test_g4_todas_as_perguntas_estao_nos_extras():
+    from agente.exportar import EXTRAS
+    faltam = [q for q in TODAS_G4 if q not in EXTRAS]
+    assert not faltam, faltam

@@ -33,12 +33,22 @@ def simples(s: str) -> str:
     return unicodedata.normalize('NFKD', s).encode('ascii', 'ignore').decode().lower()
 
 
+# Cada símbolo e emoji vira palavra numa passada só, na ordem dos dicionários ("⬆️" antes de "⬆"). O repetido ("📈📈📈",
+# "€€€") vira uma palavra só, e depois dos primeiros MAX_SIMBOLOS o resto some, como qualquer caractere fora do ASCII
+# (simples): sem isso "€1€1€1..." crescia 4 vezes e o roteador passava de 100 ms numa pergunta de 2.000 caracteres.
+_PALAVRA_DO_SIMBOLO = [*SIMBOLOS.values(), *EMOJI.values()]
+_SIMBOLO = '|'.join('((?:' + re.escape(e) + ')+)' for e in [*SIMBOLOS, *EMOJI])
+MAX_SIMBOLOS = 50
+
+
 def normalizar(pergunta: str) -> str:
     """Emoji e símbolo de moeda viram palavra, sai o acento, e a abreviação vira a palavra inteira."""
-    for e, palavra in SIMBOLOS.items():
-        pergunta = pergunta.replace(e, palavra)
-    for e, palavra in EMOJI.items():
-        pergunta = pergunta.replace(e, palavra)
+    vistos = []
+
+    def troca(m: re.Match) -> str:
+        vistos.append(m)
+        return _PALAVRA_DO_SIMBOLO[m.lastindex - 1] if len(vistos) <= MAX_SIMBOLOS else ' '
+    pergunta = re.sub(_SIMBOLO, troca, pergunta)
     # "Irã" (o país) e "irá" (o verbo) só se distinguem antes de tirar o acento.
     pergunta = re.sub(r'(?<!\w)irã(?!\w)', 'iran', pergunta, flags=re.I)
     t = simples(pergunta)
@@ -75,7 +85,9 @@ MERCADOS = {
                 r'|juros|crise|eleicao|selic|inflacao|cambio)\b)'
                 r'|\bgasolina\b(?! n[ao] (fogueira|fogo|incendio|brasa)\b)'
                 r'|\bbarril\b(?! de polvora\b)',
-    'juros': r'\bjuros\b|\bdi1?\b|\bdi futuro\b|\bselic\b|\brenda fixa\b|\btesouro\b|\bprefixad\w*',
+    'juros': r'\bjuros\b|\bdi1?\b|\bdi futuro\b|\bselic\b|\brenda fixa\b|\btesouro\b|\bprefixad\w*'
+             # "travar a taxa" é o título de renda fixa (a do câmbio fica no dólar), e "IPCA+" é o Tesouro IPCA+
+             r'|\btrav(o|ar|amos)( a| essa| esta)? taxas?\b(?! d[eo]s? (cambio|dolar|euro)\b)|\bipca ?\+',
     # "exchange" é a corretora de cripto, não o verbo nem o câmbio em inglês ("exchange my dollars", "exchange rate")
     'cripto': r'\bcripto\w*|\bbitcoins?\b|\bbtc\b|\bethereum\b|\bethers?\b|\beth\b|\bxrp\b|\bstablecoins?\b'
               # o intercâmbio é masculino ("fazer exchange no Canadá", "um exchange na Irlanda"); a corretora é "a exchange"
@@ -213,6 +225,14 @@ SEM_ARTIGO = (r'(?<!\bo )(?<!\bum )(?<!\bhouve )(?<!\bteve )(?<!\bdo )(?<!\bno )
 CLASSE = (r'(dolar|bolsa|ibovespa|cripto\w*|bitcoins?|btc|eth|ethereum|ethers?|solana|xrp|doge\w*|shiba|usdt|usdc|tether'
           r'|stablecoins?|renda fixa|tesouro|acoes|ouro|poupanca|cdb|lci|lca|fiis?'
           r'|petroleo|brent|petrobras|petr[34]|petroleiras?|bancos|de banco|bancari[ao]s?|acao|imove(l|is))(?! centra)')
+# A opinião do agente sobre o rumo do ativo ("como você vê o dólar?", "como vê a PETR4?", "como você enxerga a Selic em
+# 2027?") é direção (N2), como "qual sua visão". Fica de fora quem vê ("como eu vejo", "como vejo", "como se vê", "como o
+# mercado vê"), o que se vê sem ser o ativo ("como você vê a cotação?", "o informe") e a regra (declaração, imposto, IOF,
+# o dólar turismo e o do cartão).
+COMO_VE = (r'\bcomo (?:(?:voce|vc|tu|voces|vcs|o senhor|a senhora) )?(?:ve|veem|enxerga|enxergam|avalia|avaliam)'
+           r' (?:(?:o|a|os|as) )?(?:(?:cenario|futuro|rumo|caminho|perspectivas?) (?:d[oa]s?|pr[oa]s?|pra|para(?: o| a)?) )?'
+           r'(?:' + ATIVO + '|' + CLASSE + r'|euro|selic|juros)\b'
+           r'(?![^.?!]*\b(?:declar\w*|imposto\w*|irpf|tribut\w*|isent\w*|iof|ptax|spread|turismo|cartao)\b)')
 
 # Pôr algo na declaração ou num documento do IR ("boto o bitcoin na declaração?", "coloco em bens e direitos?", "onde
 # coloco o informe?", "onde ponho o código do DARF?") é regra de imposto (P5), não pôr o dinheiro num mercado.
@@ -240,16 +260,96 @@ PARA_O_CASO = (r'\b(proteg\w*|protecao|hedge|pra mim|para mim|pra eu|para eu|meu
                r'|escolh\w*|prefer\w*|prefir\w*|pego|fico|carteira|investir|aplicar|apostar|melhor|pior)\b')
 SEM_RELACAO = rf'^(?!(?!.*{PARA_O_CASO})(?=.*(?:{RELACAO_OU}|{PRECO_OU_REGRA_DITA})))'
 
+# A escolha seca entre classes que CLASSE não tem (N5): o indexador da renda fixa, o contrato e o euro ("tesouro ipca ou
+# prefixado?", "prefixado ou pos agora?", "opero win ou wdo?", "dolar ou euro?"). Só a pergunta inteira, ou com a escolha
+# dita ("tesouro ipca ou prefixado, qual pego?"): o conceito e a regra ("o cdb rende cdi ou ipca?", "o tesouro selic é pré
+# ou pós?", "o cartão cobra em dólar ou euro?") e o passado ("o euro ou o dólar subiu mais esse ano?") não escolhem.
+_INDEXADOR = (r'(euro|win|wdo|mini[- ]?(indice|dolar)|pre[- ]?fixad\w*|prefixad\w*|pos[- ]?fixad\w*|pre|pos|ipca\+?|cdi|selic'
+              r'|(renda )?variavel|di futuro)')
+_LADO = rf'((o|a|os|as|no|na|nos|nas|em|de|do|da|com|tesouro|titulo|cdb|lci|lca) )*({CLASSE}|{_INDEXADOR})\+?( (a vista|futuro))?'
+_LIDER = (r'((eu )?(opero|operar|operaria|pego|pegar|pegaria|invisto|investir|aplico|aplicar|coloco|colocar|boto|botar|ponho'
+          r'|vou|fico|ficar|escolho|levo|faco|fazer) )?')
+_CAUDA = (r'( (agora|hoje|ja|amanha|(este|esse|neste|nesse) ano|(pra|para|em|ate) 20(2[7-9]|[3-9]\d)'
+          r'|(no|a|pro|pra|para o) (longo|curto|medio) prazo))?')
+ESCOLHA_SECA = (rf'^{_LIDER}{_LADO} (ou|x|vs|versus) {_LADO}{_CAUDA}\W*$'
+                rf'|^(?=.*?\bqual\b)(?=.*(?:{ESCOLHA_DITA}|\bqual (e |seria )?(rende|renderia) mais\b))'
+                rf'.*\b({CLASSE}|{_INDEXADOR})\+?[^.;:?!]{{0,25}}\b(ou|x|vs|versus)\b[^.;:?!]{{0,25}}\b({CLASSE}|{_INDEXADOR})\b')
+
+# O parente a quem a pessoa pergunta se o ativo serve (N5): "pro meu filho", "pra minha avó".
+PARENTE = r'(avos?|vo|vovo|pai|mae|filh[oa]s?|tio|tia|esposa|marido|sogr[oa]s?|sobrinh[oa]s?|net[oa]s?|irmaos?|irmas?|namorad[oa])'
+# "meus pais", não "meu país"
+DE_PARENTE = rf'((meu|minha|meus|minhas) {PARENTE}|meus pais)'
+ATIVO_OU_CONTRATO = (rf'({CLASSE}|{EMPRESA}|win|mini[- ]?indice|mini[- ]?dolar|wdo|euro|memecoins?|day ?trade)')
+
+# A regra do imposto que se aproveita ("quais deduções do IR dá pra aproveitar?", "o prejuízo de 2025 dá pra aproveitar?")
+# é P5, não o "aproveito?" do pedido.
+APROVEITA_REGRA = (r'(prejuizos?|isenc\w*|isent[oa]s?|deduc\w*|dedut\w*|beneficios? fisca\w*|restituic\w*|cashback'
+                   r'|aliquotas?|darf|declarac\w*|irpf|imposto de renda|impostos?|ir)')
+
+# Quantos contratos, minis, cotas ou lotes a pessoa opera ou compra ("quantos win eu opero?", "quantas cotas de bova11 eu
+# compro?"): número de contratos é o exemplo do N5. "quantas ações tem o Ibovespa?" e "quanto vale um ponto do WIN?" não.
+QUANTOS_ATIVO = (r'\bquant[oa]s? (de )?(win|wins|wdo|wdos|ind|dol|minis?|mini[ -]?(indices?|dolar(es)?|contratos?)|minicontratos?'
+                 r'|contratos?|cotas?|lotes?|acoes|papeis|bitcoins?|btcs?)( (de|do|da|dos|das) [\w-]+)?( (que )?(eu|a gente))?'
+                 r' ((posso|consigo|devo|da (pra|para)|daria (pra|para)) )?(opero|operar|compro|comprar|pego|pegar|boto|botar|coloco'
+                 r'|colocar|ponho|por|entro|entrar|abro|abrir|carrego|carregar|mantenho|manter)\b'
+                 r'|\bquanto (eu )?opero\b|\bcuanto (dinero )?(invierto|pongo|meto|aplico|opero)\b'
+                 # a pergunta inteira sem o verbo ("quantas cotas de bova11?", "quantos win?")
+                 r'|^\W*quant[oa]s? (de )?(win|wins|wdo|wdos|minis?|mini[ -]?(indices?|dolar(es)?|contratos?)|contratos?|cotas?'
+                 r'|lotes?|acoes|papeis)( (de|do|da|dos|das) [\w-]+)?\W*$')
+
+# "como faço igual?", "por que eu faço isso?" e "se eu faço o mesmo com o dólar, pago IR?" perguntam o como, o porquê e a
+# regra, não o que fazer
+_SEM_POR_QUE = r'(?<!\bcomo )(?<!\bcomo eu )(?<!\bque )(?<!\bque eu )(?<!\bse )(?<!\bse eu )(?<!\bquando )(?<!\bquando eu )'
+
+# Proteger o próprio dinheiro de um evento ("como me protejo da eleição?", "como proteger a carteira?", "o dólar protege
+# da eleição?") é pedir estratégia (N1, N5; caso 4 da tabela "Como eu abordo esse mercado?"). Golpe, FGC, circuit breaker e
+# a segurança da conta são regra (P5); "o dólar protegeu na eleição de 2018?" é passado; "por que o dólar protege na
+# eleição?" é explicação.
+PROTECAO_REGRA = (r'\b(fgc|fundo garantidor|golpes?|golpistas?|fraudes?|piramides?|hackers?|roubos?|phishing|estelionat\w*'
+                  r'|vazament\w*|clonad\w*|circuit[ -]?breakers?|senhas?|seed|chave privada|frase (de recuperacao|semente)|2fa'
+                  r'|autentica\w*|cpf|dados|celular|contas?(?! (globa(l|is)|internaciona(l|is)|em (dolar|euro)))'
+                  r'|carteiras? (de |d[aeo] )?(bitcoins?|btc|cripto\w*|ether\w*|fria|quente|digital|fisica|hardware))\b')
+PROTEGER = (rf'(?:^|[.?!;:])(?=[^.?!;:]*?(?:protej|proteg|protec|blind|hedge))(?![^.?!;:]*{PROTECAO_REGRA})[^.?!;:]*?(?:'
+            rf'{CONCEITO_ANTES}\b(me|nos) (protejo|protegemos|proteger|proteja|protegeria|blindo|blindar)\b'
+            r'|\b(como|da (pra|para)|tem como|posso|pode|podemos|consigo|devo|deve|preciso|precisa|quero|vou|tenho que|tem que)'
+            r' (se|me|nos) (proteger|blindar)\b'
+            r'|\b(protejo|blindo)\b|\bcomo (eu )?((posso|consigo|devo|faco (pra|para)) )?(proteger|blindar)\b'
+            r'|\b(qual|que) (e )?(a |o )?(melhor|bom|boa) ((forma|jeito|maneira) de )?(se )?(protecao|hedge|proteger)\b'
+            rf'|(?<!\bcomo )(?<!\bcomo o )(?<!\bcomo a )(?<!\bpor que )(?<!\bpor que o )(?<!\bpor que a )(?<!\bporque o )'
+            rf'\b{ATIVO}\b[^.?!]{{0,15}}\b(protege|protegem|blinda|blindam|(e|seria) (um |uma )?(bom |boa |otim[oa] )?'
+            r'(hedge|protecao))\b[^.?!]{0,30}\b(eleic\w*|turnos?|lula|flavio|bolsonaro)\b)')
+
 PROIBIDOS = {
     # "O que eu faço?", "que que eu faço?", "o que fazer agora?", "preciso tomar uma decisão", "e agora?" pedem ação.
     # "O que fazer para entender o Copom?" não: é pedido de explicação.
     # "EUA proíbem a compra de petróleo russo" é a manchete: o substantivo depois do verbo de proibir ou liberar
     'dica': r'(?<!\bproibem a )(?<!\bproibiu a )(?<!\bproibe a )(?<!\bsuspende a )(?<!\bsuspendeu a )(?<!\bveta a )'
-            r'(?<!\bvetou a )(?<!\blibera a )(?<!\bliberou a )(?<!\bautoriza a )(?<!\bautorizou a )\bcompr(a|o|ar|aria|ariam)\b'
+            r'(?<!\bvetou a )(?<!\blibera a )(?<!\bliberou a )(?<!\bautoriza a )(?<!\bautorizou a )(?<!\bo dia da )(?<!\bdo dia da )'
+            r'(?<!\bno dia da )(?<!\bdata da )\bcompr(a|o|ar|aria|ariam)\b'
+            r'(?:(?<=\bfaco compra)|(?! e (de )?venda (n[oa] mesm[oa]|de|d[aeo]s?)\b))'
             r'|\bvend(e|o|er|eria)\b|\bentro\b|\bentrar\b|\bsair\b|\bcompens\w*|\bbora\b'
             r'|\bdevo\b|\bdeveria\b|\bvale (a ?pena|mais|comprar)\b|\bfaz sentido\b|\beu (compre|venda)\b'
+            # "travo a taxa agora?", "é bom travar?": o "compro?" da renda fixa; "como travo a taxa?" é o passo a passo
+            r'|(?<!\bcomo )(?<!\bcomo eu )(?<!\bse )(?<!\bse eu )\btravo\b'
+            r'|\b(vale|compensa|bom|boa|otimo|otima|melhor|hora|momento) (pra |para |de )?travar\b'
             r'|\b(o que|que que|oq)( e que)?( eu)? (faco|fazer|faria)\b'
             r'(?! (pra|para) (entender|saber|aprender|estudar|acompanhar|conhecer|ler|interpretar|compreender)\b)'
+            # a ordem invertida ("faço o quê com meus dólares?", "e agora, faço o quê?") e o copiar o outro ("meu tio comprou
+            # dólar, faço igual?", "sigo ele?", "copio a operação do meu amigo?"), menos o "como", a regra e o lugar do IR ("faço
+            # o que na declaração?", "faço o que pra declarar?", "faço o que com meu informe?", "meu pai declarou assim, faço
+            # igual?") e o perfil da rede ("sigo ele no instagram?")
+            rf'|^(?=[\s\S]*?\b(?:faco|sigo|copio|imito|repito)\b)(?![\s\S]*\b({DECLARACAO}|declar\w*|imposto de renda|fgc)\b)'
+            rf'[\s\S]*?(?:{_SEM_POR_QUE}\bfaco (o que|oq)\b'
+            rf'(?=( agora| hoje| entao| ai)?( com (o |a |os |as )?((meu|minha|meus|minhas)\b|{ATIVO}\b)|\W*$))'
+            rf'|{_SEM_POR_QUE}\bfaco (igual|o mesmo|isso|tambem)\b(?! {LUGAR_DO_IR})'
+            r'(?! (calculo|conta|simulac\w*|procedimento|processo)\b)'
+            r'(?! (pra|para) (entender|saber|aprender|estudar|acompanhar|conhecer|ler|interpretar|compreender)\b)'
+            rf'|{_SEM_POR_QUE}\b(sigo|copio|imito|repito)\b ((ele|ela|eles|elas)\b(?! (no|na|pelo|pela) (instagram|insta'
+            r'|twitter|x|youtube|tiktok|canal|perfil)\b)|(meu|minha|meus|minhas) \w+|(a |o |as |os )?(operac\w*|trade\w*|entrada\w*'
+            r'|sinal|sinais|call\w*|carteira)\b)'
+            r'|\b(faco|sigo|copio|imito|repito) (o que|oq) (ele|ela|eles|elas|todo mundo|(o|a|meu|minha) \w+) (fez|faz|fizeram|fazem'
+            r'|comprou|vendeu|mandou|disse|falou)\b)'
+            r'|\bque hago\b'
             r'|\b(preciso|tenho que|tenho de|tenho|vou ter que) (de )?(tomar )?(uma )?(decisao|decidir)\b'
             r'|\bme ajud(a|e|ar) a (tomar (uma )?decisao|decidir|escolher)\b|\bdecid(e|a|ir) (por|pra|para) mim\b'
             r'|\be agora(\?|\W*$)'
@@ -261,6 +361,7 @@ PROIBIDOS = {
             r'|curador)\b| d[ao] (petrobras|petr[34]|empresa|estatal|bc|banco central|cvm|vale|prio3?|opep)\b| (ja )?(aprov(ou|aram|a|am)'
             r'|eleg(eu|eram|e|em)|decid(iu|iram|e|em)|indic(ou|aram)|nome(ou|aram)|destitu(iu|iram)|demit(iu|iram))\b)'
             r'|\bfico (comprado|vendido|de fora)\b|\bcomo (eu )?(abordo|opero|ganho)\b|\bestrategia\b|\bposicion\w*'
+            rf'|{PROTEGER}'
             r'|\bexposicao\b|\baplicar\b|\binvestir\b|\bbuy\b|\bsell\b|\bshould i\b|\bwould you\b'
             # pôr o dinheiro num mercado, na 1ª pessoa ("invisto em petróleo?", "reinvisto?", "coloco na bolsa?"), menos
             # "como eu coloco dinheiro na corretora?" (P5)
@@ -308,7 +409,9 @@ PROIBIDOS = {
             rf'|{CONCEITO_ANTES}\b(aumentar|reduzir|diminuir|realizar)\b)[^.?!]{{0,20}}\b(posicao|lucro|{PETR}|acoes|minha|meu)\b'
             # "foi aumento?" e "foi redução ou aumento?" perguntam o que já saiu; "redução ou aumento?" sem marca de passado, ou
             # com futuro ("o próximo vai ser redução ou aumento?"), continua pedido
-            rf'|{SEM_ARTIGO}(?<!\bfoi )(?<!\bera )(?<!\breducao ou )(?<!\bcorte ou )\b(aumento|reduzo|diminuo|realizo)\W*$'
+            # "quanto de aumento?", "foi de aumento?", "o último aumento?" e "manutenção ou aumento?" (Copom) são o substantivo
+            rf'|{SEM_ARTIGO}(?<!\bfoi )(?<!\bera )(?<!\bde )(?<!\bultimo )(?<!\breducao ou )(?<!\bcorte ou )'
+            r'(?<!\bmanutencao ou )\b(aumento|reduzo|diminuo|realizo)\W*$'
             r'|^(?:(?=[\s\S]*\b(?:vai|vao|sera|serao|proxim\w*|amanha)\b)|(?![\s\S]*\b(?:foi|foram|era|teve|tiveram|houve|ultim[oa]|ontem'
             r'|anunciou|saiu|veio)\b))[\s\S]*\b(?:reducao|corte) ou aumento\W*$'
             # a posição da pessoa, não a "posição na pesquisa" nem a "posição em aberto" (conceito)
@@ -328,6 +431,11 @@ PROIBIDOS = {
             r'|\bdou uma (reduzida|aumentada|zerada|realizada|diminuida|enxugada|segurada)\b'
             r'|\b(faco|fazer|faria|vale fazer) (o |um )?(preco medio|pm)\b'
             r'|\baproveit(o|ar|aria) (a|o|essa|esse|esta|este)? ?(queda|alta|baixa|subida|desconto|tombo|crise|guerra)\b'
+            # "o dólar caiu 2%, aproveito?" e "aproveito o dólar baixo?": o pedido sem o substantivo, no fim da oração ou
+            # com o ativo; não "aproveito pra perguntar: o que é a Selic?", "como aproveitar?" nem a regra do imposto
+            rf'|^(?=[\s\S]*?\baproveit)(?![\s\S]*\b{APROVEITA_REGRA}\b)[\s\S]*{CONCEITO_ANTES}(?<!\bcomo )(?<!\bcomo eu )'
+            r'\baproveit(o|ar|aria|amos)\b'
+            rf'(?=\s*([?!.;]|$|(agora|hoje|ja|enquanto|ou)\b)| (o |a |os |as |esse |essa |este |esta )?({ATIVO}|euro|{CRIPTO_NOME})\b)'
             # "o que é oportunidade de arbitragem?" é conceito; com adjetivo ("é uma boa oportunidade?") é sempre pedido
             # "crise e oportunidade: o que a história mostra?" soma as duas palavras, não pede ("e" de somar, e o que vem é
             # pergunta de fato)
@@ -347,12 +455,27 @@ PROIBIDOS = {
             r'|(?<!\bo que e )(?<!\bo que e um )(?<!\bo que seria um )\binvestimento (seguro|bom|ruim|arriscado)\b'
             # o juízo sobre o papel, sem mais nada ("petr4 é bom?", "PETR4 tá ótima?")
             rf'|\b{EMPRESA} (e|ta|esta) (um |uma )?(bom|boa|otim[oa])( (papel|acao|investimento|compra|empresa))?\W*$'
+            # o mesmo juízo sobre a classe, o título ou o nível ("bitcoin é um bom investimento?", "o dólar tá bom?", "dólar a
+            # 5,04 é uma boa?", "IPCA+ 7% é uma boa?"); "o dólar alto é bom?" (efeito na economia), o passado ("foi um bom
+            # investimento em 2021?"), a definição e o método ("como saber se uma ação é um bom investimento?") ficam de fora.
+            # "(?<!mercado )": a corretora Mercado Bitcoin já recusa como plataforma
+            r'|^(?=.*?\b(bo[am]|otim|mau|ma|pessim))(?!.*\bcomo (saber|avaliar|analisar|identificar|ver|descobrir) se\b).*?(?:'
+            rf'(?<!\bmercado )\b({EMPRESA}|{CLASSE}|euro|memecoins?|prefixad[oa]s?|ipca ?\+)(?!\w)( (ipca ?\+?|selic|prefixado|direto|renda ?\+?))?'
+            r'( (a|em|por|de) (r\$ ?|us\$ ?|\$ ?)?\d[\d.,]*( ?(mil|k|reais|dolares|%))?| \d[\d.,]*( ?%)?)?'
+            r' (e|ta|esta|seria)( mesmo| ainda)? (um |uma )?(bom|boa|otim[oa])( (papel|acao|investimento|compra|negocio|aplicacao))?\W*$'
+            r'|(?<!\bo que )(?<!\boq )\b(e|seria|sera|ta|esta|continua|segue)( mesmo| ainda)? (um |uma )?(bom|boa|otim[oa]|mau|ma'
+            r'|pessim[oa]) (investimento|negocio|compra|aplicacao)\b)'
+            r"|\bvalendo a ?pena\b|(?<!\bwhat is a )(?<!\bwhat's a )\bgood (investment|buy)\b"
             # ter o papel ("é bom ter petr4?", "é bom ter ações da Petrobras?"): é o que fazer com ele (N1)
             rf'|\b(bom|boa|otimo|ruim|interessante) ter (a |o |as |os )?((acoes|acao|papeis|papel) d[aeo] )?{EMPRESA_SEM_VALE}\b'
             # "embarco?" é ordem, como "entro"; "embarcar" sozinho não ("o Brasil vai embarcar petróleo")
             # "posso ir no bitcoin?", "vou ir na cripto agora?": é pôr o dinheiro nele (N1)
             rf'|\b(posso|quero|vou|devo|bom|vale)( eu)? ir (no|na|pro|pra|pros|pras|para o|para a) ({ATIVO}|{CRIPTO_NOME})\b'
             r'|\bembarc(o|amos)\b|\b(vale|da (pra|para)) embarcar\b|\bembarcar (nessa|nesse|agora|ja)\b|\bbtfd\b'
+            # "opero win?", "sou iniciante, opero win?": a ordem na 1ª pessoa, como "entro"; "como eu opero?" já está acima, e
+            # "eu opero win há 2 anos, como funciona o ajuste?" (sem pergunta na oração do verbo) e o horário ficam de fora
+            r'|(?<!\bcomo )(?<!\bcomo eu )(?<!\bhorario )(?<!\bhorario eu )(?<!\bhoras )(?<!\bhoras eu )\bopero\b'
+            r'(?=[^.?!,;]{0,30}(\?|$))'
             # promessa de ganho ("dividendo é renda garantida?", M6), menos quem garante ("o CDB é garantido pelo FGC?", "o
             # bitcoin é garantido por alguma coisa?", "o dividendo mínimo é garantido na lei?") e o Tesouro ("o Tesouro Selic é
             # garantido?"), que é regra (P5)
@@ -361,12 +484,55 @@ PROIBIDOS = {
             r'(?<!\btesouro prefixado e )'
             r'\bgarantid[oa]s?\b(?! (pel[oa]|por) (fgc|governo|tesouro|lei|uniao|b3|banco central|bc|alguma coisa|algo|quem)\b'
             r'| pelo que\b| (na|em) lei\b)',
-    'direcao': r'\bvai (subir|cair|disparar|despencar|bombar|valorizar|explodir|fechar|abrir)\b|\bvao (subir|cair)\b|\bchances?\b'
+    'direcao': COMO_VE
+               + r'|\bvai (subir|cair|disparar|despencar|bombar|valorizar|explodir|fechar|abrir)\b|\bvao (subir|cair)\b|\bchances?\b'
                r'|\bprobabilidad\w*|\bde 0 a 100\b|\bum numero\b|\btendencia\b|\bpode (subir|cair|disparar)\b'
-               r'|\bsobe ou (cai|desce|nao)\b|\balavanc(ar|a)\b|\bpotencial\b|\bprevisao\b|\bprever\b|\bdisparar\b',
+               r'|\bsobe ou (cai|desce|nao)\b|\balavanc(ar|a)\b|\bpotencial\b|\bprevisao\b|\bprever\b|\bdisparar\b'
+               # "a Selic chegou no pico?": se o topo já passou é pergunta sobre o que vem; com data ou "quando" é passado
+               r'|^(?=[\s\S]*?\b(chegou|chegaram|bateu|bateram|atingiu|atingiram) )'
+               r'(?![\s\S]*\b(19\d\d|20[01]\d|202[0-5]|quando|pandemia|covid|ontem|anteontem|passad[oa]s?)\b)[\s\S]*'
+               r'\b(ja )?(chegou|chegaram|bateu|bateram|atingiu|atingiram) (n[oa]|ao|o|a) (pico|teto(?! d[aeo]s? ))\b'
+               # o tombo, a bolha e a fase que vêm ("vai ter crash?", "vem uma correção?", "a bolsa vai corrigir?", "o bitcoin
+               # tá em bolha?", "bull ou bear?"); o fato e o conceito ("o crash de 2020", "o que é bear market?", "a bolha de
+               # 2000", "vai ter correção da tabela do IR?", "a Receita vai corrigir a tabela?") ficam de fora
+               r'|\b(vai|vao|vem|deve|devem|pode|podem)( ter| haver| rolar| vir| acontecer)?( um| uma| outro| outra| mais um'
+               r'| mais uma| novo| nova)? (crash|bolha|derretimento|recessao|quedas? (forte|grande|feia)s?)\b'
+               # a correção do preço, não a do valor pela regra ("a tabela do IR vai ter correção?", "o FGTS vai ter correção?",
+               # "a restituição vem com correção pela Selic?", "o banco vai corrigir o valor?")
+               r'|^(?=.*?\bcorr[ei]g?)'
+               r'(?!.*\b(tabela|salario|imposto|ir|irpf|restituic\w*|aluguel|poupanca|fgts|inss|aposentadoria|beneficios?'
+               r'|valor|divida|prova|nota|declarac\w*|erro|monetaria)\b).*(\b(vai|vao|vem|deve|devem|pode|podem)( ter| haver'
+               r'| rolar| vir| acontecer)?( um| uma| outra| mais uma| nova)? correc(ao|oes)\b(?! pel[oa]s?\b)'
+               r'|\b(vai|vao|deve|devem|pode|podem) corrigir\b(?! (a|o|as|os|um|uma|minha|meu|minhas|meus|sua|seu|suas|seus'
+               r'|isso|isto|essa|esse erro|pel[oa]s?)\b))'
+               r'|^(?=.*?\b(bolha|bull|bear))'
+               r'(?!.*\b(o que (e|sao|significa)|oq e|significa|quer dizer|diferenca|como (sei|saber|identificar|identifico'
+               r'|reconhecer)|quando)\b).*(\b(ta|esta|estamos|estao|tamo|tao|vivemos|vivendo)( em| num| numa)?( um| uma)?'
+               r' (bolha|bull|bear)( market)?\b|(?<!\bque )\b(e|seria|sera)( uma)? bolha\b'
+               r'|\b(bull(ish)? ou bear(ish)?|bear(ish)? ou bull(ish)?)\b)'
+               r"|\b(is|are)( \w+){0,3} (going to|gonna) (crash|tank|collapse|correct)\b|\bwill( \w+){0,3} (crash|tank|collapse)\b"
+               r'|\b(bull or bear|bear or bull)\b|\b(is|are)( \w+){0,3} in a bubble\b'
+               # "alta ou baixa?", "dólar alta ou baixa?", "o dólar tá em alta ou em baixa?"; não o fechamento que já houve ("o
+               # dólar fechou em alta ou baixa ontem?") nem a temporada ("a passagem é mais cara na alta ou baixa temporada?")
+               r'|^(?=.*?\b(alta|baixa) ou\b)'
+               r'(?!.*\b(fechou|fecharam|terminou|terminaram|encerrou|encerraram|ficou|ficaram|foi|foram|teve|tiveram|abriu'
+               r'|abriram|estava|estavam|ontem|anteontem|passad[oa]s?|19\d\d|20[01]\d|202[0-5]|o que (e|sao|significa)|significa'
+               r'|quer dizer|diferenca)\b).*\b(alta ou (em |na )?baixa'
+               r'|baixa ou (em |na )?alta)(?=\W*$| (amanha|essa semana|esse mes|esse ano|depois d\w+|no fim d\w+|ate o fim d\w+'
+               r'|na semana que vem|em 202[6-9])\b)',
     'momento': r'\bstop\b|\balvo\b|\bponto de (entrada|saida)\b|\bquando (entrar|sair|comprar|vender)\b'
                r'|\b(hora|quando)\b.{0,15}\b(entrar|sair|comprar|vender|operar)\b|\balertas?\b|\bme avis(a|e)\b|\bsinal de\b'
                r'|\bamanha\b|\bna abertura\b|\bsegunda(-feira)?\b.{0,30}\b(fazer|compr\w*|vend\w*|entr\w*)'
+               # "o dólar caiu, espero?", "a petr4 caiu, espero mais um pouco?", "espero ele baixar?": esperar é o quando
+               # (N4), com o ativo na frase; não "espero que o Copom explique", "o que eu espero do Copom?" nem o dinheiro
+               # que não caiu na conta
+               rf'|^(?=[\s\S]*?\bespero\b)(?![\s\S]*\b(na conta|restituic\w*|liquidac\w*)\b)'
+               rf'(?=[\s\S]*\b({ATIVO}|{CLASSE}|euro|{CRIPTO_NOME})\b)'
+               r'[\s\S]*\bespero( mais)?( um pouco)?( mais)?( ou nao)?(?=\s*([?!.;]|$))'
+               r'|\bespero (ele |ela |o \w+ |a \w+ |os \w+ |as \w+ )?(cair|baixar|subir|recuar|voltar|melhorar|passar'
+               r'|estabilizar|corrigir)\b'
+               # e o "espero?" sozinho, que é a pergunta inteira
+               r'|^\W*(eu )?espero( mais)?( um pouco)?( mais)?( ou nao)?\W*$'
                # "Brent caiu 10% hoje, é a hora?", "perdi o bonde?", "ainda dá tempo?"; não "qual é a hora da decisão do Copom?"
                # nem "é a hora de entender a Selic?"
                # "tá na hora da prio?", "está na hora do bitcoin?" e "tá na hora?" são o mesmo pedido
@@ -390,6 +556,7 @@ PROIBIDOS = {
     'capital': r'\br\$ ?\d|\b\d+ ?mil reais\b|\b\d+ ?k\b|\b(um|dois|tres|quatro|cinco|seis|sete|oito|nove|dez|vinte|trinta|'
                r'cinquenta|cem) mil( reais)?\b|\btenho (r\$ ?)?\d+[\d.,]* ?(mil|k|reais|conto|contos|pila|paus)\b'
                r'|\bquantos contratos\b|\bquanto (eu )?(coloco|ponho|invisto|aplico|boto|devia ter|deveria ter)\b'
+               rf'|{QUANTOS_ATIVO}'
                r'|\bquanto investir\b|\bmeu (capital|dinheiro|patrimonio|salario)\b|\bminha (renda|carteira|reserva)\b'
                r'|\bganho \d+|\bpor mes\b|\bsalario\b'
                r'|\bcom \d+[\d.,]* ?(conto|contos|pila|paus)\b'
@@ -405,11 +572,32 @@ PROIBIDOS = {
               r'|\b(bom|boa|bons|boas|ideal) (pra|para) (mim|minha|meu|minhas|meus)\b'
               r'|\b(meu|minha) (avo|vo|vovo|pai|mae|filh[oa]|tio|tia|esposa|marido|sogr[oa])\b[^.?!]{0,20}\b(de|com) \d+ anos\b'
               # a adequação a um grupo, menos o material de estudo ("que livro é indicado pra iniciante?")
-              r'|^(?!.*\b(livros?|cursos?|canal|canais|sites?|apps?|aplicativos?|podcasts?|videos?|conteudos?|materia(l|is)'
+              r'|^(?=.*?\b(indicad|adequad|recomendad))'
+              r'(?!.*\b(livros?|cursos?|canal|canais|sites?|apps?|aplicativos?|podcasts?|videos?|conteudos?|materia(l|is)'
               r'|leituras?|aulas?)\b).*\b(indicad|adequad|recomendad)[oa]s? (pra|para) (quem|iniciantes?|idos[oa]s?|aposentad[oa]s?'
               r'|jovens?)\b'
-              r'|\bviver d(e|os|as) (dividendos?|proventos?|renda|juros)\b',
-    'comparar': (r'\bmelhor\b.{0,40}\bou\b|\bou\b.{0,40}\b(qual )?(o |a )?melhor\b|\bvale mais\b'
+              r'|\bviver d(e|os|as) (dividendos?|proventos?|renda|juros)\b'
+              # "bom pro meu filho?", "serve pros meus pais?": o "pro" (para o) antes do parente
+              rf'|\b(serve|servem|indicad[oa]s?|adequad[oa]s?|bom|boa|bons|boas|ideal) (pro|pros|para o|para os) {DE_PARENTE}\b'
+              # a pergunta que é só o ativo e o parente ("dólar pro meu filho de 18?", "petr4 pra minha mãe aposentada?")
+              rf'|^\W*((o|a|os|as) )?{ATIVO_OU_CONTRATO}\W*(pra|para|pro|pros|pras)( o| a| os| as)? {DE_PARENTE}'
+              r'( (de|com) \d{1,3}( anos)?| (aposentad|idos)[oa]s?)?\W*$'
+              # a adequação a um grupo com o verbo comum ("o WIN serve pra iniciante?", "petr4 é boa pra quem tá começando?"),
+              # menos o material de estudo, o simulador e a regra ("a isenção serve pra iniciante?")
+              r'|^(?=.*?\b(iniciante|leig|quem (ta|esta) comecando|idos|aposentad|jove))'
+              r'(?!.*\b(livros?|cursos?|canal|canais|sites?|apps?|aplicativos?|podcasts?|videos?|conteudos?|materia(l|is)'
+              r'|leituras?|aulas?|simulador\w*|imposto\w*|isenc\w*|isent\w*|tribut\w*|darf|irpf|declar\w*|regras?|leis?'
+              rf'|aliquotas?)\b).*\b(serve|servem|bom|boa|bons|boas|ideal|ideais|{ATIVO_OU_CONTRATO}\W*(e|sao))'
+              r' (pra|para) (iniciantes?|leig[oa]s?'
+              r'|quem (ta|esta) comecando( agora)?|idos[oa]s?|aposentad[oa]s?|jovens?)(?=\W*$|\s*[,;]| ou\b)'
+              # quem se diz iniciante, leigo ou aposentado junto da ordem ("sou iniciante, opero win?", "sou aposentado, compro
+              # petr4?"); o passo a passo ("como compro tesouro? sou iniciante") fica de fora
+              r'|\bsou (um |uma )?(iniciante|leig[oa]|novat[oa]|aposentad[oa]|idos[oa])\b[^.?!]{0,30}(?<!\bcomo )(?<!\bcomo eu )'
+              r'\b(opero|entro|compro|vendo|invisto|aplico|aporto)\b'
+              r'|(?<!\bcomo )(?<!\bcomo eu )\b(opero|entro|compro|vendo|invisto|aplico|aporto)\b[^.?!]{0,30}'
+              r'\bsou (um |uma )?(iniciante|leig[oa]|novat[oa]|aposentad[oa]|idos[oa])\b',
+    'comparar': (rf'{ESCOLHA_SECA}|'
+                 r'\bmelhor\b.{0,40}\bou\b|\bou\b.{0,40}\b(qual )?(o |a )?melhor\b|\bvale mais\b'
                  rf'|{SEM_RELACAO}{SEM_CONCEITO_CRIPTO}{SEM_DIFERENCA}\b{CLASSE}\b.{{0,25}}{OU_ATIVO}\b(ou|x|vs|versus)\b.{{0,25}}'
                  rf'\b{CLASSE}\b'
                  # "o dólar foi melhor que a bolsa em 2022?" é passado
@@ -466,6 +654,15 @@ PROIBIDOS = {
                r'\b(boa|otima|melhor|grande) pagadora\b'
                r'|\bpaga(m)? (bem|muito|bons|otimos|altos) (dividendos?|proventos?)\b'
                r'|\bpaga(m)? (dividendos?|proventos?) (altos?|bons?|gordos?)\b'
+               # o mesmo juízo sobre a empresa dito de outro jeito: "PETR4 dá bons dividendos?", "a Petrobras tem bons proventos?",
+               # "PETR4 é boa pra dividendos?", "VALE3 serve pra renda passiva?". O passado ("pagou", "deu", "foi boa") fica de
+               # fora, e sem a empresa ("empresas que dão bons dividendos pagam imposto?", "como saber se uma ação é boa pra
+               # dividendos?") é regra ou conceito (P5)
+               rf'|\b{EMPRESA}\b[^.?!]{{0,25}}\b(da|dao|rende|rendem|distribui|distribuem|tem) (bons|bom|altos|gordos|otimos|muitos)'
+               r' (dividendos?|proventos?|jcp)\b'
+               rf'|\b{EMPRESA}\b[^.?!]{{0,25}}\b((e|ta|esta|seria)( (uma|um|a|o))?( (acao|papel|empresa|opcao|escolha))?'
+               r' (boa|bom|otim[oa]|excelente|melhor)( (acao|papel|empresa|opcao|escolha))?|servem?) (pra|para)'
+               r' (quem (quer|busca|procura) )?(receber |ter |viver de )?(dividendos?|proventos?|jcp|renda(?! (variavel|fixa)))\b'
                r'|(?<!\bque e uma )(?<!\bque e a )(?<!\bsignifica )(?<!\bsignifica uma )\bvaca leiteira\b'
                # "o que é dividend yield alto?" é conceito (P5)
                r'|(?<!\bo que e )(?<!\bo que e um )(?<!\bo que e o )(?<!\bsignifica )(?<!\bsignifica um )'
@@ -545,7 +742,8 @@ PRAZO = (r'(\bate (o )?(' + MESES[1:-1] + r'|natal|carnaval|fim|final)\b'
 # do ano?") também é nível.
 NIVEL_PRAZO = (r'(\b(a|to|at|nos|aos|(na )?casa d[oa]s)( us\$| r\$| \$|\$)? ?\d|\b(em|de)(( us\$| r\$| \$|\$) ?| (?!(19|20)\d\d\b))\d'
                r'|\b(brent|wti|barril|petroleo|oil|dolar|euro|ibovespa|bitcoin|btc|gasolina|diesel) (us\$ ?|\$)?\d'
-               r'|\b\d[\d.,]* ?(dolares|dolar|reais|mil|k)\b|\b(preco|cotacao|valor|price)\b)'
+               # o número começa onde não há dígito antes, como no PRECO_EM_DOLAR ("1.1.1..." não fica quadrático)
+               r'|(?<![\d.,])\b\d[\d.,]* ?(dolares|dolar|reais|mil|k)\b|\b(preco|cotacao|valor|price)\b)'
                r'[^.?!]{0,40}(' + PRAZO + r')')
 # Nível de preço no futuro ("vai a 150?", "chega nos 200?", "volta pros 70?", "rompe 120?", "bate na casa dos 150?", "vai
 # a R$ 50?"): termina no 1º dígito, para valer com "150k" e "250 mil". Fica de fora o passado ("passou de", "chegou a",
@@ -704,6 +902,12 @@ DEFINICAO_VALUATION = (r'^((o que|oq) (e|sao|significa|quer dizer)|como (funcion
 #   cara é imposto?") é o que o bloco do barril à bomba responde, não valuation. "A gasolina tá cara?" e "a gasolina vai
 #   ficar mais cara?" continuam recusa (N2).
 BOMBA_EXPLICA = r'\b(por que|porque|pq|por causa d\w*|culpa d\w*|o que (deixa|faz|torna)|quanto d[oa]|imposto\w*|do mundo)\b'
+# - a causa de um movimento, sem prazo nem empresa ("o que faz o preço do petróleo subir?", "o que faz a bolsa afundar?",
+#   "o que leva o dólar a subir?") pede a explicação (P5), não a direção. Com "vai", prazo, número, "de novo" ou empresa
+#   continua recusa.
+EXPLICA_MOVIMENTO = (r'\b(o que|oque) (faz|fazem|deixa|deixam|leva|levam|causa|causam|provoca|provocam)\b([^.?!,;]{0,40}?)'
+                     r'\b(subir|cair|descer|despencar|disparar|afundar|derreter|valorizar|desvalorizar|recuar)\b')
+EXPLICA_MOVIMENTO_TRAVA = r'\b(esse|este|nesse|neste) (ano|mes|semestre|semana)\b|\b(de novo|novamente)\b|\d'
 BOMBA_CARA = r'\b(gasolina|diesel|etanol|combustive(?:l|is))\b([^.?!]{0,30}?)\b(car|barat)[oa]s?\b'
 # A bomba junto com a ação ("por que a gasolina e a petr4 estão caras?") é valuation do papel (N2; Mapa legal, seção 8,
 # item 10): o "caro" não sai.
@@ -714,6 +918,19 @@ BOMBA_E_EMPRESA = (rf'\b{_COMBUSTIVEL},? (e|ou) (a |o |as |os )?((acao|acoes|pap
 REGRA_DE_QUEDA = (r'\bquando\b[^?!.]{0,40}\b(queda|baixa)\b[^?!.]{0,20}\bpassa(r)? de \d+([.,]\d+)? ?%'
                   r'|\bquando\b[^?!.]{0,40}\bpassa(r)? de \d+([.,]\d+)? ?% de (queda|baixa)\b')
 PASSA_DE_PCT = r'\bpassa(r)? de (?=\d+([.,]\d+)? ?%)'
+# - o teto da isenção dito pela pessoa ("se eu passar de 20 mil em vendas no mês, pago imposto?", "se ultrapassar 35 mil de
+#   vendas de cripto paga IR?", "se eu bater 35 mil, pago imposto?"): o número é o volume de vendas dela, não um nível de
+#   preço. Só o verbo sai, com a pessoa (ou ninguém) de sujeito depois do "se/caso/quando", ou com o número seguido da venda
+#   ou do mês, e o imposto dito na frase. "se o bitcoin passar de 100 mil, pago imposto?" continua recusa.
+_VERBO_DO_TETO = (r'(?:passa(?:r|m)? (?:de|dos|das)|ultrapassa(?:r|m)?|supera(?:r|m)?|bate(?:r|m)?|atinge|atingir|atingem'
+                  r'|chega(?:r|m)? (?:a|aos|nos)|alcanca(?:r|m)?)(?: (?:os|as))?')
+_QUANTIA_DO_TETO = r' ?(?:r\$ ?)?\d[\d.,]*(?: ?(?:mil|k)\b)?'
+# O volume de vendas do mês dito com o imposto ("se eu passar de 35 mil por mês de venda de cripto, pago imposto?") não é
+# o aporte mensal nem o dinheiro dela: sai do texto que o capital lê.
+VOLUME_DE_VENDA = (r'(?<![\d.,])\b\d[\d.,]*(?: ?(?:mil|k)\b)?(?: (?:de|em) vendas?)? (?:por|ao|no) mes(?: (?:de|em) vendas?\b)'
+                   r'|(?<![\d.,])\b\d[\d.,]*(?: ?(?:mil|k)\b)? (?:de|em) vendas? (?:por|ao|no) mes\b')
+TETO_DA_VENDA = (rf'\b(?:se|caso|quando)(?: eu| a gente)? (?P<v>{_VERBO_DO_TETO})(?={_QUANTIA_DO_TETO})'
+                 rf'|\b(?P<w>{_VERBO_DO_TETO})(?={_QUANTIA_DO_TETO}(?: (?:de|em|por|no|ao))? (?:vendas?|vendid\w*|mes|mensa\w*)\b)')
 # "quando o ibovespa cai mais de 10% tem circuit breaker?" é a regra do circuit breaker, não previsão
 REGRA_CIRCUIT = r'\bquando\b[^?!.]{0,60}\bcircuit[ -]?breakers?\b|\bcircuit[ -]?breakers?\b[^?!.]{0,60}\bquando\b'
 # - a regra com o imposto como sujeito ("a isenção do bitcoin de 35 mil vai continuar?", "quanto vai ficar o IOF do cartão?",
@@ -743,7 +960,9 @@ CONDICIONAL = (r'\bse (o |a )?(\w+ ){0,2}(ganhar|vencer|perder|for eleito|for re
 # ("antes da eleição de 2018") é.
 PASSADO = (r'\b(reagiu|reagiram|aconteceu|aconteceram|foi|foram|ficou|ficaram|teve|tiveram|historico|historicamente|ja houve'
            r'|antes(?! d[aeo]s? (eleic(ao|oes)|turno|\d+o turno|(primeiro|segundo) turno|copom|halving|reuniao|posse'
-           r'|votacao|decisao|proxim\w*|fim|final)\b(?! de (19|20)\d\d))|passad[ao]s?|levou|levaram|demorou|demoraram)\b')
+           r'|votacao|decisao|proxim\w*|fim|final)\b(?! de (19|20)\d\d))|passad[ao]s?|levou|levaram|demorou|demoraram'
+           # a causa do que já aconteceu ("o que fez o petróleo cair em 2020?"); o "fez" sozinho ("o bitcoin já fez fundo?") não
+           r'|o que (fez|fizeram|causou|causaram|provocou|provocaram))\b')
 FUTURO_EXPLICITO = (r'\b(vai|vao|agora|amanha|semana que vem|depois d[oa]|proxim\w*|pra onde|para onde)\b'
                     # "Brent em 138 foi o topo?" e "o bitcoin já teve o topo?": se o topo já passou é pergunta sobre o que vem;
                     # com o ano que já passou ("o bitcoin a 69 mil em 2021 foi o topo?") é passado
@@ -801,7 +1020,6 @@ VERBO_DECISAO = ('corta|cortam|mantem|segura|eleva|elevam|aumenta|aumentam|baixa
                  '|reajusta|reajustam')
 # O melhor ou o pior momento que já passou ("qual foi o pior momento do Ibovespa na pandemia?") é fato (P1). O momento
 # "pra comprar" continua pedido, mesmo no passado ("qual foi o melhor momento pra comprar dólar em 2020?").
-MOMENTO_DICA = r'\b(bom|otimo|melhor|pior) momento\b'
 MOMENTO_PASSADO = (r'\b(qual|quando) (foi|foram) o (melhor|pior) momento\b|\b(teve|tiveram|viveu) (o|seu) (melhor|pior) momento\b'
                    r'|\b(melhor|pior) momento\b[^.?!,;]{0,40}\b(foi|foram|aconteceu|ocorreu) (em|no|na|nos|nas|durante|quando|entre)\b')
 MOMENTO_PRA = r'\b(bom|otimo|melhor|pior) momento\b[^.?!,;]{0,25}\b(pra|para|de) \w+(ar|er|ir)\b'
@@ -809,7 +1027,7 @@ MOMENTO_PRA = r'\b(bom|otimo|melhor|pior) momento\b[^.?!,;]{0,25}\b(pra|para|de)
 # gíria do preço ("o bitcoin vai voar", "vou voar com o bitcoin?") nem a entrada ("embarco no brent?", "embarco hoje?",
 # "embarco pro bitcoin?", "embarco pra lucrar?"): sai do texto que o FUTURO e a dica leem.
 VIAGEM = (r'(\b(vou|vamos|a gente vai|eu|estou|to|tou) (voar|voando)\b|\bembarc(o|amos)\b)'
-          r'( (hoje|amanha|(na |nesta |essa |nessa |esta )?(semana|mes) que vem|dia \d+|em \d+ dias|daqui a \d+ dias'
+          r'( (hoje|amanha|(na |nesta |essa |nessa |esta )?(semana|mes) que vem|dia \d+|(em|daqui|daqui a) \d+ (dias|semanas|meses)'
           r'|(na |nesta |essa |nessa |esta )?(segunda|terca|quarta|quinta|sexta)(-feira)?|(no |neste |nesse |este |esse )?(sabado|domingo)'
           rf'|em {MESES}))?'
           r' (pra|para|pro|pros|pras|rumo a|rumo ao|a caminho d[aeo])\b'
@@ -953,7 +1171,7 @@ VOTO_INFORMADO = (r'\b(eu )?vot(o|ei|arei|aria|ando) (\d+|no|na|em)\b|\bsou (\w+
                   r'|\bfiz o l\b|\beu apoio\b|\btorco (pelo|pela|pro|para o)\b')
 # Pedido de alocação, que a conta neutra (P4) nunca apaga.
 ALOCACAO = (r'\bquanto (eu )?(coloco|ponho|invisto|aplico|boto|devia ter|deveria ter)\b|\bquantos contratos\b|\bquanto investir\b'
-            r'|\br\$ ?\d|\b\d+ ?mil\b|\b\d+ ?k\b|\btenho \d')
+            r'|\br\$ ?\d|\b\d+ ?mil\b|\b\d+ ?k\b|\btenho \d|' + QUANTOS_ATIVO)
 CANDIDATO_OU_VITORIA = r'\b(flavio|bolsonaro|lula|vence|vencer|ganha|ganhar|reeleit\w*|favorit\w*|eurasia|frente)\b'
 # A chance do candidato sem ganhar dinheiro ("quais as chances do lula ganhar?") não é a chance de a pessoa ganhar dinheiro.
 GANHO_DELA = r'\bganha(r)? (dinheiro|grana)\b|\blucr\w*|\bficar rico\b|\benriquec\w*|\bganho\b'
@@ -993,11 +1211,17 @@ MOMENTO_TROCA = (r'\b' + TROCA + r'\b[^.?!]{0,40}\b(agora|ahora|antes|depois|hoj
 # Quanto mover, ou que parte: alocação (N5). Aí o valor não entra na conta, e vale a recusa do capital.
 QUANTO_TROCAR = (r'\bquanto (\w+ ){0,4}?(coloco|ponho|invisto|aplico|boto|trago|troco|converto|mando|envio|remeto|mantenho|'
                  r'deixo|tiro|passo|devia|deveria|trazer|trocar|converter|mandar|enviar|remeter|manter|deixar|tirar|passar)\b'
-                 r'|\bquanto investir\b|\bquantos contratos\b|\b(que|qual|quanto) (parte|porcentagem|percentual|fatia|pedaco)\b'
+                 r'|\bquanto investir\b|\bquantos contratos\b|' + QUANTOS_ATIVO
+                 + r'|\b(que|qual|quanto) (parte|porcentagem|percentual|fatia|pedaco)\b'
                  r'|\bquanto disso\b|\b(' + TROCA[1:-1] + r'|deixo|mantenho)\b[^.?!]{0,25}\b(tudo|metade|um terco|uma parte|parte'
                  r'|o resto|aos poucos|de uma vez|em (parcelas|etapas)|\d+ ?%|half|all)\b'
                  r'|\b(tudo|metade|parte) ou (tudo|metade|parte|nada)\b|\bhow much\b|\b(what|which) (part|portion|percentage|share)\b'
                  r'|\ball or (half|part)\b')
+# O custo, o imposto e o prazo da remessa ("quanto custa mandar?", "quanto de IOF pago pra mandar?", "quanto tempo leva
+# pra enviar?") são regra (P5), não quanto mover (N5): o trecho sai antes do QUANTO_TROCAR.
+CUSTO_DA_TROCA = (r'\bquanto (e |eh |seria |fica |sai |vai ser )?(eu )?(pago |pagaria |pagamos |vou pagar |paga |cobram |cobra '
+                  r'|se paga )?(de |do |da |o |a |os |as )?(iof|impostos?|ir|irpf|taxas?|tarifas?|spread|custa|custam|custaria'
+                  r'|custo|cobra|cobram|cobraria|tempo (leva|levaria|demora|demoraria)|demora|demoraria|leva|levaria)\b')
 MULTIPLICA = {'mil': 1e3, 'k': 1e3, 'milhao': 1e6, 'milhoes': 1e6, 'mi': 1e6}
 # Em pergunta de petróleo, "100 dólares" é o preço do barril, não o dinheiro da pessoa, a não ser que ela diga que tem.
 # O número começa onde não há outro dígito antes ((?<![\d.,])): sem isso, "1111..." recomeça em cada posição e a
@@ -1203,13 +1427,58 @@ QUANTO = r'\b(quanto|qto|qnto|cuanto)\b'
 PRAZO_SEM_PREVISAO = MOVIMENTO_PASSADO + r'|\bfocus\b'
 
 
+# Cada dinheiro ou "cai" do texto pede uma busca na oração inteira: numa pergunta que repete o mesmo trecho centenas de
+# vezes ("€1€1€1...", "📉📈📉📈...") a conta ficava quadrática. Só os primeiros MAX_TROCAS passam pela troca; o resto fica
+# como está (o "cai" e o dinheiro continuam no texto do FUTURO: na dúvida, recusa).
+MAX_TROCAS = 30
+
+
 def _trecho(t: str, m: re.Match, corte: str) -> str:
-    return re.split(corte, t[:m.start()])[-1] + m.group() + re.split(corte, t[m.end():])[0]
+    # maxsplit=1: só o primeiro pedaço depois importa, e a pergunta longa não é cortada inteira a cada ocorrência
+    return re.split(corte, t[:m.start()])[-1] + m.group() + re.split(corte, t[m.end():], maxsplit=1)[0]
 
 
 def _tira(t: str, alvo: str, marca: str, corte: str) -> str:
     """Tira cada `alvo` cujo trecho (a oração ou a frase, pelo `corte`) tem a `marca`."""
     return re.sub(alvo, lambda m: ' ' if re.search(marca, _trecho(t, m, corte)) else m.group(), t)
+
+
+# - a agenda do pregão ("a b3 abre que horas?", "a bolsa fecha no carnaval?", "a b3 abre no feriado de 20 de novembro?",
+#   "a bolsa abre amanhã?") é como o mercado funciona (P5), não o preço abrindo ou fechando. O verbo sai do texto do FUTURO
+#   só quando a pergunta inteira é essa: uma oração, com o horário ou o dia, sem movimento, nível nem verbo de ordem.
+#   "A bolsa abre em alta?", "o Ibovespa fecha acima de 130 mil no dia 30?" e "a bolsa abre no carnaval, aproveito?"
+#   continuam recusa (N2, N4).
+ABRE_FECHA = r'\b(abre|abrem|abrir|abrira|fecha|fecham|fechar|fechara)\b'
+_LOCAL_DO_PREGAO = r'(b3|bolsas?|pregao|nyse|nasdaq|wall street|tesouro direto|bovespa|mercados?)'
+AGENDA_DO_PREGAO = (r'\b(que horas?|q horas?|horarios?|feriados?|carnaval|natal|ano novo|reveillon|sabados?|domingos?'
+                    r'|fins? de semana|finais de semana|cinzas|corpus christi|sexta[- ]feira santa|dia \d+|\d+ de ' + MESES + r')\b'
+                    rf'|^\W*(a |o )?{_LOCAL_DO_PREGAO}( \w+)? ' + ABRE_FECHA
+                    + r'( (amanha|hoje|segunda|terca|quarta|quinta|sexta)(-feira)?)?\W*$')
+MOVIMENTO_DO_PRECO = (r'\b(em (alta|queda|baixa)|acima|abaixo|no (positivo|negativo|azul|vermelho)|positiv\w*|negativ\w*'
+                      r'|subindo|caindo|pra (cima|baixo)|para (cima|baixo)|gap|bem|mal|como|quanto)\b'
+                      r'|(?<![\d.,])\d[\d.,]* ?(mil|k|pontos?|%)|r\$|us\$'
+                      r'|\b(a|aos?|nos?|em|de) \d[\d.,]*\b(?! de ' + MESES + r'\b)')
+PEDIDO_NA_AGENDA = (r'\b(entro|compro|vendo|opero|zero|troco|trago|aproveit\w*|entrar|comprar|vender|operar|esper\w*|pegar'
+                    r'|devo|vale|posso|faco|fazer)\b')
+
+
+def _so_agenda_do_pregao(t: str) -> bool:
+    """A pergunta inteira é o horário ou o dia do pregão: uma oração só, sem movimento nem pedido."""
+    corpo = re.sub(r'\W+$', '', t)
+    return bool(not re.search(r'[;:?!]|[,.](?!\d)', corpo) and re.search(ABRE_FECHA, corpo)
+                and re.search(AGENDA_DO_PREGAO, corpo) and not re.search(MOVIMENTO_DO_PRECO, corpo)
+                and not re.search(PEDIDO_NA_AGENDA, corpo))
+
+
+# "Amanhã" da agenda ("copom é amanhã?", "o IPCA sai amanhã?", "a ata do Copom sai amanhã?", "a bolsa abre amanhã?") é o
+# calendário (P5), não a hora de operar, quando a pergunta inteira é essa. "Copom é amanhã, aproveito?", "copom é amanhã:
+# o que acontece com o dólar?" e "copom amanhã" continuam recusa (N4).
+_EVENTO = (r'((o |a )?(proxim[oa] )?((reuniao|decisao|ata|divulgacao) d[oa] )?(copom|ipca|ipca-15|payroll|focus|fomc|fed|pib'
+           r'|caged)|(a |o )?(proxim[oa] )?(reuniao|decisao|ata) d[oa] (bc|banco central))')
+CALENDARIO_AMANHA = (r'^\W*(sera que |sabe se |voce sabe se |vc sabe se )?' + _EVENTO
+                     + r' (e|sai|saem|tem|sera|vai ser|vai sair|acontece)( mesmo| so)? amanha( mesmo)?\W*$'
+                     r'|^\W*amanha (e|tem|sai|saem) ' + _EVENTO + r'\W*$'
+                     rf'|^\W*(a |o )?{_LOCAL_DO_PREGAO}( \w+)? ' + ABRE_FECHA + r' amanha\W*$')
 
 
 def _sem_regra_nem_agenda(t: str) -> str:
@@ -1220,7 +1489,39 @@ def _sem_regra_nem_agenda(t: str) -> str:
                  or re.search(REGRA_ANTES, antes) and not re.search(QUANTO, _trecho(t, m, ORACAO)))
         # com outro sujeito junto ("o IOF vai ficar em 3,5%, e o dólar?"), continua recusa
         return ' ' if regra and not re.search(COORDENA, _trecho(t, m, r'[?!]')) else m.group()
-    return re.sub(VAI_SER, troca, t)
+    return re.sub(VAI_SER, troca, t, count=MAX_TROCAS)
+
+
+# - a conta de câmbio com "vai ficar/custar/valer" ("quanto vai ficar 3 mil dólares em reais?", "minha viagem vai custar 4 mil
+#   dólares, quanto é em reais?") é a conversão de hoje (P4), como o "how much will I get in reais": o sujeito é a quantia
+#   ou a viagem, não a cotação. "qual dólar vai valer na fatura?" é a regra do cartão. Continua recusa com prazo na frase ou
+#   data na oração do verbo ("... em reais em dezembro?", "quanto vai valer em reais quando eu voltar?"), com a moeda de
+#   sujeito ("quanto vai ficar o dólar em reais?") e com 1 dólar ou 1 euro, que é a cotação.
+VAI_CONTA = r'\b(vai|vao) (ficar|custar|valer)\b'
+CONTA_DA_VIAGEM = r'\b(minha|nossa|a|essa|esta) viagem\b'
+MOEDA_SUJEITO = r'\b(o|a) (dolar|euro|cotacao|cambio|moeda)\b(?! (de hoje|do dia|atual|oficial)\b)'
+# o preço de outra coisa na frase ("quanto vai custar a gasolina em reais com o barril a 100 dólares?") continua recusa
+OUTRO_PRECO = (rf'\b({EMPRESA_SEM_VALE}|acoes?|bolsa|ibovespa|{CRIPTO_NOME}|cripto\w*|petroleo|brent|wti|barril|barris'
+               r'|opep|opec|ouro|gasolina|diesel|etanol|combustive(l|is)|litros?|selic|juros)\b')
+QUAL_TAXA = r'\bqual( e)?( o| a)? (dolar|cotacao|cambio|taxa( de cambio)?|ptax) $'
+NA_FATURA = r'( na| no| pra| para)( a| o)? (fatura|cartao)\b'
+DATA_DA_CONTA = (rf'\b(em|no|na|pro|pra|ate) ({MESES[1:-1]}|natal|carnaval|fim|final|volta)\b'
+                 r'|\b(amanha|depois|quando|daqui|futuro|proxim\w*)\b|\b(semana|mes|ano) que vem\b')
+
+
+def _sem_a_conta(t: str) -> str:
+    """Tira o "vai ficar/custar/valer" da conta de câmbio com a quantia da pessoa e da regra do cartão."""
+    def troca(m: re.Match) -> str:
+        frase, oracao = _trecho(t, m, r'[?!]|\.(?!\d)'), _trecho(t, m, ORACAO)
+        if re.search(PRAZO, frase) or re.search(DATA_DA_CONTA, oracao):
+            return m.group()
+        if re.search(QUAL_TAXA, t[:m.start()]) and re.match(NA_FATURA, t[m.end():]):
+            return ' '
+        valor = cambio(frase)[0]
+        conta = re.search(CONVERSAO, frase) or re.search(CONTA_DA_VIAGEM, frase)
+        sujeito = re.search(MOEDA_SUJEITO, frase) or re.search(OUTRO_PRECO, frase)
+        return ' ' if conta and valor and valor > 1 and not sujeito else m.group()
+    return re.sub(VAI_CONTA, troca, t, count=MAX_TROCAS)
 
 
 def _posse(oracao: str) -> list[int]:
@@ -1231,17 +1532,68 @@ def _posse(oracao: str) -> list[int]:
                     and not re.search(PESSOA, oracao[max(o for o in oleo if o < x.start()):x.start()]))]
 
 
+# A necessidade ou o plano de quem fala ("preciso de 5 mil dólares até dezembro", "vou precisar de 4 mil dólares daqui a 3
+# meses", "quero juntar 10 mil dólares até o fim do ano") e o valor da viagem ("2 mil dólares pra viagem do ano que vem")
+# também são o dinheiro dela, não um nível de preço com prazo.
+NECESSIDADE = r'\b(precis\w*|junt(ar|o|ando|amos)|pretend\w*|planej\w*)\b'
+PRA_O_PLANO = r' (pra|para|pro|pros) (a |o |minha |meu |nossa |nosso )?(viagem|viagens|intercambio|ferias|lua de mel|mochilao)\b'
+
+
 def _sem_o_dinheiro_dela(t: str) -> str:
-    """Tira do texto do FUTURO o dinheiro que a pessoa diz que tem ou leva (posse na mesma oração)."""
+    """Tira do texto do FUTURO o dinheiro que a pessoa diz que tem, leva, precisa ou junta (na mesma oração), ou que é
+    o da viagem."""
     if re.search(VALOR_QUE_VEM, t):
         return t
 
     def troca(m: re.Match) -> str:
         antes = t[:m.start()]
         oracao = re.split(r'[?!;:]|\.(?!\d)|,(?!\d)', antes)[-1]
-        dela = _posse(oracao) and not re.search(ANTES_DO_NIVEL, antes)
+        dela = ((_posse(oracao) or re.search(NECESSIDADE, oracao) or re.match(PRA_O_PLANO, t[m.end():]))
+                and not re.search(ANTES_DO_NIVEL, antes))
         return ' ' if dela else m.group()
-    return re.sub(_DINHEIRO, troca, t)
+    return re.sub(_DINHEIRO, troca, t, count=MAX_TROCAS)
+
+
+# O dinheiro que "cai na conta" (dividendo, JCP, cupom, o dinheiro da venda) é o pagamento, não a queda do preço: o verbo
+# sai do texto do FUTURO quando vem com "na conta", ou quando o pagamento é o sujeito e a oração pede a data ou o prazo
+# ("quando cai o dividendo?", "o dinheiro da venda de ação cai em quantos dias?"). Com um preço antes, no mesmo trecho
+# ("quando a ação cai o dividendo compensa?", "a ação e o dividendo caem quando?"), continua recusa (N2), como "a ação cai
+# depois da data com?".
+_CAI = r'(cai|caem|cair|caia|caiam|caira|cairao)'
+CAI_NA_CONTA = r' (na|em) (minha |sua |nossa |tua )?conta\b'
+PAGAMENTO = (r'(dividendos?|proventos?|jcp|juros sobre (o )?capital( proprio)?|cupom|cupons|pagamentos?|restituic(ao|oes)'
+             r'|dinheiro|grana)')
+# "o dinheiro" só é o pagamento quando a frase diz de onde ele vem ("vendi ações, quando cai o dinheiro?"); "quando cai o
+# dinheiro do bitcoin?" continua recusa
+DINHEIRO_DE_QUE = r'\b(vend\w*|resgat\w*|saque|sacar|saquei|liquidac\w*)\b'
+PEDE_PRAZO = r'\b(quando|que dia|qual dia|que data|qual (e )?(a )?data|quanto tempo|quantos dias|prazo|demora\w*)\b'
+PRECO_ANTES = (r'\b(acao|acoes|papel|papeis|preco|cotacao|ativo|bolsa|ibov\w*|indice|dolar|euro|bitcoin|btc|cripto\w*'
+               r'|petroleo|brent|barril|juros?|selic)\b|\b' + EMPRESA + r'\b')
+
+
+def _sem_o_pagamento(t: str) -> str:
+    """Tira do texto do FUTURO o "cai" do dinheiro que entra na conta."""
+    if not re.search(r'\bconta\b', t) and not re.search(PEDE_PRAZO, t):
+        return t  # sem "na conta" nem data pedida, nenhum "cai" sai
+
+    def troca(m: re.Match) -> str:
+        antes, depois = re.split(TRECHO, t[:m.start()])[-1], t[m.end():]
+        if re.match(CAI_NA_CONTA, depois):
+            return ' '
+        if not re.search(PEDE_PRAZO, _trecho(t, m, ORACAO)):
+            return m.group()
+        sujeito = re.match(rf' (?:(?:o|a|os|as) )?{PAGAMENTO}\b', depois)
+        if sujeito and re.search(PRECO_ANTES, antes):
+            sujeito = None
+        if not sujeito:
+            sujeito = re.search(rf'\b{PAGAMENTO}( (d[aoe]s?|de) \w+){{0,4}} $', antes)
+            if sujeito and re.search(PRECO_ANTES, antes[:sujeito.start()]):
+                sujeito = None
+        if (sujeito and re.match(r'\W*(?:(?:o|a|os|as) )?(dinheiro|grana)\b', sujeito.group())
+                and not re.search(DINHEIRO_DE_QUE, _trecho(t, m, r'[?!]'))):
+            sujeito = None
+        return ' ' if sujeito else m.group()
+    return re.sub(r'\b' + _CAI + r'\b', troca, t, count=MAX_TROCAS)
 
 
 def _texto_do_futuro(t: str) -> str:
@@ -1251,6 +1603,9 @@ def _texto_do_futuro(t: str) -> str:
     t = re.sub(CARA_NAO_PRECO, ' ', t)
     if re.search(BOMBA_EXPLICA, t) and not re.search(FUTURO_EXPLICITO, t) and not re.search(BOMBA_E_EMPRESA, t):
         t = re.sub(BOMBA_CARA, r'\1\2', t)
+    if (re.search(EXPLICA_MOVIMENTO, t) and not re.search(FUTURO_EXPLICITO, t) and not re.search(PRAZO, t)
+            and not re.search(EXPLICA_MOVIMENTO_TRAVA, t) and not re.search(rf'\b{EMPRESA}\b', t)):
+        t = re.sub(EXPLICA_MOVIMENTO, r'\1 \2\3 ', t)
     t = re.sub(DESCONTO_NA_FONTE, ' ', t)
     if not re.search(rf'\b{EMPRESA}\b', t):
         t = re.sub(DESCONTO_NAO_PRECO, lambda m: m.group(0) if re.search(ADJUNTO_ANTES, m.string[:m.start()])
@@ -1260,12 +1615,17 @@ def _texto_do_futuro(t: str) -> str:
     if re.search(REGRA_CIRCUIT, t):
         t = re.sub(CAI_MAIS_PCT, ' ', t)
         t = re.sub(r'\bcircuit[ -]?breakers? (dispara\w*|aciona\w*|e acionado)\b', ' ', t)  # quem dispara é a regra
-    t = _sem_regra_nem_agenda(t)
+    t = _sem_a_conta(_sem_regra_nem_agenda(t))
+    t = _sem_o_pagamento(t)
+    if _so_agenda_do_pregao(t):
+        t = re.sub(ABRE_FECHA, ' ', t)
 
     def sem_regra(m: re.Match) -> str:
-        frase = re.split(r'[?!]', t[:m.start()])[-1] + m.group() + re.split(r'[?!]', t[m.end():])[0]
+        frase = re.split(r'[?!]', t[:m.start()])[-1] + m.group() + re.split(r'[?!]', t[m.end():], maxsplit=1)[0]
         return m.group() if re.search(COORDENA, frase) else ' '
     t = re.sub(REGRA_FUTURA, sem_regra, t)
+    t = re.sub(TETO_DA_VENDA, lambda m: (m.group()[:m.start('v' if m.group('v') else 'w') - m.start()] + ' '
+                                         if re.search(REGRA_IMPOSTO, _trecho(t, m, r'[?!]|\.(?!\d)')) else m.group()), t)
     t = _tira(t, PRAZO, PRAZO_SEM_PREVISAO, ORACAO)
     t = re.sub(VIAGEM, ' ', t)
     return _sem_o_dinheiro_dela(re.sub(INTERVALO, ' ', t))
@@ -1279,13 +1639,13 @@ def _so_o_dinheiro_dela(t: str) -> str:
     def troca(m: re.Match) -> str:
         antes, depois = t[:m.start()], t[m.end():]
         oracao = re.split(r'[?!;:]|\.(?!\d)|,(?!\d)', antes)[-1]
-        frase = re.split(r'[?!]|\.(?!\d)', antes)[-1] + m.group() + re.split(r'[?!]|\.(?!\d)', depois)[0]
+        frase = re.split(r'[?!]|\.(?!\d)', antes)[-1] + m.group() + re.split(r'[?!]|\.(?!\d)', depois, maxsplit=1)[0]
         oleo = [x.start() for x in re.finditer(OLEO, oracao)]
         posse = _posse(oracao)
         dela = (bool(posse) and not (oleo and oleo[-1] > posse[-1]) or bool(re.match(NA_CONTA, depois))
                 or bool(re.search(CONVERSAO, frase)) or any(a <= m.start() < b for a, b in gastos))
         return m.group() if dela else ' '
-    return re.sub(_DINHEIRO, troca, t)
+    return re.sub(_DINHEIRO, troca, t, count=MAX_TROCAS)
 
 
 # A regra do imposto, da declaração, do FGC ou da custódia não é onde pôr o dinheiro (P5): o lugar do verbo é a declaração,
@@ -1305,8 +1665,188 @@ REGRA_DO_VERBO = (
     rf'(?=[^.?!]{{0,40}}{REGRA_IMPOSTO}){_SEM_GANHO}'
     rf'|(?<!onde )(?<!onde eu )\b(guardo|deixo)\b{_SEM_MOTIVO}{{0,50}}[,;]'
     rf'(?=[^.?!]{{0,30}}\b(declar\w*|imposto\w*|tribut\w*|isent\w*)\b){_SEM_GANHO}'
+    rf'|(?<!como )(?<!como eu )\b(aporto|aportamos|faco (um |o )?aporte)\b{_SEM_MOTIVO}{{0,50}}[,;]'
+    rf'(?=[^.?!]{{0,40}}\b(declar\w*|imposto\w*|darf|irpf|isent\w*)\b){_SEM_GANHO}'
+    r'(?![^.?!]*\b(ou|pra nao|para nao|por causa|porque|ja que)\b)'
     r'|\b(guardo|deixo|anoto|coloco|ponho|boto)\b (a |as |o |os |minha |minhas |meu |meus )?(seed|senha\w*|chave\w*( privada)?'
     r'|frase\w*( de recuperacao| semente)?|palavras( de recuperacao)?|\d+ palavras|backup)\b')
+
+
+# O valor que a pessoa tem na frase da declaração ou do imposto ("tenho 5 mil em bitcoin, preciso declarar?", "tenho 10 mil
+# em ações, preciso declarar?", "faço um aporte por mês, preciso declarar todo mês?") é o dado para aplicar a regra (P5),
+# não pedido de alocação: o piso de R$ 5 mil da declaração depende dele. Vale só quando o capital é o único pedido e a
+# pergunta não tem lugar, escolha, dever, "ou", motivo, ganho nem verbo de pôr, tirar ou mover o dinheiro.
+REGRA_COM_VALOR = (r'\b(declar\w*|bens e direitos|irpf|imposto de renda|darf|isent\w*)\b'
+                   r'|\b(pago|pagaria|paga|pagar|pagam|tem|teria|incide|cobr\w*|recolh\w*)\b[^.?!]{0,20}'
+                   r'\b(ir(?! (pra|para|ate|a|ao)\b)|imposto\w*|darf|irpf)\b')
+PEDIDO_COM_VALOR = (r'\b(onde|qual|quais|devo|deveria|vale|valeria|compens\w*|melhor|pior|ou|tudo|metade|parte|evit\w*'
+                    r'|pra nao|para nao|por causa|porque|ja que|mais|menos|ganh\w*|rend\w*|lucr\w*|vend\w*|compr\w*'
+                    r'|saco|sacar|tiro|tirar|resgat\w*|transfir\w*|transferir|troc\w*|mando|mandar|levo|levar|trago|trazer)\b'
+                    rf'|{INVESTE}|{ALOCACAO_REAIS}|{QUANTO_TROCAR}')
+# O lugar na declaração ("onde declaro?", "coloco em bens e direitos?", "em qual ficha?") e o "imposto de renda" não são o
+# "onde", o "coloco" nem o "renda" do pedido.
+LUGAR_NA_DECLARACAO = (rf'\bonde (eu )?(declaro|declarar|declara|informo|lanco)\b'
+                       rf'|\b(onde (eu )?)?(coloco|ponho|boto|lanco|informo)\b{_SEM_MOTIVO}{{0,40}}\b(em|na|no|nas|nos)'
+                       rf'( (qual|que|a|o))? {DECLARACAO_LUGAR}\b|\b(em )?(qual|que) (ficha|grupo|codigo|campo)\b'
+                       r'|\bimposto de renda\b')
+
+
+# Comprar ou vender na pergunta da regra (P5): o imposto, o IOF, a declaração, a isenção de R$ 35 mil, a data com ou a conta
+# da viagem na mesma frase ("vender bitcoin paga imposto?", "se eu vender minhas ações pago IR?", "quem compra bitcoin
+# precisa declarar?", "IOF na compra de dólar", "se eu comprar na data com eu recebo?", "vou comprar 500 euros pra viagem,
+# quanto custa em reais?"). Só o infinitivo, o "se/quando/caso/quem" e o substantivo: "vendo meu bitcoin? pago imposto?"
+# continua dica. Com "ou", "agora", "antes", motivo ("pra não pagar"), ganho, "mais/menos" imposto, "vale", hora ou
+# momento, ou a regra que muda, em qualquer lugar da pergunta, também.
+REGRA_DA_COMPRA = (rf'{REGRA_IMPOSTO}|\b(impostos?|iof|darf|come[- ]cotas)\b|\b(de|do|o|no|sem|com) ir\b(?! (pra|para|ate|a|ao)\b)'
+                   r'|\bdatas? (com|ex)\b|\b(ate|acima de|abaixo de|mais de|menos de|passa\w* de) (r\$ ?)?35 mil\b'
+                   r'|\bviage(m|ns)\b(?=[^.?!]*(\bquanto (custa\w*|da|dao|fica\w*|sai\w*|e|sao|pago)\b|\bem reais\b'
+                   r'|\bquantos reais\b))'
+                   # a liquidação ("quando o dinheiro cai na conta depois de vender bitcoin?", "a venda liquida em D+2?")
+                   r'|\b(cai|cair|caem|caiu) na conta\b|\bliquid\w*|\bd ?\+ ?\d\b')
+VERBO_DA_REGRA = (r'\b((se|quando|caso)( eu)? (compro|vendo|compre|venda|comprar|vender)|quem (compra|vende))\b|\b(comprar|vender)\b'
+                  r'|\b(na|da|pela|a|uma|cada|toda|nas|das|pelas|as) compras?\b')
+PEDIDO_NA_REGRA = (r'\b(ou|agora|ja|antes(?! d[ao] datas? (com|ex)\b)|melhor|pior|compens\w*|hora|momento|porque|devido)\b'
+                   r'|(?<!quanto )\bvale\b|\b(mais|menos)\b(?! (de|do que) (r\$ ?)?\d)|\bganh\w*\b(?! de capital)'
+                   r'|\b(pra|para|por|de) (nao|pagar|ficar|fugir|evitar|economizar|ganhar|lucrar|aproveitar|escapar|causa)\b'
+                   r'|\b(mud\w*|nov[ao]s?|bo[am]s?|cert[ao]s?|segur[ao]s?|arrisc\w*|pode ser|(faco|fazer|faria) isso)\b')
+
+
+def _sem_o_verbo_da_regra(t: str) -> str:
+    """O texto sem o comprar/vender quando toda frase pergunta a regra; igual quando a pergunta tem marca de pedido."""
+    if re.search(PEDIDO_NA_REGRA, t):
+        return t
+    frases = re.split(r'([?!]|\.(?!\d))', t)
+    # toda frase com palavra pergunta a regra: "comprar petr4 paga imposto? é bom?" continua dica
+    if any(re.search(r'\w', f) and not re.search(REGRA_DA_COMPRA, f) for f in frases):
+        return t
+    return ''.join(re.sub(VERBO_DA_REGRA, ' ', f) for f in frases)
+
+
+# Compensar prejuízo é a regra do IR (P5), não "compensa comprar?": o substantivo ("como funciona a compensação de
+# prejuízo?"), o prejuízo que "pode compensar" ou "pode ser compensado", o "posso compensar o prejuízo?" e o "compensar o
+# prejuízo" com o regime ou o imposto dito depois ("de day trade com swing trade", "no IR"). "Tô no prejuízo, compensa?",
+# "como compensar o prejuízo que tive na PETR4?" (recuperar a perda) e o compensar com o jeito de operar ("comprando mais",
+# "operando day trade") continuam dica.
+_SEM_ACAO = (r'(?![^.?!]*\b(comprando|vendendo|aportando|investindo|aplicando|entrando|saindo|operando|botando|pondo'
+             r'|colocando|segur\w*|mant(er|enho|endo)|dobr\w*|zer(o|ar|ando)|realiz(o|ar|ando)|hold\w*|carreg\w*)\b)')
+_PODE = (r'(posso|pode|podem|podemos|poderia|da (pra|para)|consigo|tem como|e possivel|ser|sao|foi|foram|sera|serao'
+         r'|vai ser|deve ser)')
+_PREJUIZO = r'(o |a |os |as |meus? |minhas? |esses? |essas? |seus? |suas? |de |do |da |dos |das )?(prejuizos?|perdas?)\b'
+MARCA_IR = (r'\b(ir(?! (pra|para|ate|a|ao)\b)|irpf|imposto\w*|darf|declar\w*|receita|tribut\w*|isen\w*|aliquota\w*'
+            r'|day ?trades?|swing ?trades?|operac(ao|oes) comu\w*|lucros?|ganhos?|mes(es)? seguintes?|proximos meses)\b')
+COMPENSAR_PREJUIZO = (rf'\bcompensac(ao|oes)\b{_SEM_ACAO}'
+                      rf'|\b(prejuizos?|perdas?)\b[^.?!]{{0,40}}\b({_PODE} compens\w*|compens\w* com (o |a |os |as )?(lucros?|ganhos?)\b)'
+                      rf'{_SEM_ACAO}'
+                      rf'|\b{_PODE} compens\w* {_PREJUIZO}{_SEM_ACAO}'
+                      rf'|\bcompens\w* {_PREJUIZO}(?=[^.?!]*{MARCA_IR}){_SEM_ACAO}')
+
+
+# A definição de ordem e de operação ("o que é stop loss?", "como funciona o stop no mini-índice?", "o que é opção de
+# compra?", "o que é vender a descoberto?", "qual a diferença entre stop loss e stop gain?") é conceito (P5): o N4 proíbe
+# indicar o stop, não explicar o que ele é. O resto da pergunta continua valendo ("o que é stop? qual eu uso amanhã?").
+_TERMO_DE_ORDEM = (r'(stop( (loss|gain|movel|limite|de (perda|ganho)))?|orde(m|ns) (de )?(stop|compra|venda)( (a mercado|limitada))?'
+                   r'|opc(ao|oes) (de )?(compra|venda)|spread( de compra e (de )?venda)?'
+                   r'|dolar (de )?compra( e (o )?(dolar )?(de )?venda)?|vend(a|er) a descoberto|compra e (de )?venda)\b')
+TERMO_DEFINIDO = (r'\b(o que (e|sao|seria|significa|quer dizer)|como funcionam?|(pra|para) que serve|me explica|explica'
+                  r'|qual (e )?a diferenca entre)( (o|a|os|as|um|uma))? ' + _TERMO_DE_ORDEM
+                  + r'( (e|ou) (o |a |um |uma )?' + _TERMO_DE_ORDEM + ')*')
+# O que, no resto, volta a pedir o stop ou a ordem ("o que é stop? qual eu uso?", "e me diz onde colocar").
+PEDIDO_JUNTO = (r'\b(eu|vou|meu|minha|meus|minhas|mim|consigo|me|qual|quais|quanto|quantos|onde|uso|usar|usaria'
+                r'|coloco|colocar|ponho|por|boto|botar|faco|usa|poe|bota|coloca)\b|\d')
+
+
+# "Como compro Tesouro?", "como vender ações no home broker?", "como faço pra comprar dólar pra viagem?" pedem o passo a
+# passo (P5), como "como eu coloco dinheiro na corretora?". Com momento, preço, ganho, escolha, quantidade ou o "você" na
+# frase ("como comprar na baixa?", "como compro petr4 agora?", "como vender sem perder?"), continua dica (N1, N4, N5).
+_NEGOCIA = r'(compr(o|a|ar|amos)|vend(o|e|er|emos))\b'
+COMO_NEGOCIA = (r'\bcomo( que| q| se| eu| a gente)?( (faco|faz|fazer|posso|consigo|podemos|funciona|e)( (pra|para|de))?'
+                rf'( eu)?)? {_NEGOCIA}( e {_NEGOCIA})?')
+COMO_NEGOCIA_PEDIDO = (r'\b(agora|hoje|amanha|logo|hora|horas|momento|quando|antes(?! do vencimento)|depois|ate|enquanto'
+                       r'|baixa|baixo|alta|queda|cai|caiu|cair|caindo|cairem|sobe|subiu|subir|subindo|topo|pico|fundo do poco'
+                       r'|no fundo|barat\w*|caros?|(mais|muito|tao|ta|esta) cara|lucr\w*|ganh\w*|perd\w*|prejuizo|rende|rendem'
+                       r'|render|rendimento\w*|rentab\w*|proteg\w*|hedge|mais|menos|melhor|melhores|pior|piores|bom(?! dia)'
+                       r'|boa(?! (tarde|noite))|bons|boas|certa|certo|ideal|qual|quais|ou|voce|vc|tu|seguro|segura|seguranca'
+                       r'|que (paga|pagam)'
+                       r'|prazo|dinheiro|grana|pouco|muito|meme\w*'
+                       r'|quant(o|a|os|as)(?! (custa|custam|cobra\w*|e o (iof|imposto|ir|custo)|de (iof|imposto|ir|taxa\w*))\b))\b'
+                       r'|\bja\W*$')
+
+
+# "Por mês" que não é a renda nem o aporte da pessoa (N5): o rendimento, a taxa ou o custo ("quanto rende a poupança por
+# mês?", "13,75% ao ano dá quanto por mês?", "a corretora cobra quanto por mês?"), o limite da isenção ("vendas de até 20
+# mil por mês são isentas?") e o gasto da conta de câmbio ("preciso de 800 dólares por mês", P4). Com ganho, aporte,
+# sobra, alocação, objetivo ou escolha na pergunta ("quanto preciso ter pra render 2 mil por mês?", "qual o melhor?"),
+# segue capital.
+_SUJEITO_POR_MES = (r'(rende|rendem|rendeu|rendia|render|rendera|renderia|rendendo|rendimentos?|rentabilidade|taxas?|juros|cdi'
+                    r'|selic|poupanca|ipca|inflacao|ao ano|custa|custam|custo|cobra|cobram|tarifas?|custodia'
+                    r'|isen\w*|limite|teto|impostos?|darf|tribut\w*)')
+# Sem número entre o rendimento e o "por mês": "quanto rende 500 por mês no tesouro?" tem o aporte dela e segue capital,
+# como "quanto rende R$ 500 no tesouro?".
+POR_MES_NEUTRO = (rf'\b{_SUJEITO_POR_MES}\b[^.?!\d]{{0,40}}\bpor mes\b|%[^.?!]{{0,30}}\bpor mes\b'
+                  r'|\bpor mes\b[^.?!]{0,40}\b(isen\w*|impostos?|darf|tribut\w*|custodia|tarifas?)\b|' + GASTO_DEPOIS.pattern)
+RENDA_OU_APORTE = (r'\b(ganh\w*|receb\w*|sobr\w*|guard\w*|junt\w*|separ\w*|economiz\w*|poupo|poupar|inv[ei]st\w*|aplic\w*'
+                   r'|aport\w*|coloc\w*|ponho|boto|botar|deixo|deixar|tir(o|ar)|fatur\w*|lucr\w*|salario|renda|viver|vivo'
+                   r'|meta|objetivo|aposent\w*|melhor|vale|compensa\w*)\b|\b(preciso|precisaria|precisa|teria|tenho|tem) (que |de )?ter\b'
+                   r'|\b(quero|queria|gostaria de) (ter|render)\b')
+
+
+# "Sair" de publicação e de custo não é sair da posição: "quando vai sair o IPCA?", "a decisão do Copom vai sair que
+# horas?", "quanto vai sair 1000 dólares em reais?". Com juízo ("vai sair o IPCA alto?", "o balanço vai sair forte?"),
+# com data que ainda vem no custo ("quanto vai sair o dólar no fim do ano?") ou com o "sair da/do" do papel, continua.
+_PUBLICADO = (r'(ipca|inpc|igp\w*|pib|caged|payroll|focus|boletim|resultados?|decisao|balancos?|ata|pesquisas?|apuracao'
+              r'|relatorios?|comunicado|informes?|restituicao|lote|calendario|edital|divulgacao|datafolha|quaest|ipec)')
+_JUIZO_SAIR = (r'(alt[oa]s?|baix[oa]s?|forte|fraco|bo[ma]|ruim|dur[oa]|acima|abaixo|melhor|pior|maior|menor|positiv\w*'
+               r'|negativ\w*|favor|contra|surpreend\w*|decepcion\w*)')
+_DATA_QUE_VEM = (r'(fim do ano|final do ano|ano que vem|mes que vem|semana que vem|proxim\w*|amanha|depois d\w*'
+                 r'|dezembro|janeiro|(em|no|para|pra) 20\d\d)')
+SAIR_PUBLICADO = (
+    rf'\bsair (o|a|os|as) ((proxim|nov|primeir|segund|ultim)[oa]s? )?{_PUBLICADO}\b(?![^.?!]*\b{_JUIZO_SAIR}\b)'
+    rf'|\bquanto (vai|vao|ia|iria) (me |nos )?sair\b(?= (\d|r\$|us\$|mil\b|cem\b|em reais\b|(o|a|os|as) (iof|viagem'
+    rf'|passage(m|ns)|hospedagem|hotel|compra|conversao|troca|tarifas?|spread|taxas?|conta|cartao)\b))'
+    rf'(?![^.?!]*\b{_DATA_QUE_VEM}\b)')
+SAIR_QUANDO = (rf'(\b{_PUBLICADO}\b[^.?!,]{{0,40}}\b(vai|vao|deve|devem) )sair (quando|que horas|a que horas|que dia'
+               rf'|em que dia|que data|hoje)(?=\W*$)')
+
+
+def _sem_sair_publicado(t: str) -> str:
+    """O texto sem o "sair" da publicação ("quando vai sair o IPCA?") e do custo ("quanto vai sair 1000 dólares?")."""
+    return re.sub(SAIR_QUANDO, r'\1 ', re.sub(SAIR_PUBLICADO, ' ', t))
+
+
+# A garantia que é regra (P5), não promessa de ganho (M6): a custódia quando a corretora quebra ("minhas ações ficam
+# garantidas se a corretora falir?"), o rendimento da renda fixa ("o CDB tem rendimento garantido?") e o dividendo mínimo
+# da Lei das S.A. ("a Petrobras tem dividendo mínimo garantido?"). "Lucro" e "ganho" garantido continuam promessa.
+QUEBRA_DA_CORRETORA = (r'\b(corretoras?|bancos?|instituic(ao|oes)|financeiras?|exchanges?|fintechs?)\b'
+                       r'[^.?!]{0,40}\b(quebr\w*(?! (o |a |os |as )?(recordes?|marca|barreira|teto|piso|sigilo|regras?)\b)'
+                       r'|fal(ir|iu|isse|irem|ida|ido)|for a falencia)\b'
+                       r'|\b(quebra|falencia) d[aeo]s? (corretora|banco|instituicao|financeira|exchange)s?\b')
+GARANTIA_DA_REGRA = (r'\b(cdb|lci|lca|poupanca|tesouro|renda fixa|deposito|cri|cra|debentures?)\b[^.?!]{0,30}'
+                     r'\b(rendimentos?|rentabilidade|remuneracao|juros?|taxa)\b( (e|sao|ta|esta|fica|ficam))? garantid[oa]s?\b'
+                     r'|\b(dividendos?|proventos?) minimos?( obrigatorios?)?( de \d+ ?%)?( (e|sao|ta|esta))? garantid[oa]s?\b')
+# o que a pessoa faz com o dinheiro ("a corretora pode quebrar, tiro meu dinheiro?") continua capital (N5)
+ACAO_COM_DINHEIRO = (r'\b(tiro|tirar|saco|sacar|retiro|retirar|resgato|resgatar|mudo|mudar|movo|mover|transfiro|transferir'
+                     r'|passo|passar|levo|levar|deixo|deixar|ponho|por|boto|botar|coloco|colocar|invisto|investir|aplico'
+                     r'|aplicar|guardo|guardar|divido|dividir|espalho|espalhar|faco|fazer)\b')
+
+
+# A idade (a sua ou a de um parente) e a aposentadoria como renda numa pergunta de regra não pedem adequação (P5): "minha
+# mãe tem 70 anos, precisa declarar o IR?", "meu filho de 12 anos entra como dependente?", "tenho 17 anos, posso abrir
+# conta na corretora?", "meu pai de 65 anos tem isenção de IR na aposentadoria?". Com adequação junto ("pode ter
+# petrobras?", "serve pra ela?", "vale a pena?", "onde ela investe?") continua perfil. A aposentadoria como objetivo ("pra
+# aposentadoria") não sai.
+IDADE_DITA = (r'\btenho \d+ anos\b|\b(minha|meu|ela|ele)\b[^.?!]{0,25}\btem \d+ anos\b'
+              r'|\b(meu|minha) (avo|vo|vovo|pai|mae|filh[oa]|tio|tia|esposa|marido|sogr[oa])\b[^.?!]{0,20}\b(de|com) \d+ anos\b'
+              r'|(?<!\bpra )(?<!\bpara )(?<!\bpra a )(?<!\bpara a )(?<!\bpra minha )(?<!\bpara minha )(?<!\bpra sua )'
+              r'(?<!\bpara sua )\baposentadoria\b')
+REGRA_DA_IDADE = (r'\b(declar\w*|irpf|darf|carne[- ]leao|bens e direitos|imposto\w*|isen\w*|dependentes?|tribut\w*)\b'
+                  r'|\bir\b(?! (pra|para|ate|a|ao|bem|mal)\b)'
+                  r'|\b(abrir|abro|abre|ter|tenho|tem|tirar|criar|fazer) (uma )?conta (em|na|numa|no|de) (corretora|banco|exchange'
+                  r'|b3|tesouro)\b|\bmenor de idade\b')
+ADEQUACAO = (r'\b(pode|podem|posso|deve|devem|devo|deveria|vale|compensa)\b( \w+)? (ter|investir|comprar|aplicar|entrar|colocar'
+             r'|por|botar)\b(?! (uma )?conta\b)|\bvale a pena\b|\b(bom|boa|melhor|ideal|serve|servem) (pra|para)\b'
+             r'|\bonde (eu |ela |ele )?(invist\w*|invest\w*|aplic\w*|coloc\w*|ponho|poe|boto|bota)\b'
+             r'(?![^.?!]{0,40}\b(declarac\w*|ficha|bens e direitos|irpf|imposto de renda)\b)'
+             r'|\b(quanto|qual|em que)\b[^.?!]{0,15}\b(invist\w*|invest\w*|aplic\w*)\b')
 
 
 def _valor_e_dela(t: str) -> bool:
@@ -1364,8 +1904,14 @@ def analisar(pergunta: str) -> Pedido:
                proibidos=achou(PROIBIDOS), voto_informado=bool(re.search(VOTO_INFORMADO, t)))
     # O preço, o fato e o alvo em reais não são o dinheiro da pessoa; o que ela diz que é dela ("recebi dividendos de R$ 50
     # mil, onde ponho?") continua capital (N5).
+    # o volume de vendas do mês na pergunta do imposto ("se eu passar de 35 mil por mês em bitcoin, pago imposto?") também não
+    sem_venda = re.sub(VOLUME_DE_VENDA, ' ', t) if re.search(REGRA_IMPOSTO, t) else t
     if ('capital' in p.proibidos and not _valor_e_dela(t)
-            and not re.search(PROIBIDOS['capital'], re.sub(PRECO_OU_FATO, ' ', t))):
+            and not re.search(PROIBIDOS['capital'], re.sub(PRECO_OU_FATO, ' ', sem_venda))):
+        p.proibidos.remove('capital')
+    # nem o "por mês" do rendimento, da taxa, do limite da isenção ou do gasto da viagem
+    if ('capital' in p.proibidos and not re.search(RENDA_OU_APORTE, t)
+            and not re.search(PROIBIDOS['capital'], re.sub(POR_MES_NEUTRO, ' ', t))):
         p.proibidos.remove('capital')
     # O momento que já passou não é pedido de entrada, a não ser que o resto da pergunta peça dica.
     # Só sai o trecho do momento que já passou: um "e hoje é bom momento?" depois dele continua dica (N1).
@@ -1379,6 +1925,50 @@ def analisar(pergunta: str) -> Pedido:
     if ('dica' in p.proibidos and re.search(REGRA_DO_VERBO, t)
             and not re.search(PROIBIDOS['dica'], re.sub(REGRA_DO_VERBO, ' ', t))):
         p.proibidos.remove('dica')
+    # Comprar ou vender na regra do imposto, do IOF ou da data com; compensar prejuízo no IR; a definição de stop e de ordem;
+    # o passo a passo de "como comprar"; a agenda de amanhã; e o "sair" da publicação: são P5, não pedido.
+    sem_o_verbo = _sem_o_verbo_da_regra(t)
+    if 'dica' in p.proibidos and sem_o_verbo != t and not re.search(PROIBIDOS['dica'], sem_o_verbo):
+        p.proibidos.remove('dica')
+    if ('dica' in p.proibidos and re.search(COMPENSAR_PREJUIZO, t)
+            and not re.search(PROIBIDOS['dica'], re.sub(COMPENSAR_PREJUIZO, ' ', t))):
+        p.proibidos.remove('dica')
+    if {'dica', 'momento'} & set(p.proibidos) and re.search(TERMO_DEFINIDO, t):
+        t_sem_termo = re.sub(TERMO_DEFINIDO, ' ', t)
+        if not re.search(PEDIDO_JUNTO, t_sem_termo):
+            for codigo in ('dica', 'momento'):
+                if codigo in p.proibidos and not re.search(PROIBIDOS[codigo], t_sem_termo):
+                    p.proibidos.remove(codigo)
+    if ('dica' in p.proibidos and re.search(COMO_NEGOCIA, t) and not re.search(COMO_NEGOCIA_PEDIDO, t)
+            and not re.search(PROIBIDOS['dica'], re.sub(COMO_NEGOCIA, ' ', t))):
+        p.proibidos.remove('dica')
+    if 'momento' in p.proibidos and re.search(CALENDARIO_AMANHA, t):
+        p.proibidos.remove('momento')
+    # Só sai quando o "sair" de publicação ou de custo era o único pedido de ação ou de momento da pergunta.
+    t_publicado = _sem_sair_publicado(t)
+    if t_publicado != t and not any(re.search(PROIBIDOS[c], t_publicado) for c in ('dica', 'momento')):
+        p.proibidos = [c for c in p.proibidos if c not in ('dica', 'momento')]
+    # A garantia que é regra (custódia quando a corretora quebra, renda fixa, dividendo mínimo) não é promessa de ganho, e
+    # "meu dinheiro" ao lado da corretora que quebra é a regra da custódia e do FGC (P5), não alocação (N5).
+    quebra = re.search(QUEBRA_DA_CORRETORA, t)
+    if 'dica' in p.proibidos and (quebra or re.search(GARANTIA_DA_REGRA, t)):
+        t_regra = re.sub(GARANTIA_DA_REGRA, ' ', t)
+        if quebra:
+            t_regra = re.sub(r'\bgarantid[oa]s?\b', ' ', t_regra)
+        if not re.search(PROIBIDOS['dica'], t_regra):
+            p.proibidos.remove('dica')
+    if ('capital' in p.proibidos and quebra and not re.search(ACAO_COM_DINHEIRO, t) and not re.search(
+            PROIBIDOS['capital'], re.sub(r'\b(meu|minha) (dinheiro|patrimonio|capital|carteira)\b', ' ', t))):
+        p.proibidos.remove('capital')
+    # a idade na pergunta de declaração, dependente ou conta de menor não é adequação
+    if ('perfil' in p.proibidos and re.search(REGRA_DA_IDADE, t) and not re.search(ADEQUACAO, t)
+            and not re.search(PROIBIDOS['perfil'], re.sub(IDADE_DITA, ' ', t))):
+        p.proibidos.remove('perfil')
+    # A causa do que já aconteceu ("o que fez o petróleo disparar em 2022?") não é o "disparar" que pede direção: quem
+    # decide é o filtro do PASSADO, logo abaixo ("o que fez o petróleo disparar? vai disparar mais?" continua recusa).
+    if ('direcao' in p.proibidos and re.search(r'\bo que (fez|fizeram|causou|causaram|provocou|provocaram)\b', t)
+            and not re.search(PROIBIDOS['direcao'], re.sub(r'\bdisparar\b', ' ', t))):
+        p.proibidos.remove('direcao')
     if p.voto_informado and 'eleicao' not in p.temas:
         p.temas.append('eleicao')
     # Conceito de derivativo (margem, ajuste diário, alavancagem): a explicação está no bloco do mini-índice.
@@ -1416,7 +2006,7 @@ def analisar(pergunta: str) -> Pedido:
     # "como a Petrobras pode lucrar com o pré-sal?" pede a explicação, não a projeção
     explica = re.search(r'\b(como|por que|porque)\b', t) and not re.search(r'\b(vai|vao)\b', t)
     lucro_futuro = ((re.search(r'\b(vai|vao|deve|devem|pode|podem)( \w+){0,2} lucr\w*', t)
-                     or lucro_empresa and (re.search(LUCRO_QUE_VEM, t) or re.search(PROXIMO_RESULTADO, t) and not (
+                     or lucro_empresa and (re.search(LUCRO_QUE_VEM, t_publicado) or re.search(PROXIMO_RESULTADO, t) and not (
                          re.search(PEDE_DATA, t) and not re.search(JUIZO_RESULTADO, t) and not p.proibidos)))
                     and not re.search(PESSOA_QUE_LUCRA, t) and not explica)
     # O dividendo que ainda vai sair ("quanto a Petrobras paga de dividendo esse ano?") é previsão de emissor (N2).
@@ -1482,7 +2072,7 @@ def analisar(pergunta: str) -> Pedido:
                 p.proibidos.append(codigo)
         if 'comparar' in p.proibidos:
             p.proibidos.remove('comparar')  # "antes ou depois de domingo" não compara classes de ativos
-    quanto = bool(re.search(QUANTO_TROCAR, t))
+    quanto = bool(re.search(QUANTO_TROCAR, re.sub(CUSTO_DA_TROCA, ' ', t)))
     if quanto and 'capital' not in p.proibidos:
         p.proibidos.append('capital')
     # Conta neutra de câmbio com o dinheiro que a pessoa contou (P4): o valor em reais, quanto muda a cada R$ 0,10 e
@@ -1492,6 +2082,10 @@ def analisar(pergunta: str) -> Pedido:
     if 'cripto' in p.mercados:
         t_dinheiro = re.sub(PRECO_DA_CRIPTO, ' ', t_dinheiro)
     valor, moeda, gasto, gasto_moeda = cambio(t_dinheiro)
+    # Só o gasto em moeda estrangeira, com a conversão pedida ("vou fazer intercâmbio, preciso de 800 dólares por mês, quanto
+    # dá em reais?"): a conta é a do próprio gasto.
+    if valor is None and gasto_moeda in MOEDA and re.search(CONVERSAO, t):
+        valor, moeda, gasto, gasto_moeda = gasto, gasto_moeda, None, None
     sem_preco = t
     if 'petroleo' in p.mercados:
         # o 1º dinheiro dela que não é o preço do barril nem do litro ("o petróleo passou de 100 dólares?" não tem)
@@ -1531,4 +2125,9 @@ def analisar(pergunta: str) -> Pedido:
                 p.mercados.append(moeda)
             if 'capital' in p.proibidos:
                 p.proibidos.remove('capital')
+    # O valor que ela tem na pergunta da declaração ("tenho 5 mil em bitcoin, preciso declarar?") é o dado da regra (P5).
+    if (p.proibidos == ['capital'] and re.search(REGRA_COM_VALOR, t)
+            and not re.search(PEDIDO_COM_VALOR, re.sub(LUGAR_NA_DECLARACAO, ' declaracao ', t))
+            and not re.search(PROIBIDOS['capital'], _tira(t, PROIBIDOS['capital'], REGRA_COM_VALOR, r'[?!]|\.(?!\d)'))):
+        p.proibidos.remove('capital')
     return p
