@@ -103,10 +103,11 @@ def eventos(tipo: str) -> dict:
 
 
 def petroleo(tema: str = '') -> dict:
-    """Os eventos de petróleo e Petrobras do tema, com a reação do Brent no dia (o mesmo número do texto) e o caminho."""
+    """Os eventos de petróleo e Petrobras do tema (o 1º que a pergunta cita), com a reação do Brent no dia (o mesmo número
+    do texto) e o caminho."""
     nome_tema = F._petroleo()['temas'][tema]['nome'] if tema else 'petróleo e Petrobras'
     evs = [e for e in F._reacao_petroleo() if (not tema or e['tema'] == tema) and e['brent_dia'] is not None]
     casos = [{'data': e['data'], 'dia_da_reacao': str(e['brent_dia'].date()), 'titulo': e['titulo'],
               'valor': round(float(e['brent']), 2), 'caminho': _caminho('brent', e['brent_dia'])} for e in evs]
     return _cartao(f'{nome_tema[0].upper() + nome_tema[1:]} desde 2016', 'brent', casos,
-                   'Fonte primária de cada evento (CVM, Planalto, OPEP) e EIA (Brent à vista, domínio público); cálculo próprio')
+                   'Fonte de cada evento (a primária, quando houver) e EIA (Brent à vista, domínio público); cálculo próprio')

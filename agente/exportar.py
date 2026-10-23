@@ -11,7 +11,7 @@ Gera dois arquivos:
 import json
 from dataclasses import asdict
 from datetime import datetime
-from itertools import permutations
+from itertools import combinations, permutations
 from pathlib import Path
 
 from coletor.config import FUSO
@@ -43,6 +43,21 @@ def _bloco(b: F.Bloco | None) -> dict | None:
         return None
     return {'titulo': b.titulo, 'linhas': [{'texto': ln.texto, 'fontes': [_fonte(f) for f in ln.fontes]} for ln in b.linhas],
             'resumo': b.resumo, 'limites': list(b.limites)}
+
+
+def _eventos_petroleo() -> dict:
+    """Um bloco por combinação de temas que a pergunta pode citar (chave "tema1+tema2", na ordem do JSON). A linha de cada
+    evento é a mesma em todo bloco: ela vai uma vez só, em `linhas`, e o bloco guarda os índices (`eventos`) e as linhas
+    dele que vêm depois (a faixa e a taxa-base). O TS monta: linhas[i] de cada índice, depois as do bloco."""
+    linhas = _bloco(F.petroleo_eventos(()))['linhas'][:len(F._petroleo()['eventos'])]
+    blocos = {}
+    for n in range(len(F._petroleo()['temas']) + 1):
+        for c in combinations(F._petroleo()['temas'], n):
+            b = _bloco(F.petroleo_eventos(c))
+            evs = [i for i, e in enumerate(F._petroleo()['eventos']) if not c or e['tema'] in c]
+            assert b['linhas'][:len(evs)] == [linhas[i] for i in evs], c
+            blocos['+'.join(c)] = {**b, 'eventos': evs, 'linhas': b['linhas'][len(evs):]}
+    return {'linhas': linhas, 'blocos': blocos}
 
 
 def base() -> dict:
@@ -102,7 +117,7 @@ def base() -> dict:
         },
         'dois_lados': {k: _bloco(F.dois_lados(k)) for k in F.HISTORICO},
         'petroleo': {
-            'eventos': {'': _bloco(F.petroleo_eventos()), **{t: _bloco(F.petroleo_eventos(t)) for t in F._petroleo()['temas']}},
+            'eventos': _eventos_petroleo(),
             'temas': {t: v['regex'] for t, v in F._petroleo()['temas'].items()},
             'barril': _bloco(F.barril_bomba()),
         },
@@ -172,6 +187,22 @@ EXTRAS = [
     'o petróleo vai subir com a guerra?', 'quais ações de petróleo comprar?', 'compro PETR4 amanhã?',
     'o imposto do diesel mudou?', 'como está o petróleo?', 'Brent e dólar', 'troca de presidente da Petrobras',
     'a covid derrubou o petróleo?', 'Tarifas dos EUA e o Ibovespa', 'A guerra no Irã derrubou a bolsa?',
+    # 23/10/2026, achados da revisão do petróleo.
+    'vale a pena PETR4?', 'PETR4 é boa pagadora de dividendos?', 'PETR4 ou PRIO3, qual é melhor?', 'petrobras ou vale?',
+    'qual petroleira paga mais dividendo?', 'mantenho PETR4?', 'faço preço médio em petr4?', 'petróleo: long ou short?',
+    'o petróleo caiu 15% num dia, é oportunidade?', 'qual o preço justo da PETR4?', 'PETR4 tá descontada?',
+    'o brent vai a 150?', 'o Brent chega a 200?', 'o barril vai pra 150?', 'a opep corta?', 'petrobras vai pagar dividendo?',
+    'a petrobras vai reajustar a gasolina?', 'barril a 115, a petrobras vai lucrar muito?', 'quem é o presidente da Petrobras?',
+    'quando o Bolsonaro trocou o presidente da Petrobras?', 'a OPEP vai cortar a produção domingo?',
+    'se o Lula ganhar, troca o presidente da Petrobras?', 'presidente da Petrobras e o 2º turno',
+    'a eleição é um barril de pólvora, a bolsa cai?', 'o Copom jogou gasolina no dólar?', 'o petróleo passou de 100 dólares?',
+    'o barril a US$ 120, e a gasolina?', 'tenho 5 mil dólares, o petróleo mexe com isso?', 'a pandemia derrubou a Petrobras?',
+    'a guerra da Ucrânia e a Petrobras', 'a guerra comercial derrubou o petróleo?', 'o ataque à Arábia Saudita e o petróleo',
+    'a guerra de preços do petróleo em 2020', 'a Petrobras deixou de ser operadora do pré-sal', 'o petróleo irá subir?',
+    'o petróleo fechou negativo hoje?', 'o WTI ficou negativo?', 'a OPEP e a guerra', 'o petróleo e a inflação',
+    'gasolina e IPCA', 'a Petrobras pagou dividendo de R$ 6,73 por ação?', 'a gasolina a R$ 6,53 é cara?',
+    'como o Ibovespa reagiu ao dividendo extraordinário da Petrobras em 2024?', 'o que é a paridade de importação?',
+    'a gasolina tá defasada?', 'o Brent já passou de 150 alguma vez?',
 ]
 
 

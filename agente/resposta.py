@@ -54,8 +54,13 @@ def escolher_blocos(p: Pedido, hoje: str) -> list[F.Bloco]:
         if not p.eleicao:
             blocos.append(F.economia())
         blocos.append(F.copom(medidos_cambio))
-    # Em pergunta de petróleo, guerra e choque externo vêm pelo bloco do petróleo, que mede também o Brent.
-    tipos = [t for t in F.TIPOS if t in p.temas and not ('petroleo' in p.mercados and t in ('geopolitico', 'choque_externo'))]
+    # Em pergunta de petróleo, guerra e choque externo vêm pelo bloco do petróleo, que mede também o Brent, quando ele cobre
+    # o assunto: tarifa, sanção e guerra comercial não são guerra do petróleo, e ficam na linha do tempo.
+    t = normalizar(p.pergunta)
+    temas_petroleo = F.tema_petroleo(t) if 'petroleo' in p.mercados else ()
+    coberto = {'geopolitico': 'guerra' in temas_petroleo and not re.search(TARIFA_DITA, t),
+               'choque_externo': 'choque' in temas_petroleo}
+    tipos = [x for x in F.TIPOS if x in p.temas and not coberto.get(x)]
     for tipo in tipos:
         blocos.append(F.eventos(tipo))
     tem_economia = lambda: any(b and b.titulo.startswith('A economia hoje') for b in blocos)  # noqa: E731
@@ -66,7 +71,8 @@ def escolher_blocos(p: Pedido, hoje: str) -> list[F.Bloco]:
         blocos.insert(0, F.economia())
     # Mercado sem evento no repertório ("devo comprar dólar?", "como está o Ibovespa?"): o caminho que ele já fez, o que o
     # mercado espera (Focus, atribuído) e as datas marcadas que já mexeram com ele.
-    tem_evento = p.eleicao or 'copom' in p.temas or bool(tipos)
+    # A linha do tempo que fica numa pergunta de petróleo não tira o caminho do Brent nem os dois lados.
+    tem_evento = p.eleicao or 'copom' in p.temas or any(x not in coberto or 'petroleo' not in p.mercados for x in tipos)
     medidos = [m for m in dict.fromkeys(MEDIDO.get(m, m) for m in p.mercados) if m in F.HISTORICO]
     # "ETF de bitcoin na B3": a B3 é o lugar da cripto, não o Ibovespa. Sem caminho nem dois lados do índice.
     b3_so_lugar = 'cripto' in p.mercados and not re.search(IBOV_DITO, normalizar(p.pergunta))
@@ -97,7 +103,14 @@ def escolher_blocos(p: Pedido, hoje: str) -> list[F.Bloco]:
             continue  # contrato (WIN) ou cripto na B3: a regra de IR das ações à vista não vale
         blocos.append(F.mercado(m))
         if m == 'petroleo':
-            blocos += [F.petroleo_eventos(F.tema_petroleo(normalizar(p.pergunta))), F.barril_bomba()]
+            # Quem cita só a ação ("vale a pena PETR4?", "PETR4 ou PRIO3?") não recebe a história de um emissor (Res. CVM
+            # 20): os eventos entram quando a pergunta cita o fato ou o petróleo. Do barril à bomba, quando ela fala de
+            # combustível, ou do petróleo sem tema.
+            so_acao = not temas_petroleo and re.search(ACAO_DITA, t) and not re.search(PETROLEO_DITO, t)
+            if not so_acao:
+                blocos.append(F.petroleo_eventos(temas_petroleo))
+            if re.search(COMBUSTIVEL_DITO, t) or not temas_petroleo and not so_acao:
+                blocos.append(F.barril_bomba())
         if m == 'cripto':
             # Regras, imposto, riscos e a linha do tempo. Tema citado (halving, FTX, ETF...): a linha do tempo antes das
             # regras, com a definição primeiro se a pessoa perguntou "o que é". Pergunta de imposto: o imposto primeiro.
@@ -132,6 +145,11 @@ def escolher_blocos(p: Pedido, hoje: str) -> list[F.Bloco]:
 CRIPTO_TITULOS = (F.TITULO_MARCOS, F.TITULO_CRIPTO, F.TITULO_CRIPTO_IMPOSTO, F.TITULO_CRIPTO_RISCOS)
 # A pessoa falou do índice mesmo, e não só da B3 como lugar.
 IBOV_DITO = r'\bibov\w*|\bbovespa\b|\bacoes\b|\bacao\b|\bbova11\b'
+TARIFA_DITA = r'\btarifa\w*|\bsanc(ao|oes)\b|\bguerra comercial\b'
+ACAO_DITA = r'\b(petrobras|petr[34]|prio3?|petroleiras?|acao|acoes)\b'
+PETROLEO_DITO = r'\b(petroleo|brent|wti|barril|opep|opec|ormuz|combustive(l|is)|gasolina|diesel)\b'
+COMBUSTIVEL_DITO = (r'\b(gasolina|diesel|etanol|combustive(l|is)|bomba|posto|litro|reajust\w*|ipca|inflacao|defasa\w*'
+                    r'|paridade|politica de preco\w*)\b')
 IMPOSTO_DITO = r'\bimpost\w*|\bdeclar\w*|\birpf?\b|\bdarf\b|\bleao\b|\btribut\w*|\bisen\w*'
 # Pergunta de preço ou de movimento de cripto: o repertório não tem a cotação.
 PRECO_CRIPTO = (r'\b(quanto (ta|esta|vale|custa)|preco|cotacao|caiu|subiu|cai|sobe|reagiu|valoriz\w*|desvaloriz\w*)\b'

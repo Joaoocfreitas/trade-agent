@@ -1055,21 +1055,23 @@ def _petroleo() -> dict:
     return _json('agente/petroleo.json')
 
 
-def tema_petroleo(pergunta_normalizada: str) -> str:
-    return next((k for k, t in _petroleo()['temas'].items() if re.search(t['regex'], pergunta_normalizada)), '')
+def tema_petroleo(pergunta_normalizada: str) -> tuple[str, ...]:
+    """Todos os temas dos eventos de petróleo que a pergunta cita, na ordem do JSON ("a OPEP e a guerra": os dois)."""
+    return tuple(k for k, t in _petroleo()['temas'].items() if re.search(t['regex'], pergunta_normalizada))
 
 
 @cache
 def _reacao_petroleo() -> list[dict]:
-    """Para cada evento: o Brent no seu próprio calendário (o 1º dia com cotação a partir do dia da reação) e o Ibovespa e
-    o dólar no pregão da reação da B3, pelo método do estudo (estudo/janelas.py)."""
+    """Para cada evento: o Brent no seu próprio calendário (o 1º dia com cotação a partir do dia da reação, ou do dia
+    próprio do Brent quando ele reagiu em outro dia) e o Ibovespa e o dólar no pregão da reação da B3, pelo método do
+    estudo (estudo/janelas.py)."""
     from estudo.janelas import calendario, dia_zero, medir_preco, no_calendario
     brent = serie('brent')
     cal = calendario(serie('ibov'))
     ibov, ptax = serie('ibov').reindex(cal), no_calendario(serie('ptax'), cal)
     saida = []
     for e in _petroleo()['eventos']:
-        ib = dia_zero(e['reacao'], brent.index)
+        ib = dia_zero(e.get('reacao_brent', e['reacao']), brent.index)
         ix = dia_zero(e['reacao'], cal)
         mb = medir_preco(brent, ib) if ib is not None else {}
         mi = medir_preco(ibov, ix) if ix is not None else {}
@@ -1080,11 +1082,14 @@ def _reacao_petroleo() -> list[dict]:
     return saida
 
 
-def petroleo_eventos(tema: str = '') -> Bloco:
-    """Todos os eventos do tema que a pessoa citou (sem tema, todos), com a reação no dia, e a faixa de cada medida."""
+def petroleo_eventos(temas: tuple[str, ...] | str = ()) -> Bloco:
+    """Todos os eventos dos temas que a pessoa citou (sem tema, todos), com a reação no dia, e a faixa de cada medida.
+    A medida de um pregão dividido com outro fato (o 1º turno, outro evento) fica na linha, com o aviso, e fora da faixa."""
+    if isinstance(temas, str):
+        temas = (temas,) if temas else ()
     p = _petroleo()
-    nome_tema = p['temas'][tema]['nome'] if tema else 'petróleo e Petrobras'
-    evs = [e for e in _reacao_petroleo() if not tema or e['tema'] == tema]
+    nome_tema = juntar([p['temas'][t]['nome'] for t in temas]) if temas else 'petróleo e Petrobras'
+    evs = [e for e in _reacao_petroleo() if not temas or e['tema'] in temas]
     b = Bloco(f'O que aconteceu antes: {nome_tema} desde 2016 (fato)')
     for e in evs:
         partes = []
@@ -1093,37 +1098,50 @@ def petroleo_eventos(tema: str = '') -> Bloco:
         if e['b3_dia'] is not None:
             partes.append(f'na B3 ({dia(e["b3_dia"])}), o Ibovespa {mov(e["ibov"], 2)} e o dólar {mov(e["dolar"], 2)}')
         reacao = '; '.join(partes) if partes else 'sem dado da reação ainda'
-        b.add(f'{dia(e["data"])}, {e["titulo"]}: no dia da reação, {reacao}.', Fonte(e['fonte']['nome'], e['fonte']['url']),
+        if e.get('mesmo_pregao'):
+            reacao += f' (o pregão é o mesmo de {e["mesmo_pregao"]["com"]}: a variação não separa um fato do outro)'
+        fontes = e['fonte'] if isinstance(e['fonte'], list) else [e['fonte']]
+        b.add(f'{dia(e["data"])}, {e["titulo"]}: no dia da reação, {reacao}.', *[Fonte(f['nome'], f['url']) for f in fontes],
               F_BRENT, F_IBOV, F_PTAX, F_ESTUDO)
-    med = lambda k: [e[k] for e in evs if not math.isnan(e[k])]  # noqa: E731
+    med = lambda k: [e[k] for e in evs if not math.isnan(e[k]) and k not in e.get('mesmo_pregao', {}).get('fora', [])]  # noqa: E731
     br, ib, dl = med('brent'), med('ibov'), med('dolar')
+    divididos = [e for e in evs if e.get('mesmo_pregao')]
     if br and ib:
+        fora = (f' Fica fora da faixa a medida dividida com outro fato no mesmo pregão ({len(divididos)} '
+                f'{"evento" if len(divididos) == 1 else "eventos"}).') if divididos else ''
         b.add(f'Nos {len(evs)} eventos, no dia da reação: o Brent {faixa_mov(min(br), max(br), 2)}; o Ibovespa '
-              f'{faixa_mov(min(ib), max(ib), 2)}; o dólar {faixa_mov(min(dl), max(dl), 2)}.', F_ESTUDO)
+              f'{faixa_mov(min(ib), max(ib), 2)}; o dólar {faixa_mov(min(dl), max(dl), 2)}.{fora}', F_ESTUDO)
         b.resumo = (f'Nos {len(evs)} eventos de {nome_tema} desde 2016, no dia da reação o Brent {faixa_mov(min(br), max(br), 2)} '
-                    f'e o Ibovespa {faixa_mov(min(ib), max(ib), 2)}. São casos marcantes, não sorteados: a amostra exagera as '
-                    f'reações grandes.')
+                    f'e o Ibovespa {faixa_mov(min(ib), max(ib), 2)}; a ação da Petrobras não foi medida (falta a licença da '
+                    f'B3), e os casos são marcantes, não sorteados.')
     b.linhas.append(taxa_base('brent', 'petróleo Brent'))
     b.limites += ['A reação das ações de petróleo (Petrobras, PRIO e outras) fica fora: a licença de dados da B3 para uso em '
                   'produto ainda está pendente.',
                   'Os eventos foram escolhidos por terem sido marcantes, não sorteados: a amostra exagera as reações grandes.']
+    if divididos:
+        b.limites.append(f'Em {len(divididos)} {"evento" if len(divididos) == 1 else "eventos"} o pregão da reação é o mesmo de '
+                         f'outro fato (por exemplo, {divididos[0]["mesmo_pregao"]["com"]}): a variação daquele dia não é só do '
+                         f'petróleo.')
     incertos = sum(e['reacao_incerta'] for e in evs)
     if incertos:
-        b.limites.append(f'Em {incertos} eventos o horário do anúncio não foi confirmado: a reação pode ter sido no pregão seguinte.')
+        b.limites.append(f'Em {incertos} {"evento" if incertos == 1 else "eventos"} o horário do anúncio não foi confirmado: a '
+                         f'reação pode ter sido no pregão seguinte.')
     return b
 
 
 def barril_bomba() -> Bloco:
-    """Do barril à bomba: a composição do preço (Petrobras), o peso na inflação (IBGE) e a conta do barril em reais."""
+    """Do barril à bomba: a composição do preço (Petrobras), o peso na inflação (IBGE) e o barril em reais."""
     b = _bloco_json(_petroleo()['barril'])
     d_b, brent = _ultimo('brent')
     ptax = serie('ptax')
     ptax = ptax[ptax.index <= d_b]
     d_p, dolar = ptax.index[-1], float(ptax.iloc[-1])
-    reais = brent * dolar
-    b.add(f'Com o Brent a US$ {num(brent, 2)} (EIA, {dia(d_b)}) e o dólar a R$ {num(dolar, 4)} (PTAX, {dia(d_p)}), um barril custa '
-          f'R$ {num(reais, 2)}; com 158,987 litros por barril, são R$ {num(reais / 158.987, 2)} por litro de petróleo cru, antes '
-          f'de refino, impostos e margens.', F_BRENT, F_PTAX)
+    b.add(f'Com o Brent a US$ {num(brent, 2)} (EIA, {dia(d_b)}) e o dólar a R$ {num(dolar, 4)} (PTAX, {dia(d_p)}), um barril '
+          f'custa R$ {num(brent * dolar, 2)}: em reais, o barril depende do Brent e também do dólar.', F_BRENT, F_PTAX)
+    b.limites += ['A conta do barril em reais é só aritmética: não se compara com a parte da Petrobras (que é por litro de '
+                  'gasolina já misturada com etanol, e de outra semana), não é o custo da Petrobras e não diz se o preço dela '
+                  'está certo nem se vai mudar.',
+                  'O repertório não calcula a defasagem entre o preço da Petrobras e o do mercado internacional.']
     return b
 
 

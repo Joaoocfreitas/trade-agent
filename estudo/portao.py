@@ -90,31 +90,41 @@ def conferir(nome: str, velha: pd.Series, nova: pd.Series, hoje: pd.Timestamp, l
             if (dif > limite).any():
                 d = dif[dif > limite].index[0]
                 m.append(f'mudou um valor do histórico já aceito ({d.date()}: {a[d]} virou {b[d]})')
-    novos = nova[nova.index > velha.index.max()] if len(velha) else nova
-    if len(novos):
+    # Dentro da janela de revisão (o que entrou nos últimos dias pode ser revisto pela fonte), faixa e formato valem para
+    # todo ponto, não só para o novo; o salto, só para o ponto novo ou revisto, ida e volta, medido na própria série nova
+    # (um salto já liberado à mão, que não mudou, não segura de novo).
+    if len(velha):
+        janela = nova[nova.index > corte]
+        base = velha.reindex(janela.index)
+        mudou = set(janela.index[base.isna() | ((janela - base).abs() > base.abs() * 1e-6 + 1e-9)])
+        seq = pd.concat([nova[nova.index <= corte].iloc[-1:], janela])
+    else:
+        janela = seq = nova
+        mudou = set(nova.index)
+    if len(janela):
         lo, hi = t['faixa']
-        fora = novos[(novos < lo) | (novos > hi)]
+        fora = janela[(janela < lo) | (janela > hi)]
         if len(fora):
             m.append(f'fora da faixa {lo}–{hi}: {fora.index[0].date()} = {fora.iloc[0]}')
-        anterior = pd.concat([velha.iloc[-1:], novos]) if len(velha) else novos
+        perto = [i for i in range(1, len(seq)) if seq.index[i] in mudou or seq.index[i - 1] in mudou]
         if 'salto_pct' in t and not liberada:
-            salto = (anterior.pct_change().abs() * 100).dropna()
+            salto = (seq.pct_change(fill_method=None).abs() * 100).iloc[perto].dropna()
             grande = salto[salto > t['salto_pct']]
             if len(grande):
                 m.append(f'salto de {grande.iloc[0]:.2f}% em {grande.index[0].date()} (limite {t["salto_pct"]}%)')
         if 'salto_abs' in t and not liberada:
-            salto = anterior.diff().abs().dropna()
+            salto = seq.diff().abs().iloc[perto].dropna()
             grande = salto[salto > t['salto_abs'] + 1e-9]
             if len(grande):
                 m.append(f'salto de {grande.iloc[0]:.2f} em {grande.index[0].date()} (limite {t["salto_abs"]})')
         if t.get('multiplo'):
-            resto = ((novos / t['multiplo']) - (novos / t['multiplo']).round()).abs()
+            resto = ((janela / t['multiplo']) - (janela / t['multiplo']).round()).abs()
             if (resto > 1e-6).any():
-                m.append(f'Selic que não é múltiplo de {t["multiplo"]}: {novos[resto > 1e-6].iloc[0]}')
-        if t.get('inteiro') and ((novos - novos.round()).abs() > 1e-9).any():
+                m.append(f'Selic que não é múltiplo de {t["multiplo"]}: {janela[resto > 1e-6].iloc[0]}')
+        if t.get('inteiro') and ((janela - janela.round()).abs() > 1e-9).any():
             m.append('valor com centavos (o fechamento do Ibovespa é inteiro; o Ipeadata já publicou ponto falso assim)')
-        if t.get('dia_util') and (novos.index.weekday >= 5).any():
-            m.append(f'ponto em fim de semana: {novos.index[novos.index.weekday >= 5][0].date()}')
+        if t.get('dia_util') and (janela.index.weekday >= 5).any():
+            m.append(f'ponto em fim de semana: {janela.index[janela.index.weekday >= 5][0].date()}')
     return m
 
 

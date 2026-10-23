@@ -34,6 +34,8 @@ def normalizar(pergunta: str) -> str:
         pergunta = pergunta.replace(e, palavra)
     for e, palavra in EMOJI.items():
         pergunta = pergunta.replace(e, palavra)
+    # "Irã" (o país) e "irá" (o verbo) só se distinguem antes de tirar o acento.
+    pergunta = re.sub(r'(?<!\w)irã(?!\w)', 'iran', pergunta, flags=re.I)
     t = simples(pergunta)
     return re.sub(r'\b\w+\b', lambda m: ABREVIACOES.get(m.group(), m.group()), t)
 
@@ -53,8 +55,13 @@ MERCADOS = {
              r'|\b(trazer|traz|trago|mandar|mando|enviar|envio|levar|transferir)\b[^.?!]{0,30}\b(pro brasil|para o brasil|pra fora'
              r'|para fora|do exterior|de fora|para o exterior|pro exterior)\b',
     'euro': r'\beuros?\b|\beur\b',
-    'petroleo': r'\bpetroleo\b|\bbrent\b|\bwti\b|\bpetrobras\b|\bpetr[34]\b|\bprio3?\b|\bopep\b|\bopec\b|\bcombustive(l|is)\b'
-                r'|\bgasolina\b|\bdiesel\b|\bbarril\b|\bormuz\b|\bpetroleiras?\b',
+    'petroleo': r'\bpetroleo\b|\bbrent\b|\bwti\b|\bpetrobras\b|\bpetr[34]\b|\bprio3?\b|\bopep\b|\bopec\b|\bdiesel\b|\bormuz\b'
+                r'|\bpetroleiras?\b'
+                # em sentido figurado não é petróleo: "o combustível da alta", "jogou gasolina no dólar", "barril de pólvora"
+                r'|\bcombustive(l|is)\b(?! (da|do|de|para|pra|pro) (alta|queda|rali|dolar|bolsa|mercado|ibovespa|juros|crise|eleicao)\b)'
+                r'|(?<!\bjogou )(?<!\bjogar )(?<!\bjoga )(?<!\bjogam )(?<!\bjogando )(?<!\bjogaram )(?<!\bbotou )(?<!\bbotar )'
+                r'\bgasolina\b(?! n[ao] (fogueira|fogo|incendio|brasa)\b)'
+                r'|\bbarril\b(?! de polvora\b)',
     'juros': r'\bjuros\b|\bdi1?\b|\bdi futuro\b|\bselic\b|\brenda fixa\b|\btesouro\b|\bprefixad\w*',
     'cripto': r'\bcripto\w*|\bbitcoins?\b|\bbtc\b|\bethereum\b|\bethers?\b|\beth\b|\bxrp\b|\bexchanges?\b|\bstablecoins?\b'
               r'|\bsolana\b|\bhalving\b|\bftx\b|\busdt\b|\busdc\b|\btether\b|\bhash11\b|\bdoge\w*|\bshiba\b|' + rf'\b{EXCH}\b',
@@ -62,7 +69,15 @@ MERCADOS = {
     'previsao': r'\bpolymarket\b|\bkalshi\b|\bmercados? de previs\w*',
 }
 
-CANDIDATOS = {'flavio': r'\bflavio\b|\bbolsonaro\b', 'lula': r'\blula\b'}
+# "Jair Bolsonaro" não é o candidato.
+CANDIDATOS = {'flavio': r'\bflavio\b|(?<!\bjair )\bbolsonaro\b', 'lula': r'\blula\b'}
+# Palavra que faz a pergunta ser de eleição mesmo citando cargo de empresa ("se o Lula ganhar, troca o presidente da
+# Petrobras?"). Sem ela, o presidente da Petrobras não é o da República, e o Bolsonaro que trocou o comando da
+# Petrobras não é o candidato.
+ELEITORAL = (r'\belei(cao|coes|toral|torais)\b|\bturnos?\b|\bcandidat\w*|\burnas?\b|\bpesquisas?\b|\bvot(o|ar)\b'
+             r'|\b(ganhar|vencer|perder|eleito)\b|\bproximo presidente\b|\blula\b|\bflavio\b')
+CARGO = (r'\b(presidente|presidencia|ceo|comando)\b( d[aoe]| na| no)? (petrobras|estatal|conselho|empresa|opep|banco central|bc)\b'
+         r'|\b(petrobras|estatal)\b[^.?!]{0,30}\b(presidente|presidencia)\b')
 
 TEMAS = {
     'eleicao': r'\belei(cao|coes|toral|torais)\b|\bturnos?\b|\bcandidat\w*|\burnas?\b|\bpresidente\b|\bganhar a elei'
@@ -74,12 +89,15 @@ TEMAS = {
     'legislativo': r'\bcongresso\b|\bcamara\b|\bsenado\b|\bvotacao\b|\bpec\b|\breforma\b|\bimpeachment\b',
     'judicial': r'\bstf\b|\bsupremo\b|\bjulgamento\b|\bprisao\b|\bcondenacao\b',
     # "petróleo" sozinho não é geopolítica: tem mercado próprio, com os eventos de guerra que mexeram com o Brent
-    'geopolitico': r'\btarifas?\b|\bguerra\b|\bsancao\b|\bsancoes\b|\bira\b',
+    'geopolitico': r'\btarifas?\b|\bguerra\b|\bsancao\b|\bsancoes\b|\biran\b|\b(o|do|no|ao|pro|pelo|com o|contra o) ira\b',
     'choque_externo': r'\bpandemia\b|\bcovid\b|\bcrise (global|externa|internacional)\b',
     'escandalo': r'\bescandalos?\b|\bdelacao\b|\blava ?jato\b|\bgrampo\b',
     'economia': r'\beconomia\b|\binflacao\b|\bipca\b|\bdivida\b|\bpib\b|\bfiscal\b',
     'conceito': r'\bo que (e|sao|significa)\b|\bcomo funciona\b|\bme explica\b|\bexplica\b',
 }
+
+# Empresas e tickers da B3 ("PETR4", "PRIO3", "VALE3", "ITUB4", "BOVA11"), para a escolha entre eles.
+EMPRESA = r'(petrobras|petr[34]|prio3?|vale3?|[a-z]{4}(3|4|5|6|11))'
 
 PROIBIDOS = {
     # "O que eu faço?", "que que eu faço?", "o que fazer agora?", "preciso tomar uma decisão", "e agora?" pedem ação.
@@ -97,7 +115,20 @@ PROIBIDOS = {
             # mover o dinheiro, na 1ª pessoa ("trago o dinheiro?", "troco?"), menos "como mando dinheiro pra fora?" (P5)
             r'|(?<!como )(?<!como eu )\b(troco|trago|mando|envio|converto|transfiro|remeto)\b|\bdeixo (la|aqui|parado|onde esta)\b'
             r'|\b(tiro|boto)\b[^.?!]{0,40}\b(exchange|corretora|carteira)\b'
-            r'|(?<=.{10})\be ai(\?|\W*$)|\bconviene\b|\b(debo|deberia) (cambiar|traer|mandar|enviar)\b',
+            r'|(?<=.{10})\be ai(\?|\W*$)|\bconviene\b|\b(debo|deberia) (cambiar|traer|mandar|enviar)\b'
+            # o que fazer com a posição, preso à 1ª pessoa ou à posse ("mantenho PETR4?", "zero minha petrobras?")
+            r'|\bmantenho\b|\bsegur(o|ar)\b (a |o )?(minha|meu|minhas|meus|posicao|petr\w*|acao|acoes|papel|papeis)\b'
+            r'|\b(vale|devo|compensa|deveria) segurar\b'
+            r'|\bzer(o|ar|ei)\b (a |o |as |os )?(minha|meu|minhas|meus|posicao|tudo|petr\w*|acoes)\b'
+            r'|\b(aumento|aumentar|reduzo|reduzir|diminuo|diminuir|realizo|realizar)\b[^.?!]{0,20}\b(posicao|lucro|petr\w*|acoes'
+            r'|minha|meu)\b'
+            r'|\b(minha|meu) posicao\b|\bposicao (em|na|no)\b|\b(faco|fazer|faria|vale fazer) (o |um )?preco medio\b'
+            r'|\baproveit(o|ar|aria) (a|o|essa|esse|esta|este)? ?(queda|alta|baixa|subida|desconto|tombo|crise|guerra)\b'
+            r'|\b(e|seria) (uma )?(boa |otima |grande )?oportunidade\b'
+            r'|\boportunidade (de|pra|para) (compra|entrada|comprar|entrar|vender|lucro|ganh\w*)\b'
+            r'|\b(bom|otimo|melhor|pior) momento\b|\b(ta|esta|e|chegou) (na )?(hora|momento) de\b'
+            r'|\blong ou short\b|\bshort ou long\b|\b(fico|ficar|entro|vou) (long|short)\b'
+            r'|\b(e )?(um )?investimento (seguro|bom|ruim|arriscado)\b',
     'direcao': r'\bvai (subir|cair|disparar|despencar|bombar|valorizar|explodir|fechar|abrir)\b|\bvao (subir|cair)\b|\bchances?\b'
                r'|\bprobabilidad\w*|\bde 0 a 100\b|\bum numero\b|\btendencia\b|\bpode (subir|cair|disparar)\b'
                r'|\bsobe ou (cai|desce|nao)\b|\balavanc(ar|a)\b|\bpotencial\b|\bprevisao\b|\bprever\b|\bdisparar\b',
@@ -116,7 +147,13 @@ PROIBIDOS = {
                 r'.{0,25}\bou\b.{0,25}\b(dolar|bolsa|cripto|bitcoin|renda fixa|tesouro|acoes|ouro|poupanca|cdb)\b',
     'ranking': r'\branking\b|\bmelhores (acoes|ativos|moedas|criptos)\b|\btop ?\d+\b|\bmonta (uma )?carteira\b'
                r'|\bcarteira (recomendada|sugerida|ideal)\b|\bquais (acoes|ativos)\b|\bqual (acao|ativo|papel|moeda|cripto)\b'
-               r'|\bque acao\b|\bsobe mais\b|\bmais se benefici\w*|\bmelhor (acao|ativo|cripto|moeda)\b',
+               r'|\bque acao\b|\bsobe mais\b|\bmais se benefici\w*|\bmelhor (acao|ativo|cripto|moeda)\b'
+               # escolher entre empresas ou tickers ("PETR4 ou PRIO3?", "PRIO é melhor que a Petrobras?") é ranking (M2)
+               rf'|\b{EMPRESA}\b.{{0,25}}\b(ou|x|vs|versus)\b.{{0,25}}\b{EMPRESA}\b'
+               rf'|\b{EMPRESA}\b.{{0,30}}\b(e )?melhor (do )?que\b'
+               r'|\b(qual|que) (e )?(a )?(melhor |mais \w+ )?petroleiras?\b|\bmelhor(es)? petroleiras?\b'
+               r'|\bpaga(m)? mais (dividendos?|proventos?)\b|\b(boa|otima|melhor|grande) pagadora\b'
+               r'|\bpaga(m)? (bem|muito) (dividendos?|proventos?)\b|\b(mais|menos) (solid|segur|arriscad)[ao]s?\b',
     'seletivo': r'\bso (os|as) (casos|vezes|anos|eleicoes|reunioes|dias|turnos)\b|\bso (as )?altas\b|\bso os positivos\b'
                 r'|\bmostra so\b|\bmostra apenas\b|\bapenas (os|as) (casos|turnos|vezes)\b|\b(so|apenas) (a|as) (mediana|media|altas|quedas)\b',
     'plataforma': r'\bqual (a )?(melhor )?(exchange|corretora|plataforma|app)\b|\bonde (eu )?(compro|opero|abro conta)\b'
@@ -153,23 +190,32 @@ PROIBIDOS = {
 # Pergunta sobre o futuro de um preço: direção, magnitude, nível ou "o que acontece se". Leva a recusa (N2).
 FUTURO = (r'\b(sobe|sobem|subir|suba|subira|subiria|desce|descer|cai|caem|cair|caia|caira|cairia|despenc\w*|dispar\w*|derret\w*'
           r'|valoriz\w*|desvaloriz\w*|aprecia\w*|recua\w*|fecha|fechar|abre|abrir|pra cima|para cima|pra baixo|para baixo|topo'
-          r'|fundo|barat[oa]|caro|vies|palpite|visao|acha|acham|opiniao|tendencia|provavel|esperado|retorno|potencial'
-          r'|vai bem|vai mal|reage bem|reage mal|vai a \d+|chega a \d+|pra onde|para onde|go up|go down|rise|fall|rally'
-          r'|bajar|probabilidad\w*|chances?'
+          r'|fundo|barat[oa]s?|car[oa]s?|vies|palpite|visao|acha|acham|opiniao|tendencia|provavel|esperado|retorno|potencial'
+          # o preço de uma ação contra o "justo" (valuation) também é opinião sobre para onde ela vai
+          r'|descontad[oa]s?|esticad[oa]s?|subvalorizad[oa]s?|sobrevalorizad[oa]s?|supervalorizad[oa]s?|upside|valuation'
+          r'|preco justo'
+          r'|vai bem|vai mal|reage bem|reage mal|pra onde|para onde|go up|go down|rise|fall|rally'
+          r'|bajar|probabilidad\w*|chances?|voltar (pra|para|a)|continuar (subindo|caindo)'
           # gíria de cripto, em formas fechadas: "bombardeio" e "pump and dump" (conceito) não entram
-          r'|explod\w*|decol\w*|bombar|bombando|bombou|pumpa\w*|pumpar|pra lua|para a lua|to the moon)\b')
+          r'|explod\w*|decol\w*|bombar|bombando|bombou|pumpa\w*|pumpar|pra lua|para a lua|to the moon)\b'
+          # nível de preço no futuro ("vai a 150?", "chega a 200 mil?", "bate 50 reais?"): termina no 1º dígito, para valer
+          # com "150k" e "250 mil". "Passou de" fica de fora: é passado.
+          r'|\b(vai a|chega a|chegar a|vai (pra|para)|passa(r)? de|bate(r)?( os)?)( us\$)? ?\d')
 CONDICIONAL = (r'\bse (o |a )?(\w+ ){0,2}(ganhar|vencer|perder|for eleito|for reeleito|cortar|cortarem|subir|aumentar|baixar|'
                r'reduzir|mantiver|wins?)\b|\b(ganhando|vencendo|perdendo)\b|\bcom (o |a )?\w+ eleit[oa]\b|\bif \w+ wins?\b')
 # Pergunta sobre o que já aconteceu: não pede direção.
-PASSADO = r'\b(reagiu|reagiram|aconteceu|aconteceram|foi|foram|historico|historicamente|antes|passad[ao]s?|ja houve)\b'
+PASSADO = r'\b(reagiu|reagiram|aconteceu|aconteceram|foi|foram|ficou|ficaram|historico|historicamente|antes|passad[ao]s?|ja houve)\b'
 FUTURO_EXPLICITO = r'\b(vai|vao|agora|amanha|semana que vem|depois d[oa]|proxim\w*|pra onde|para onde)\b'
 # Decisão de juros que ainda vai sair: "vai cortar os juros?", "o BC vai reduzir a Selic?", "vai ter corte?", "o Copom
 # cortará?", "corta na próxima reunião?". É futuro pela forma do verbo: não passa pelo filtro do PASSADO.
 DECISAO = (r'\b(vai|vao|ira|irao|deve|devem|pode|podem)( \w+){0,2} (cortar|baixar|reduzir|manter|segurar|elevar|aumentar'
-           r'|subir|mexer|parar|pausar|interromper)\b'
+           r'|subir|mexer|parar|pausar|interromper|reajustar|pagar)\b'
            r'|\b(cort|baix|segur|elev|aument)a(ra|rao|ria|riam)\b|\breduzi(ra|rao|ria|riam)\b|\bmante(ra|rao|ria|riam)\b'
            r'|\b(vai ter|vai haver|vao ter|tera|havera|teremos)( \w+){0,2} (corte|cortes|alta|altas|aumento|reducao|elevacao'
-           r'|manutencao|pausa|queda)\b'
+           r'|manutencao|pausa|queda|reajuste|reajustes)\b'
+           # a forma curta, no presente: "a OPEP corta?", "o Copom sobe?"
+           r'|^(a |o )?(opep|opec|copom|bc|banco central)\+? (corta|cortam|mantem|sobe|eleva|aumenta|reduz|baixa)'
+           r'( (a |os )?(producao|juros|selic|taxa))?\W*$'
            r'|\b(corta|cortam|mantem|segura|eleva|aumenta|baixa|reduz|sobe)\b.{0,30}\b(proxim\w*|amanha|semana que vem)\b')
 # "Corta ou mantém?", "corte ou manutenção?": pode ser a decisão de amanhã ou a de ontem, então passa pelo filtro do PASSADO.
 DECISAO_OU = (r'\b(corta|cortam|mantem|segura|eleva|aumenta|baixa|reduz|sobe)\b.{0,20}\bou (corta|cortam|mantem|segura'
@@ -237,6 +283,15 @@ QUANTO_TROCAR = (r'\bquanto (\w+ ){0,4}?(coloco|ponho|invisto|aplico|boto|trago|
                  r'|\b(tudo|metade|parte) ou (tudo|metade|parte|nada)\b|\bhow much\b|\b(what|which) (part|portion|percentage|share)\b'
                  r'|\ball or (half|part)\b')
 MULTIPLICA = {'mil': 1e3, 'k': 1e3, 'milhao': 1e6, 'milhoes': 1e6, 'mi': 1e6}
+# Em pergunta de petróleo, "100 dólares" é o preço do barril, não o dinheiro da pessoa, a não ser que ela diga que tem.
+PRECO_EM_DOLAR = r'(us\$|u\$|usd) ?\d[\d.,]*( ?(mil|k))?|\d[\d.,]*( ?(mil|k))? ?(dolares|dolar|dollars?|usd)\b'
+POSSE = r'\b(tenho|guardei|guardo|juntei|economizei|poupei|meus|minhas|recebi|ganhei)\b'
+# Valor em reais que é preço ou fato ("dividendo de R$ 6,73 por ação", "os R$ 20 bilhões", "a gasolina a R$ 6,53"), não o
+# dinheiro da pessoa: não é capital.
+PRECO_OU_FATO = (r'r\$ ?\d[\d.,]*( ?(mil|mi|bi|bilh\w*|milh\w*))? por (acao|litro|barril)\b'
+                 r'|r\$ ?\d[\d.,]* ?(bi|bilh\w*)\b|r\$ ?\d[\d.,]* ?milh\w* (de|em) (dividendo|lucro|juros)\w*'
+                 r'|\b(gasolina|diesel|etanol|dolar|euro|barril|litro|acao|petr[34]|petrobras|dividendo\w*) (a|de|em|por|chegou a'
+                 r'|bateu|custa\w*|esta a|ta a|foi a|foi de|pagou( dividendos?)?( de)?) r\$ ?\d[\d.,]*')
 
 
 def _moeda(rotulo: str | None) -> str | None:
@@ -355,9 +410,21 @@ def _numero(s: str) -> float:
 
 def analisar(pergunta: str) -> Pedido:
     t = normalizar(pergunta)
-    achou = lambda padroes: [k for k, rx in padroes.items() if re.search(rx, t)]  # noqa: E731
-    p = Pedido(pergunta=pergunta, mercados=achou(MERCADOS), candidatos=achou(CANDIDATOS), temas=achou(TEMAS),
+    achou = lambda padroes, texto=t: [k for k, rx in padroes.items() if re.search(rx, texto)]  # noqa: E731
+    # O presidente da Petrobras e o domingo da reunião da OPEP não são a eleição, a não ser que a pergunta cite a eleição
+    # de outro jeito.
+    t_eleicao = t
+    if not re.search(ELEITORAL, t):
+        t_eleicao = re.sub(CARGO, ' ', t)
+        if re.search(r'\bpetrobras\b', t):
+            t_eleicao = re.sub(r'\bbolsonaro\b', ' ', t_eleicao)
+    if re.search(r'\b(opep|opec)\b', t):
+        t_eleicao = re.sub(r'\bdomingo\b', ' ', t_eleicao)
+    temas = [k for k, rx in TEMAS.items() if re.search(rx, t_eleicao if k == 'eleicao' else t)]
+    p = Pedido(pergunta=pergunta, mercados=achou(MERCADOS), candidatos=achou(CANDIDATOS, t_eleicao), temas=temas,
                proibidos=achou(PROIBIDOS), voto_informado=bool(re.search(VOTO_INFORMADO, t)))
+    if 'capital' in p.proibidos and not re.search(PROIBIDOS['capital'], re.sub(PRECO_OU_FATO, ' ', t)):
+        p.proibidos.remove('capital')
     if p.voto_informado and 'eleicao' not in p.temas:
         p.temas.append('eleicao')
     # Conceito de derivativo (margem, ajuste diário, alavancagem): a explicação está no bloco do mini-índice.
@@ -372,7 +439,9 @@ def analisar(pergunta: str) -> Pedido:
     # Decisão de juros que ainda vai sair ("vai cortar a Selic?", "corta ou mantém?") também é futuro de preço.
     decisao = bool(p.mercados or re.search(SOBRE_JUROS, t) or curta) and bool(
         re.search(DECISAO, t) or (re.search(DECISAO_OU, t) and not so_passado))
-    if (sobre_preco and futuro and not so_passado or decisao) and 'direcao' not in p.proibidos:
+    # Lucro de uma empresa que ainda vai sair ("a Petrobras vai lucrar?") é projeção; o da pessoa é chance_dinheiro.
+    lucro_futuro = re.search(r'\b(vai|vao|deve|devem|pode|podem)( \w+){0,2} lucr\w*', t) and not re.search(r'\b(eu|vou)\b', t)
+    if (sobre_preco and futuro and not so_passado or decisao or lucro_futuro) and 'direcao' not in p.proibidos:
         p.proibidos.append('direcao')
     contrato = bool({'mini_indice', 'mini_dolar'} & set(p.mercados) or re.search(CONTRATO, t))
     hora = re.search(HORA, t)
@@ -384,6 +453,9 @@ def analisar(pergunta: str) -> Pedido:
         if re.search(MOVIMENTO, t) and 'direcao' not in p.proibidos:
             p.proibidos.append('direcao')
     if 'voto' in p.proibidos and 'comparar' in p.proibidos:
+        p.proibidos.remove('comparar')
+    # Escolher entre empresas ("PETR4 ou PRIO3, qual é melhor?") é ranking (M2), não comparar classes de ativo (N5).
+    if 'ranking' in p.proibidos and 'comparar' in p.proibidos and re.search(rf'\b{EMPRESA}\b', t):
         p.proibidos.remove('comparar')
     if 'aposta' in p.proibidos and 'previsao' not in p.mercados:
         p.mercados.append('previsao')
@@ -423,6 +495,10 @@ def analisar(pergunta: str) -> Pedido:
     # quantos meses de gasto cobre. Não entra quando ela pergunta quanto mover (alocação, N5) nem quando mover (N4): ao
     # lado da reação nos turnos, o valor dela viraria indicação de momento. Pergunta de contrato (mini-dólar) também não.
     valor, moeda, gasto, gasto_moeda = cambio(t)
+    if 'petroleo' in p.mercados and not re.search(POSSE, t):
+        valor = None  # "o petróleo passou de 100 dólares?": é o preço do barril
+        if 'dolar' in p.mercados and not re.search(MERCADOS['dolar'], re.sub(PRECO_EM_DOLAR, ' ', t)):
+            p.mercados.remove('dolar')
     contrato_futuro = bool({'mini_indice', 'mini_dolar'} & set(p.mercados) or re.search(CONTRATO, t))
     cripto = bool({'cripto', 'memecoin'} & set(p.mercados))  # "10 mil dólares em USDT" é cripto da pessoa, não câmbio
     if valor is not None and not contrato_futuro:
