@@ -48,7 +48,9 @@ def test_tema_da_linha_do_tempo(pergunta, tema):
     assert F.tema_cripto(normalizar(pergunta)) == tema
     r = montar(pergunta, hoje='2026-10-23')
     assert r.violacoes == [], r.violacoes
-    if tema:
+    if tema == 'ftx':  # a definição diz que era corretora e que o fundador foi acusado (L13 da rodada 2)
+        assert r.curta[0].startswith('Corretora também quebra: a FTX')
+    elif tema:
         assert r.curta[0].startswith('Na linha do tempo da cripto:')
 
 

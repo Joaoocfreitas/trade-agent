@@ -87,7 +87,9 @@ def test_bloco_de_eventos_mostra_todos_os_do_tema(temas):
     esperados = [e for e in PETROLEO['eventos'] if not temas or e['tema'] in temas]
     assert sum(1 for ln in b.linhas if ': no dia da reação' in ln.texto) == len(esperados)  # todos, nunca os maiores
     assert any('licença de dados da B3' in x for x in b.limites)
-    assert 'a ação da Petrobras não foi medida' in b.resumo
+    # a ação de nenhuma petroleira é medida, e a amostra exagera as reações grandes (L1 da rodada 2)
+    assert 'a ação da Petrobras e a das outras petroleiras não foram medidas' in b.resumo
+    assert 'a amostra exagera as reações grandes' in b.resumo
     for ln in b.linhas:
         assert frases_proibidas(ln.texto) == [], ln.texto
 

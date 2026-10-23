@@ -1,5 +1,5 @@
 {
- "gerado_em": "2026-10-23T14:34:34-03:00",
+ "gerado_em": "2026-10-23T15:40:43-03:00",
  "textos": {
   "AVISO": "⚠️ Sou uma IA e posso errar. Isto não é recomendação de investimento: a empresa não é analista credenciada na APIMEC nem consultora autorizada pela CVM. Rentabilidade passada não indica rentabilidade futura.",
   "RECUSA": "Não digo se você deve comprar, vender ou esperar, nem para onde o preço vai: isso seria análise ou consultoria. Mostro o que dá para saber hoje, com fonte, para você decidir.",
@@ -7,6 +7,7 @@
   "RISCO_DERIVATIVO": "Em mini-índice, mini-dólar e DI futuro a posição é alavancada: a margem é só garantia, o ajuste diário debita ou credita a conta a cada pregão, e a perda pode passar do que você depositou.",
   "RISCO_DERIVATIVO_CRIPTO": "No futuro ou na opção de cripto, como no mini-índice, no mini-dólar e no DI futuro, a posição é alavancada: a margem é só garantia, o ajuste diário debita ou credita a conta a cada pregão, e a perda pode passar do que você depositou.",
   "SEM_PRECO_CRIPTO": "O repertório ainda não mostra o preço do bitcoin: nenhuma fonte gratuita permite uso comercial da cotação.",
+  "SEM_DEFASAGEM": "O repertório não calcula a defasagem entre o preço da Petrobras e o do mercado internacional.",
   "RISCO_CRIPTO": "Cripto à vista, em regra, não é valor mobiliário e não tem a proteção da regulação da CVM. Quem regula e autoriza as corretoras de cripto é o Banco Central, num processo que ainda está em curso. Futuro de cripto e cota de ETF de cripto são valores mobiliários.",
   "POR_PEDIDO": {
    "direcao": "Não digo para onde o preço vai nem dou chance de alta ou queda, nem em número de 0 a 100.",
@@ -20947,7 +20948,7 @@
      {
       "data": "2025-06-24",
       "dia_da_reacao": "2025-06-24",
-      "titulo": "Cessar-fogo entre Israel e Irã entra em vigor",
+      "titulo": "Cessar-fogo entre Israel e Irã é anunciado",
       "valor": -7.01,
       "caminho": [
        5.86,
@@ -20966,7 +20967,7 @@
      {
       "data": "2026-02-28",
       "dia_da_reacao": "2026-03-02",
-      "titulo": "Guerra de EUA e Israel contra o Irã e bloqueio de Ormuz",
+      "titulo": "Guerra de EUA e Israel contra o Irã; o conflito afeta o tráfego em Ormuz",
       "valor": 8.3,
       "caminho": [
        0.81,
@@ -21080,7 +21081,7 @@
      {
       "data": "2026-04-28",
       "dia_da_reacao": "2026-04-28",
-      "titulo": "Emirados Árabes deixam a OPEP e a OPEP+",
+      "titulo": "Emirados Árabes anunciam a saída da OPEP e da OPEP+ (a partir de 01/05)",
       "valor": 3.28,
       "caminho": [
        -6.8,
@@ -21974,7 +21975,7 @@
      {
       "data": "2026-04-28",
       "dia_da_reacao": "2026-04-28",
-      "titulo": "Emirados Árabes deixam a OPEP e a OPEP+",
+      "titulo": "Emirados Árabes anunciam a saída da OPEP e da OPEP+ (a partir de 01/05)",
       "valor": 3.28,
       "caminho": [
        -6.8,
@@ -22266,7 +22267,7 @@
      {
       "data": "2025-06-24",
       "dia_da_reacao": "2025-06-24",
-      "titulo": "Cessar-fogo entre Israel e Irã entra em vigor",
+      "titulo": "Cessar-fogo entre Israel e Irã é anunciado",
       "valor": -7.01,
       "caminho": [
        5.86,
@@ -22285,7 +22286,7 @@
      {
       "data": "2026-02-28",
       "dia_da_reacao": "2026-03-02",
-      "titulo": "Guerra de EUA e Israel contra o Irã e bloqueio de Ormuz",
+      "titulo": "Guerra de EUA e Israel contra o Irã; o conflito afeta o tráfego em Ormuz",
       "valor": 8.3,
       "caminho": [
        0.81,
@@ -23910,6 +23911,250 @@
     "O repertório ainda não mostra o preço do bitcoin: nenhuma fonte gratuita permite uso comercial da cotação."
    ]
   },
+  "imposto_etf": {
+   "titulo": "Imposto e formas de ter cripto no Brasil (regra conferida em 23/10/2026)",
+   "linhas": [
+    {
+     "texto": "Em corretora no Brasil, vender até R$ 35 mil por mês, somando todas as criptos, é isento. Passou disso, todo o ganho do mês paga imposto (15% até R$ 5 milhões de ganho), pelo DARF até o último dia útil do mês seguinte; trocar uma cripto por outra também conta.",
+     "fontes": [
+      {
+       "nome": "Lei 9.250/1995, art. 22",
+       "url": "https://www.planalto.gov.br/ccivil_03/leis/l9250.htm"
+      },
+      {
+       "nome": "Lei 8.981/1995, art. 21",
+       "url": "https://www.planalto.gov.br/ccivil_03/leis/l8981.htm"
+      },
+      {
+       "nome": "Receita Federal, Perguntas e Respostas IRPF 2026",
+       "url": "https://www.gov.br/receitafederal/pt-br/centrais-de-conteudo/publicacoes/perguntas-e-respostas/dirpf/p-r-irpf-2026-v1-00-2026-04-23.pdf"
+      }
+     ]
+    },
+    {
+     "texto": "A isenção de R$ 35 mil é da venda da própria cripto. Cota de ETF e contrato futuro são negociados na bolsa: a isenção de R$ 20 mil da bolsa vale só para ações e ouro à vista, e a Receita diz que ela não vale para cota de fundo de índice (ETF) nem para day trade.",
+     "fontes": [
+      {
+       "nome": "Receita Federal, Perguntas e Respostas IRPF 2026",
+       "url": "https://www.gov.br/receitafederal/pt-br/centrais-de-conteudo/publicacoes/perguntas-e-respostas/dirpf/p-r-irpf-2026-v1-00-2026-04-23.pdf"
+      },
+      {
+       "nome": "Receita Federal, isenções na bolsa",
+       "url": "https://www.gov.br/receitafederal/pt-br/assuntos/meu-imposto-de-renda/pagamento/renda-variavel/bolsa-de-valores-1/isencoes"
+      }
+     ]
+    },
+    {
+     "texto": "A proposta de 17,5% sem isenção (Medida Provisória 1.303/2025) perdeu a validade em 08/10/2025, e nenhuma lei a substituiu até 23/10/2026.",
+     "fontes": [
+      {
+       "nome": "Medida Provisória 1.303/2025",
+       "url": "https://www.planalto.gov.br/ccivil_03/_ato2023-2026/2025/mpv/mpv1303.htm"
+      },
+      {
+       "nome": "Congresso, Ato Declaratório nº 67/2025 (fim da vigência da MP 1.303)",
+       "url": "https://www2.camara.leg.br/legin/fed/atodecpm/2025/atodeclaratoriodopresidentedamesa-67-14-outubro-2025-798130-publicacaooriginal-176721-cn.html"
+      }
+     ]
+    },
+    {
+     "texto": "Em corretora no exterior, o ganho paga 15% por ano, na declaração, sem isenção.",
+     "fontes": [
+      {
+       "nome": "Lei 14.754/2023 (aplicações no exterior)",
+       "url": "https://www.planalto.gov.br/ccivil_03/_ato2023-2026/2023/lei/l14754.htm"
+      },
+      {
+       "nome": "Receita Federal, Perguntas e Respostas IRPF 2026",
+       "url": "https://www.gov.br/receitafederal/pt-br/centrais-de-conteudo/publicacoes/perguntas-e-respostas/dirpf/p-r-irpf-2026-v1-00-2026-04-23.pdf"
+      }
+     ]
+    },
+    {
+     "texto": "Na declaração, a cripto vai em Bens e Direitos, grupo 08 (código 01 é bitcoin), pelo custo de compra, quando o custo de cada tipo é de R$ 5 mil ou mais. Desde 01/07/2026 a DeCripto substituiu a antiga IN 1.888.",
+     "fontes": [
+      {
+       "nome": "Receita Federal, Perguntas e Respostas IRPF 2026",
+       "url": "https://www.gov.br/receitafederal/pt-br/centrais-de-conteudo/publicacoes/perguntas-e-respostas/dirpf/p-r-irpf-2026-v1-00-2026-04-23.pdf"
+      },
+      {
+       "nome": "Receita Federal, DeCripto",
+       "url": "https://www.gov.br/receitafederal/pt-br/assuntos/orientacao-tributaria/declaracoes-e-demonstrativos/criptoativos/decripto"
+      }
+     ]
+    },
+    {
+     "texto": "Formas de ter exposição ao bitcoin: comprar numa corretora de cripto no Brasil, regulada pelo Banco Central (a autorização ainda está em processo, e a corretora tem de informar no site e no app se tem autorização ou pedido em análise); guardar em carteira própria (quem guarda a chave é você, e perder a chave é perder o ativo); cota de ETF na B3, por corretora de valores; ou futuro de bitcoin na B3, que não entrega bitcoin (liquidação só em dinheiro), com margem e ajuste diário: a posição é alavancada, e a perda pode passar do que você depositou.",
+     "fontes": [
+      {
+       "nome": "Resolução BCB 520/2025",
+       "url": "https://www.bcb.gov.br/estabilidadefinanceira/exibenormativo?tipo=Resolu%C3%A7%C3%A3o%20BCB&numero=520"
+      },
+      {
+       "nome": "Resolução BCB 521/2025",
+       "url": "https://www.bcb.gov.br/estabilidadefinanceira/exibenormativo?tipo=Resolu%C3%A7%C3%A3o%20BCB&numero=521"
+      },
+      {
+       "nome": "Lei 6.385/1976 (mercado de valores mobiliários)",
+       "url": "https://www.planalto.gov.br/ccivil_03/leis/l6385compilada.htm"
+      },
+      {
+       "nome": "B3 (Bora Investir), glossário: margem de garantia",
+       "url": "https://borainvestir.b3.com.br/glossario/margem-de-garantia/"
+      }
+     ]
+    },
+    {
+     "texto": "No cadastro da CVM há 29 fundos de índice (ETF) ligados a cripto em funcionamento, com cerca de R$ 6,9 bilhões.",
+     "fontes": [
+      {
+       "nome": "CVM, dados abertos: cadastro de classes de fundos (baixado em 23/10/2026)",
+       "url": "https://dados.cvm.gov.br/dados/FI/CAD/DADOS/registro_fundo_classe.zip"
+      }
+     ]
+    },
+    {
+     "texto": "O futuro de bitcoin da B3 é negociado desde 17/04/2024: cada contrato vale 0,1 bitcoin, cotado em reais, com liquidação só em dinheiro.",
+     "fontes": [
+      {
+       "nome": "B3, Ofício-Circular 044/2024-PRE (contrato futuro de bitcoin)",
+       "url": "https://www.b3.com.br/data/files/2E/40/4F/10/D868E810C54843E8DC0D8AA8/OC%20044-2024%20PRE%20Lancamento%20do%20Contrato%20Futuro%20de%20Bitcoin%20e%20da%20Op.%20Estruturada%20de%20Rolagem%20de%20Contrato%20Futuro%20de%20Bitcoin%20(PT).pdf"
+      },
+      {
+       "nome": "B3, início do futuro de bitcoin",
+       "url": "https://www.b3.com.br/pt_br/noticias/inicio-do-futuro-de-bitcoin.htm"
+      }
+     ]
+    }
+   ],
+   "resumo": "A isenção de R$ 35 mil é da venda da própria cripto. Cota de ETF e contrato futuro são negociados na bolsa: a isenção de R$ 20 mil da bolsa vale só para ações e ouro à vista, e a Receita diz que ela não vale para cota de fundo de índice (ETF) nem para day trade.",
+   "limites": [
+    "Regra de imposto muda por lei: confira na Receita antes de declarar.",
+    "A regra de imposto do ETF e do futuro de cripto ainda não foi conferida na fonte: confira na Receita antes de vender."
+   ]
+  },
+  "imposto_declaracao": {
+   "titulo": "Imposto e formas de ter cripto no Brasil (regra conferida em 23/10/2026)",
+   "linhas": [
+    {
+     "texto": "Em corretora no Brasil, vender até R$ 35 mil por mês, somando todas as criptos, é isento. Passou disso, todo o ganho do mês paga imposto (15% até R$ 5 milhões de ganho), pelo DARF até o último dia útil do mês seguinte; trocar uma cripto por outra também conta.",
+     "fontes": [
+      {
+       "nome": "Lei 9.250/1995, art. 22",
+       "url": "https://www.planalto.gov.br/ccivil_03/leis/l9250.htm"
+      },
+      {
+       "nome": "Lei 8.981/1995, art. 21",
+       "url": "https://www.planalto.gov.br/ccivil_03/leis/l8981.htm"
+      },
+      {
+       "nome": "Receita Federal, Perguntas e Respostas IRPF 2026",
+       "url": "https://www.gov.br/receitafederal/pt-br/centrais-de-conteudo/publicacoes/perguntas-e-respostas/dirpf/p-r-irpf-2026-v1-00-2026-04-23.pdf"
+      }
+     ]
+    },
+    {
+     "texto": "A isenção de R$ 35 mil é da venda da própria cripto. Cota de ETF e contrato futuro são negociados na bolsa: a isenção de R$ 20 mil da bolsa vale só para ações e ouro à vista, e a Receita diz que ela não vale para cota de fundo de índice (ETF) nem para day trade.",
+     "fontes": [
+      {
+       "nome": "Receita Federal, Perguntas e Respostas IRPF 2026",
+       "url": "https://www.gov.br/receitafederal/pt-br/centrais-de-conteudo/publicacoes/perguntas-e-respostas/dirpf/p-r-irpf-2026-v1-00-2026-04-23.pdf"
+      },
+      {
+       "nome": "Receita Federal, isenções na bolsa",
+       "url": "https://www.gov.br/receitafederal/pt-br/assuntos/meu-imposto-de-renda/pagamento/renda-variavel/bolsa-de-valores-1/isencoes"
+      }
+     ]
+    },
+    {
+     "texto": "A proposta de 17,5% sem isenção (Medida Provisória 1.303/2025) perdeu a validade em 08/10/2025, e nenhuma lei a substituiu até 23/10/2026.",
+     "fontes": [
+      {
+       "nome": "Medida Provisória 1.303/2025",
+       "url": "https://www.planalto.gov.br/ccivil_03/_ato2023-2026/2025/mpv/mpv1303.htm"
+      },
+      {
+       "nome": "Congresso, Ato Declaratório nº 67/2025 (fim da vigência da MP 1.303)",
+       "url": "https://www2.camara.leg.br/legin/fed/atodecpm/2025/atodeclaratoriodopresidentedamesa-67-14-outubro-2025-798130-publicacaooriginal-176721-cn.html"
+      }
+     ]
+    },
+    {
+     "texto": "Em corretora no exterior, o ganho paga 15% por ano, na declaração, sem isenção.",
+     "fontes": [
+      {
+       "nome": "Lei 14.754/2023 (aplicações no exterior)",
+       "url": "https://www.planalto.gov.br/ccivil_03/_ato2023-2026/2023/lei/l14754.htm"
+      },
+      {
+       "nome": "Receita Federal, Perguntas e Respostas IRPF 2026",
+       "url": "https://www.gov.br/receitafederal/pt-br/centrais-de-conteudo/publicacoes/perguntas-e-respostas/dirpf/p-r-irpf-2026-v1-00-2026-04-23.pdf"
+      }
+     ]
+    },
+    {
+     "texto": "Na declaração, a cripto vai em Bens e Direitos, grupo 08 (código 01 é bitcoin), pelo custo de compra, quando o custo de cada tipo é de R$ 5 mil ou mais. Desde 01/07/2026 a DeCripto substituiu a antiga IN 1.888.",
+     "fontes": [
+      {
+       "nome": "Receita Federal, Perguntas e Respostas IRPF 2026",
+       "url": "https://www.gov.br/receitafederal/pt-br/centrais-de-conteudo/publicacoes/perguntas-e-respostas/dirpf/p-r-irpf-2026-v1-00-2026-04-23.pdf"
+      },
+      {
+       "nome": "Receita Federal, DeCripto",
+       "url": "https://www.gov.br/receitafederal/pt-br/assuntos/orientacao-tributaria/declaracoes-e-demonstrativos/criptoativos/decripto"
+      }
+     ]
+    },
+    {
+     "texto": "Formas de ter exposição ao bitcoin: comprar numa corretora de cripto no Brasil, regulada pelo Banco Central (a autorização ainda está em processo, e a corretora tem de informar no site e no app se tem autorização ou pedido em análise); guardar em carteira própria (quem guarda a chave é você, e perder a chave é perder o ativo); cota de ETF na B3, por corretora de valores; ou futuro de bitcoin na B3, que não entrega bitcoin (liquidação só em dinheiro), com margem e ajuste diário: a posição é alavancada, e a perda pode passar do que você depositou.",
+     "fontes": [
+      {
+       "nome": "Resolução BCB 520/2025",
+       "url": "https://www.bcb.gov.br/estabilidadefinanceira/exibenormativo?tipo=Resolu%C3%A7%C3%A3o%20BCB&numero=520"
+      },
+      {
+       "nome": "Resolução BCB 521/2025",
+       "url": "https://www.bcb.gov.br/estabilidadefinanceira/exibenormativo?tipo=Resolu%C3%A7%C3%A3o%20BCB&numero=521"
+      },
+      {
+       "nome": "Lei 6.385/1976 (mercado de valores mobiliários)",
+       "url": "https://www.planalto.gov.br/ccivil_03/leis/l6385compilada.htm"
+      },
+      {
+       "nome": "B3 (Bora Investir), glossário: margem de garantia",
+       "url": "https://borainvestir.b3.com.br/glossario/margem-de-garantia/"
+      }
+     ]
+    },
+    {
+     "texto": "No cadastro da CVM há 29 fundos de índice (ETF) ligados a cripto em funcionamento, com cerca de R$ 6,9 bilhões.",
+     "fontes": [
+      {
+       "nome": "CVM, dados abertos: cadastro de classes de fundos (baixado em 23/10/2026)",
+       "url": "https://dados.cvm.gov.br/dados/FI/CAD/DADOS/registro_fundo_classe.zip"
+      }
+     ]
+    },
+    {
+     "texto": "O futuro de bitcoin da B3 é negociado desde 17/04/2024: cada contrato vale 0,1 bitcoin, cotado em reais, com liquidação só em dinheiro.",
+     "fontes": [
+      {
+       "nome": "B3, Ofício-Circular 044/2024-PRE (contrato futuro de bitcoin)",
+       "url": "https://www.b3.com.br/data/files/2E/40/4F/10/D868E810C54843E8DC0D8AA8/OC%20044-2024%20PRE%20Lancamento%20do%20Contrato%20Futuro%20de%20Bitcoin%20e%20da%20Op.%20Estruturada%20de%20Rolagem%20de%20Contrato%20Futuro%20de%20Bitcoin%20(PT).pdf"
+      },
+      {
+       "nome": "B3, início do futuro de bitcoin",
+       "url": "https://www.b3.com.br/pt_br/noticias/inicio-do-futuro-de-bitcoin.htm"
+      }
+     ]
+    }
+   ],
+   "resumo": "Imposto da cripto: na declaração, ela vai em Bens e Direitos, grupo 08 (código 01 é bitcoin), pelo custo de compra, quando o custo de cada tipo é de R$ 5 mil ou mais; em corretora de cripto no Brasil, vendas de até R$ 35 mil por mês são isentas e, acima disso, o ganho paga 15%.",
+   "limites": [
+    "Regra de imposto muda por lei: confira na Receita antes de declarar.",
+    "A regra de imposto do ETF e do futuro de cripto ainda não foi conferida na fonte: confira na Receita antes de vender."
+   ]
+  },
   "marcos": {
    "": {
     "titulo": "Linha do tempo da cripto desde 2016 (fato, sem preço)",
@@ -23954,8 +24199,12 @@
       "texto": "24/09/2021: China declara ilegais as atividades de negócio com moeda virtual (Circular 237, revogada em 06/02/2026).",
       "fontes": [
        {
-        "nome": "Fonte primária do evento de 24/09/2021",
+        "nome": "Circular 237, documento de 15/09/2021 (gov.cn; a página não traz a data de divulgação)",
         "url": "https://www.gov.cn/zhengce/zhengceku/2021-10/08/content_5641404.htm"
+       },
+       {
+        "nome": "Escritório Haynes Boone, alerta de 02/11/2021 (a circular saiu no site do Banco Central da China em 24/09/2021)",
+        "url": "https://www.haynesboone.com/news/alerts/china-intensifies-regulations-on-cryptocurrency-trading-and-mining"
        }
       ]
      },
@@ -24012,7 +24261,7 @@
       "texto": "19/04/2024: Halving: de 6,25 para 3,125 BTC (às 21h09 em Brasília; já era 20/04 em UTC).",
       "fontes": [
        {
-        "nome": "Fonte primária do evento de 20/04/2024",
+        "nome": "mempool.space, bloco 840.000 (20/04/2024 00h09 UTC = 19/04 21h09 em Brasília)",
         "url": "https://mempool.space/api/block-height/840000"
        }
       ]
@@ -24138,7 +24387,7 @@
       "texto": "19/04/2024: Halving: de 6,25 para 3,125 BTC (às 21h09 em Brasília; já era 20/04 em UTC).",
       "fontes": [
        {
-        "nome": "Fonte primária do evento de 20/04/2024",
+        "nome": "mempool.space, bloco 840.000 (20/04/2024 00h09 UTC = 19/04 21h09 em Brasília)",
         "url": "https://mempool.space/api/block-height/840000"
        }
       ]
@@ -24156,16 +24405,16 @@
       "texto": "ETF de cripto é um fundo de índice regulado pela CVM e negociado na B3, comprado por corretora de valores; no cadastro da CVM há 29 ligados a cripto em funcionamento, com cerca de R$ 6,9 bilhões.",
       "fontes": [
        {
+        "nome": "CVM, dados abertos: cadastro de classes de fundos (baixado em 23/10/2026)",
+        "url": "https://dados.cvm.gov.br/dados/FI/CAD/DADOS/registro_fundo_classe.zip"
+       },
+       {
         "nome": "Lei 6.385/1976 (mercado de valores mobiliários)",
         "url": "https://www.planalto.gov.br/ccivil_03/leis/l6385compilada.htm"
        },
        {
         "nome": "Parecer de Orientação CVM 40/2022",
         "url": "https://conteudo.cvm.gov.br/export/sites/cvm/legislacao/pareceres-orientacao/anexos/Pare040.pdf"
-       },
-       {
-        "nome": "CVM, dados abertos: cadastro de classes de fundos (baixado em 23/10/2026)",
-        "url": "https://dados.cvm.gov.br/dados/FI/CAD/DADOS/registro_fundo_classe.zip"
        }
       ]
      },
@@ -24219,7 +24468,7 @@
       ]
      }
     ],
-    "resumo": "Na linha do tempo da cripto: 11/11/2022: FTX pede recuperação judicial nos EUA.",
+    "resumo": "Corretora também quebra: a FTX pediu recuperação judicial nos EUA em 11/11/2022, e a SEC (a CVM dos EUA) acusou o fundador de desviar dinheiro de clientes.",
     "limites": [
      "Sem a variação do preço em cada data: o repertório ainda não tem cotação licenciada do bitcoin."
     ]
@@ -24325,8 +24574,12 @@
       "texto": "24/09/2021: China declara ilegais as atividades de negócio com moeda virtual (Circular 237, revogada em 06/02/2026).",
       "fontes": [
        {
-        "nome": "Fonte primária do evento de 24/09/2021",
+        "nome": "Circular 237, documento de 15/09/2021 (gov.cn; a página não traz a data de divulgação)",
         "url": "https://www.gov.cn/zhengce/zhengceku/2021-10/08/content_5641404.htm"
+       },
+       {
+        "nome": "Escritório Haynes Boone, alerta de 02/11/2021 (a circular saiu no site do Banco Central da China em 24/09/2021)",
+        "url": "https://www.haynesboone.com/news/alerts/china-intensifies-regulations-on-cryptocurrency-trading-and-mining"
        }
       ]
      },
@@ -24733,7 +24986,7 @@
      ]
     },
     {
-     "texto": "29/11/2016, Lei 13.365: a Petrobras deixa de ser operadora obrigatória do pré-sal: no dia da reação, o Brent subiu 7,32% (30/11/2016); na B3 (30/11/2016), o Ibovespa subiu 1,51% e o dólar caiu 0,27% (o pregão é o mesmo de o corte da OPEP de 30/11/2016: a variação não separa um fato do outro).",
+     "texto": "29/11/2016, Lei 13.365: a Petrobras deixa de ser operadora obrigatória do pré-sal: no dia da reação, o Brent subiu 7,32% (30/11/2016); na B3 (30/11/2016), o Ibovespa subiu 1,51% e o dólar caiu 0,27% (o pregão é o mesmo do corte da OPEP de 30/11/2016: a variação não separa um fato do outro).",
      "fontes": [
       {
        "nome": "Planalto, texto da Lei 13.365",
@@ -24758,7 +25011,7 @@
      ]
     },
     {
-     "texto": "30/11/2016, OPEP fecha o primeiro corte de produção desde 2008: no dia da reação, o Brent subiu 7,32% (30/11/2016); na B3 (30/11/2016), o Ibovespa subiu 1,51% e o dólar caiu 0,27% (o pregão é o mesmo de a Lei 13.365 (pré-sal): a variação não separa um fato do outro).",
+     "texto": "30/11/2016, OPEP fecha o primeiro corte de produção desde 2008: no dia da reação, o Brent subiu 7,32% (30/11/2016); na B3 (30/11/2016), o Ibovespa subiu 1,51% e o dólar caiu 0,27% (o pregão é o mesmo da Lei 13.365 (pré-sal): a variação não separa um fato do outro).",
      "fontes": [
       {
        "nome": "OPEP, comunicado de 30/11/2016",
@@ -25674,7 +25927,7 @@
      ]
     },
     {
-     "texto": "03/04/2025, OPEP+ acelera o aumento da produção: no dia da reação, o Brent caiu 6,12% (03/04/2025); na B3 (03/04/2025), o Ibovespa caiu 0,04% e o dólar caiu 1,50% (o pregão é o mesmo de a reação às tarifas recíprocas dos EUA (anunciadas em 02/04, depois do fechamento): a variação não separa um fato do outro).",
+     "texto": "03/04/2025, OPEP+ acelera o aumento da produção: no dia da reação, o Brent caiu 6,12% (03/04/2025); na B3 (03/04/2025), o Ibovespa caiu 0,04% e o dólar caiu 1,50% (o pregão é o mesmo da reação às tarifas recíprocas dos EUA (anunciadas em 02/04, depois do fechamento): a variação não separa um fato do outro).",
      "fontes": [
       {
        "nome": "OPEP, comunicado de 03/04/2025",
@@ -25724,7 +25977,7 @@
      ]
     },
     {
-     "texto": "24/06/2025, Cessar-fogo entre Israel e Irã entra em vigor: no dia da reação, o Brent caiu 7,01% (24/06/2025); na B3 (24/06/2025), o Ibovespa subiu 0,45% e o dólar caiu 0,50%.",
+     "texto": "24/06/2025, Cessar-fogo entre Israel e Irã é anunciado: no dia da reação, o Brent caiu 7,01% (24/06/2025); na B3 (24/06/2025), o Ibovespa subiu 0,45% e o dólar caiu 0,50%.",
      "fontes": [
       {
        "nome": "Imprensa (eixos/Estadão Conteúdo, 24/06/2025)",
@@ -25749,7 +26002,7 @@
      ]
     },
     {
-     "texto": "28/02/2026, Guerra de EUA e Israel contra o Irã e bloqueio de Ormuz: no dia da reação, o Brent subiu 8,30% (02/03/2026); na B3 (02/03/2026), o Ibovespa subiu 0,28% e o dólar subiu 0,98%.",
+     "texto": "28/02/2026, Guerra de EUA e Israel contra o Irã; o conflito afeta o tráfego em Ormuz: no dia da reação, o Brent subiu 8,30% (02/03/2026); na B3 (02/03/2026), o Ibovespa subiu 0,28% e o dólar subiu 0,98%.",
      "fontes": [
       {
        "nome": "Imprensa (g1, 02/03/2026)",
@@ -25899,10 +26152,10 @@
      ]
     },
     {
-     "texto": "28/04/2026, Emirados Árabes deixam a OPEP e a OPEP+: no dia da reação, o Brent subiu 3,28% (28/04/2026); na B3 (28/04/2026), o Ibovespa caiu 0,51% e o dólar subiu 0,36%.",
+     "texto": "28/04/2026, Emirados Árabes anunciam a saída da OPEP e da OPEP+ (a partir de 01/05): no dia da reação, o Brent subiu 3,28% (28/04/2026); na B3 (28/04/2026), o Ibovespa caiu 0,51% e o dólar subiu 0,36%.",
      "fontes": [
       {
-       "nome": "Imprensa (Khaleej Times); a nota oficial dos Emirados não foi lida",
+       "nome": "Imprensa (Khaleej Times, 28/04/2026); a nota oficial dos Emirados não foi lida",
        "url": "https://www.khaleejtimes.com/uae-announces-decision-to-withdraw-from-opec-opec-from-may-1"
       },
       {
@@ -25924,7 +26177,7 @@
      ]
     },
     {
-     "texto": "04/10/2026, OPEP+ mantém as metas de produção de novembro: no dia da reação, o Brent caiu 7,38% (05/10/2026); na B3 (05/10/2026), o Ibovespa subiu 7,70% e o dólar caiu 4,55% (o pregão é o mesmo de o 1º turno da eleição de 2026: a variação não separa um fato do outro).",
+     "texto": "04/10/2026, OPEP+ mantém as metas de produção de novembro: no dia da reação, o Brent caiu 7,38% (05/10/2026); na B3 (05/10/2026), o Ibovespa subiu 7,70% e o dólar caiu 4,55% (o pregão é o mesmo do 1º turno da eleição de 2026: a variação não separa um fato do outro).",
      "fontes": [
       {
        "nome": "Imprensa especializada (Enerdata), citando o comunicado da OPEP+",
@@ -25976,7 +26229,7 @@
        ]
       }
      ],
-     "resumo": "Nos 50 eventos de petróleo e Petrobras desde 2016, no dia da reação o Brent foi de queda de 47,47% a alta de 12,53% e o Ibovespa foi de queda de 12,17% a alta de 2,09%; a ação da Petrobras não foi medida (falta a licença da B3), e os casos são marcantes, não sorteados.",
+     "resumo": "Nos 50 eventos de petróleo e Petrobras desde 2016, no dia da reação o Brent foi de queda de 47,47% a alta de 12,53% e o Ibovespa foi de queda de 12,17% a alta de 2,09% (fora da faixa, 4 eventos que dividem o pregão com outro fato); a ação da Petrobras e a das outras petroleiras não foram medidas (falta a licença da B3), e os casos são marcantes, não sorteados: a amostra exagera as reações grandes.",
      "limites": [
       "A reação das ações de petróleo (Petrobras, PRIO e outras) fica fora: a licença de dados da B3 para uso em produto ainda está pendente.",
       "Os eventos foram escolhidos por terem sido marcantes, não sorteados: a amostra exagera as reações grandes.",
@@ -26062,7 +26315,7 @@
        ]
       }
      ],
-     "resumo": "Nos 11 eventos de decisões da OPEP e da OPEP+ desde 2016, no dia da reação o Brent foi de queda de 11,09% a alta de 8,36% e o Ibovespa foi de queda de 4,14% a alta de 1,49%; a ação da Petrobras não foi medida (falta a licença da B3), e os casos são marcantes, não sorteados.",
+     "resumo": "Nos 11 eventos de decisões da OPEP e da OPEP+ desde 2016, no dia da reação o Brent foi de queda de 11,09% a alta de 8,36% e o Ibovespa foi de queda de 4,14% a alta de 1,49% (fora da faixa, 3 eventos que dividem o pregão com outro fato); a ação da Petrobras e a das outras petroleiras não foram medidas (falta a licença da B3), e os casos são marcantes, não sorteados: a amostra exagera as reações grandes.",
      "limites": [
       "A reação das ações de petróleo (Petrobras, PRIO e outras) fica fora: a licença de dados da B3 para uso em produto ainda está pendente.",
       "Os eventos foram escolhidos por terem sido marcantes, não sorteados: a amostra exagera as reações grandes.",
@@ -26108,7 +26361,7 @@
        ]
       }
      ],
-     "resumo": "Nos 9 eventos de guerras e ataques desde 2016, no dia da reação o Brent foi de queda de 15,43% a alta de 11,71% e o Ibovespa foi de queda de 0,55% a alta de 2,09%; a ação da Petrobras não foi medida (falta a licença da B3), e os casos são marcantes, não sorteados.",
+     "resumo": "Nos 9 eventos de guerras e ataques desde 2016, no dia da reação o Brent foi de queda de 15,43% a alta de 11,71% e o Ibovespa foi de queda de 0,55% a alta de 2,09%; a ação da Petrobras e a das outras petroleiras não foram medidas (falta a licença da B3), e os casos são marcantes, não sorteados: a amostra exagera as reações grandes.",
      "limites": [
       "A reação das ações de petróleo (Petrobras, PRIO e outras) fica fora: a licença de dados da B3 para uso em produto ainda está pendente.",
       "Os eventos foram escolhidos por terem sido marcantes, não sorteados: a amostra exagera as reações grandes.",
@@ -26152,7 +26405,7 @@
        ]
       }
      ],
-     "resumo": "Nos 7 eventos de medidas do governo sobre combustível desde 2016, no dia da reação o Brent foi de queda de 2,73% a alta de 12,53% e o Ibovespa foi de queda de 4,49% a alta de 0,05%; a ação da Petrobras não foi medida (falta a licença da B3), e os casos são marcantes, não sorteados.",
+     "resumo": "Nos 7 eventos de medidas do governo sobre combustível desde 2016, no dia da reação o Brent foi de queda de 2,73% a alta de 12,53% e o Ibovespa foi de queda de 4,49% a alta de 0,05% (fora da faixa, 1 evento que divide o pregão com outro fato); a ação da Petrobras e a das outras petroleiras não foram medidas (falta a licença da B3), e os casos são marcantes, não sorteados: a amostra exagera as reações grandes.",
      "limites": [
       "A reação das ações de petróleo (Petrobras, PRIO e outras) fica fora: a licença de dados da B3 para uso em produto ainda está pendente.",
       "Os eventos foram escolhidos por terem sido marcantes, não sorteados: a amostra exagera as reações grandes.",
@@ -26195,7 +26448,7 @@
        ]
       }
      ],
-     "resumo": "Nos 2 eventos de choques de demanda desde 2016, no dia da reação o Brent caiu de 22,52% a 47,47% e o Ibovespa caiu de 0,02% a 12,17%; a ação da Petrobras não foi medida (falta a licença da B3), e os casos são marcantes, não sorteados.",
+     "resumo": "Nos 2 eventos de choques de demanda desde 2016, no dia da reação o Brent caiu de 22,52% a 47,47% e o Ibovespa caiu de 0,02% a 12,17%; a ação da Petrobras e a das outras petroleiras não foram medidas (falta a licença da B3), e os casos são marcantes, não sorteados: a amostra exagera as reações grandes.",
      "limites": [
       "A reação das ações de petróleo (Petrobras, PRIO e outras) fica fora: a licença de dados da B3 para uso em produto ainda está pendente.",
       "Os eventos foram escolhidos por terem sido marcantes, não sorteados: a amostra exagera as reações grandes."
@@ -26231,7 +26484,7 @@
        ]
       }
      ],
-     "resumo": "Nos 21 eventos de Petrobras (presidente, preço e dividendo) desde 2016, no dia da reação o Brent foi de queda de 2,50% a alta de 3,25% e o Ibovespa foi de queda de 5,12% a alta de 1,74%; a ação da Petrobras não foi medida (falta a licença da B3), e os casos são marcantes, não sorteados.",
+     "resumo": "Nos 21 eventos de Petrobras (presidente, preço e dividendo) desde 2016, no dia da reação o Brent foi de queda de 2,50% a alta de 3,25% e o Ibovespa foi de queda de 5,12% a alta de 1,74%; a ação da Petrobras e a das outras petroleiras não foram medidas (falta a licença da B3), e os casos são marcantes, não sorteados: a amostra exagera as reações grandes.",
      "limites": [
       "A reação das ações de petróleo (Petrobras, PRIO e outras) fica fora: a licença de dados da B3 para uso em produto ainda está pendente.",
       "Os eventos foram escolhidos por terem sido marcantes, não sorteados: a amostra exagera as reações grandes.",
@@ -26287,7 +26540,7 @@
        ]
       }
      ],
-     "resumo": "Nos 20 eventos de decisões da OPEP e da OPEP+ e guerras e ataques desde 2016, no dia da reação o Brent foi de queda de 15,43% a alta de 11,71% e o Ibovespa foi de queda de 4,14% a alta de 2,09%; a ação da Petrobras não foi medida (falta a licença da B3), e os casos são marcantes, não sorteados.",
+     "resumo": "Nos 20 eventos de decisões da OPEP e da OPEP+ e guerras e ataques desde 2016, no dia da reação o Brent foi de queda de 15,43% a alta de 11,71% e o Ibovespa foi de queda de 4,14% a alta de 2,09% (fora da faixa, 3 eventos que dividem o pregão com outro fato); a ação da Petrobras e a das outras petroleiras não foram medidas (falta a licença da B3), e os casos são marcantes, não sorteados: a amostra exagera as reações grandes.",
      "limites": [
       "A reação das ações de petróleo (Petrobras, PRIO e outras) fica fora: a licença de dados da B3 para uso em produto ainda está pendente.",
       "Os eventos foram escolhidos por terem sido marcantes, não sorteados: a amostra exagera as reações grandes.",
@@ -26343,7 +26596,7 @@
        ]
       }
      ],
-     "resumo": "Nos 18 eventos de decisões da OPEP e da OPEP+ e medidas do governo sobre combustível desde 2016, no dia da reação o Brent foi de queda de 11,09% a alta de 12,53% e o Ibovespa foi de queda de 4,49% a alta de 1,49%; a ação da Petrobras não foi medida (falta a licença da B3), e os casos são marcantes, não sorteados.",
+     "resumo": "Nos 18 eventos de decisões da OPEP e da OPEP+ e medidas do governo sobre combustível desde 2016, no dia da reação o Brent foi de queda de 11,09% a alta de 12,53% e o Ibovespa foi de queda de 4,49% a alta de 1,49% (fora da faixa, 4 eventos que dividem o pregão com outro fato); a ação da Petrobras e a das outras petroleiras não foram medidas (falta a licença da B3), e os casos são marcantes, não sorteados: a amostra exagera as reações grandes.",
      "limites": [
       "A reação das ações de petróleo (Petrobras, PRIO e outras) fica fora: a licença de dados da B3 para uso em produto ainda está pendente.",
       "Os eventos foram escolhidos por terem sido marcantes, não sorteados: a amostra exagera as reações grandes.",
@@ -26397,7 +26650,7 @@
        ]
       }
      ],
-     "resumo": "Nos 13 eventos de decisões da OPEP e da OPEP+ e choques de demanda desde 2016, no dia da reação o Brent foi de queda de 47,47% a alta de 8,36% e o Ibovespa foi de queda de 12,17% a alta de 1,49%; a ação da Petrobras não foi medida (falta a licença da B3), e os casos são marcantes, não sorteados.",
+     "resumo": "Nos 13 eventos de decisões da OPEP e da OPEP+ e choques de demanda desde 2016, no dia da reação o Brent foi de queda de 47,47% a alta de 8,36% e o Ibovespa foi de queda de 12,17% a alta de 1,49% (fora da faixa, 3 eventos que dividem o pregão com outro fato); a ação da Petrobras e a das outras petroleiras não foram medidas (falta a licença da B3), e os casos são marcantes, não sorteados: a amostra exagera as reações grandes.",
      "limites": [
       "A reação das ações de petróleo (Petrobras, PRIO e outras) fica fora: a licença de dados da B3 para uso em produto ainda está pendente.",
       "Os eventos foram escolhidos por terem sido marcantes, não sorteados: a amostra exagera as reações grandes.",
@@ -26445,7 +26698,7 @@
        ]
       }
      ],
-     "resumo": "Nos 32 eventos de decisões da OPEP e da OPEP+ e Petrobras (presidente, preço e dividendo) desde 2016, no dia da reação o Brent foi de queda de 11,09% a alta de 8,36% e o Ibovespa foi de queda de 5,12% a alta de 1,74%; a ação da Petrobras não foi medida (falta a licença da B3), e os casos são marcantes, não sorteados.",
+     "resumo": "Nos 32 eventos de decisões da OPEP e da OPEP+ e Petrobras (presidente, preço e dividendo) desde 2016, no dia da reação o Brent foi de queda de 11,09% a alta de 8,36% e o Ibovespa foi de queda de 5,12% a alta de 1,74% (fora da faixa, 3 eventos que dividem o pregão com outro fato); a ação da Petrobras e a das outras petroleiras não foram medidas (falta a licença da B3), e os casos são marcantes, não sorteados: a amostra exagera as reações grandes.",
      "limites": [
       "A reação das ações de petróleo (Petrobras, PRIO e outras) fica fora: a licença de dados da B3 para uso em produto ainda está pendente.",
       "Os eventos foram escolhidos por terem sido marcantes, não sorteados: a amostra exagera as reações grandes.",
@@ -26513,7 +26766,7 @@
        ]
       }
      ],
-     "resumo": "Nos 16 eventos de guerras e ataques e medidas do governo sobre combustível desde 2016, no dia da reação o Brent foi de queda de 15,43% a alta de 12,53% e o Ibovespa foi de queda de 4,49% a alta de 2,09%; a ação da Petrobras não foi medida (falta a licença da B3), e os casos são marcantes, não sorteados.",
+     "resumo": "Nos 16 eventos de guerras e ataques e medidas do governo sobre combustível desde 2016, no dia da reação o Brent foi de queda de 15,43% a alta de 12,53% e o Ibovespa foi de queda de 4,49% a alta de 2,09% (fora da faixa, 1 evento que divide o pregão com outro fato); a ação da Petrobras e a das outras petroleiras não foram medidas (falta a licença da B3), e os casos são marcantes, não sorteados: a amostra exagera as reações grandes.",
      "limites": [
       "A reação das ações de petróleo (Petrobras, PRIO e outras) fica fora: a licença de dados da B3 para uso em produto ainda está pendente.",
       "Os eventos foram escolhidos por terem sido marcantes, não sorteados: a amostra exagera as reações grandes.",
@@ -26565,7 +26818,7 @@
        ]
       }
      ],
-     "resumo": "Nos 11 eventos de guerras e ataques e choques de demanda desde 2016, no dia da reação o Brent foi de queda de 47,47% a alta de 11,71% e o Ibovespa foi de queda de 12,17% a alta de 2,09%; a ação da Petrobras não foi medida (falta a licença da B3), e os casos são marcantes, não sorteados.",
+     "resumo": "Nos 11 eventos de guerras e ataques e choques de demanda desde 2016, no dia da reação o Brent foi de queda de 47,47% a alta de 11,71% e o Ibovespa foi de queda de 12,17% a alta de 2,09%; a ação da Petrobras e a das outras petroleiras não foram medidas (falta a licença da B3), e os casos são marcantes, não sorteados: a amostra exagera as reações grandes.",
      "limites": [
       "A reação das ações de petróleo (Petrobras, PRIO e outras) fica fora: a licença de dados da B3 para uso em produto ainda está pendente.",
       "Os eventos foram escolhidos por terem sido marcantes, não sorteados: a amostra exagera as reações grandes.",
@@ -26611,7 +26864,7 @@
        ]
       }
      ],
-     "resumo": "Nos 30 eventos de guerras e ataques e Petrobras (presidente, preço e dividendo) desde 2016, no dia da reação o Brent foi de queda de 15,43% a alta de 11,71% e o Ibovespa foi de queda de 5,12% a alta de 2,09%; a ação da Petrobras não foi medida (falta a licença da B3), e os casos são marcantes, não sorteados.",
+     "resumo": "Nos 30 eventos de guerras e ataques e Petrobras (presidente, preço e dividendo) desde 2016, no dia da reação o Brent foi de queda de 15,43% a alta de 11,71% e o Ibovespa foi de queda de 5,12% a alta de 2,09%; a ação da Petrobras e a das outras petroleiras não foram medidas (falta a licença da B3), e os casos são marcantes, não sorteados: a amostra exagera as reações grandes.",
      "limites": [
       "A reação das ações de petróleo (Petrobras, PRIO e outras) fica fora: a licença de dados da B3 para uso em produto ainda está pendente.",
       "Os eventos foram escolhidos por terem sido marcantes, não sorteados: a amostra exagera as reações grandes.",
@@ -26676,7 +26929,7 @@
        ]
       }
      ],
-     "resumo": "Nos 9 eventos de medidas do governo sobre combustível e choques de demanda desde 2016, no dia da reação o Brent foi de queda de 47,47% a alta de 12,53% e o Ibovespa foi de queda de 12,17% a alta de 0,05%; a ação da Petrobras não foi medida (falta a licença da B3), e os casos são marcantes, não sorteados.",
+     "resumo": "Nos 9 eventos de medidas do governo sobre combustível e choques de demanda desde 2016, no dia da reação o Brent foi de queda de 47,47% a alta de 12,53% e o Ibovespa foi de queda de 12,17% a alta de 0,05% (fora da faixa, 1 evento que divide o pregão com outro fato); a ação da Petrobras e a das outras petroleiras não foram medidas (falta a licença da B3), e os casos são marcantes, não sorteados: a amostra exagera as reações grandes.",
      "limites": [
       "A reação das ações de petróleo (Petrobras, PRIO e outras) fica fora: a licença de dados da B3 para uso em produto ainda está pendente.",
       "Os eventos foram escolhidos por terem sido marcantes, não sorteados: a amostra exagera as reações grandes.",
@@ -26721,7 +26974,7 @@
        ]
       }
      ],
-     "resumo": "Nos 28 eventos de medidas do governo sobre combustível e Petrobras (presidente, preço e dividendo) desde 2016, no dia da reação o Brent foi de queda de 2,73% a alta de 12,53% e o Ibovespa foi de queda de 5,12% a alta de 1,74%; a ação da Petrobras não foi medida (falta a licença da B3), e os casos são marcantes, não sorteados.",
+     "resumo": "Nos 28 eventos de medidas do governo sobre combustível e Petrobras (presidente, preço e dividendo) desde 2016, no dia da reação o Brent foi de queda de 2,73% a alta de 12,53% e o Ibovespa foi de queda de 5,12% a alta de 1,74% (fora da faixa, 1 evento que divide o pregão com outro fato); a ação da Petrobras e a das outras petroleiras não foram medidas (falta a licença da B3), e os casos são marcantes, não sorteados: a amostra exagera as reações grandes.",
      "limites": [
       "A reação das ações de petróleo (Petrobras, PRIO e outras) fica fora: a licença de dados da B3 para uso em produto ainda está pendente.",
       "Os eventos foram escolhidos por terem sido marcantes, não sorteados: a amostra exagera as reações grandes.",
@@ -26785,7 +27038,7 @@
        ]
       }
      ],
-     "resumo": "Nos 23 eventos de choques de demanda e Petrobras (presidente, preço e dividendo) desde 2016, no dia da reação o Brent foi de queda de 47,47% a alta de 3,25% e o Ibovespa foi de queda de 12,17% a alta de 1,74%; a ação da Petrobras não foi medida (falta a licença da B3), e os casos são marcantes, não sorteados.",
+     "resumo": "Nos 23 eventos de choques de demanda e Petrobras (presidente, preço e dividendo) desde 2016, no dia da reação o Brent foi de queda de 47,47% a alta de 3,25% e o Ibovespa foi de queda de 12,17% a alta de 1,74%; a ação da Petrobras e a das outras petroleiras não foram medidas (falta a licença da B3), e os casos são marcantes, não sorteados: a amostra exagera as reações grandes.",
      "limites": [
       "A reação das ações de petróleo (Petrobras, PRIO e outras) fica fora: a licença de dados da B3 para uso em produto ainda está pendente.",
       "Os eventos foram escolhidos por terem sido marcantes, não sorteados: a amostra exagera as reações grandes.",
@@ -26843,7 +27096,7 @@
        ]
       }
      ],
-     "resumo": "Nos 27 eventos de decisões da OPEP e da OPEP+, guerras e ataques e medidas do governo sobre combustível desde 2016, no dia da reação o Brent foi de queda de 15,43% a alta de 12,53% e o Ibovespa foi de queda de 4,49% a alta de 2,09%; a ação da Petrobras não foi medida (falta a licença da B3), e os casos são marcantes, não sorteados.",
+     "resumo": "Nos 27 eventos de decisões da OPEP e da OPEP+, guerras e ataques e medidas do governo sobre combustível desde 2016, no dia da reação o Brent foi de queda de 15,43% a alta de 12,53% e o Ibovespa foi de queda de 4,49% a alta de 2,09% (fora da faixa, 4 eventos que dividem o pregão com outro fato); a ação da Petrobras e a das outras petroleiras não foram medidas (falta a licença da B3), e os casos são marcantes, não sorteados: a amostra exagera as reações grandes.",
      "limites": [
       "A reação das ações de petróleo (Petrobras, PRIO e outras) fica fora: a licença de dados da B3 para uso em produto ainda está pendente.",
       "Os eventos foram escolhidos por terem sido marcantes, não sorteados: a amostra exagera as reações grandes.",
@@ -26906,7 +27159,7 @@
        ]
       }
      ],
-     "resumo": "Nos 22 eventos de decisões da OPEP e da OPEP+, guerras e ataques e choques de demanda desde 2016, no dia da reação o Brent foi de queda de 47,47% a alta de 11,71% e o Ibovespa foi de queda de 12,17% a alta de 2,09%; a ação da Petrobras não foi medida (falta a licença da B3), e os casos são marcantes, não sorteados.",
+     "resumo": "Nos 22 eventos de decisões da OPEP e da OPEP+, guerras e ataques e choques de demanda desde 2016, no dia da reação o Brent foi de queda de 47,47% a alta de 11,71% e o Ibovespa foi de queda de 12,17% a alta de 2,09% (fora da faixa, 3 eventos que dividem o pregão com outro fato); a ação da Petrobras e a das outras petroleiras não foram medidas (falta a licença da B3), e os casos são marcantes, não sorteados: a amostra exagera as reações grandes.",
      "limites": [
       "A reação das ações de petróleo (Petrobras, PRIO e outras) fica fora: a licença de dados da B3 para uso em produto ainda está pendente.",
       "Os eventos foram escolhidos por terem sido marcantes, não sorteados: a amostra exagera as reações grandes.",
@@ -26964,7 +27217,7 @@
        ]
       }
      ],
-     "resumo": "Nos 41 eventos de decisões da OPEP e da OPEP+, guerras e ataques e Petrobras (presidente, preço e dividendo) desde 2016, no dia da reação o Brent foi de queda de 15,43% a alta de 11,71% e o Ibovespa foi de queda de 5,12% a alta de 2,09%; a ação da Petrobras não foi medida (falta a licença da B3), e os casos são marcantes, não sorteados.",
+     "resumo": "Nos 41 eventos de decisões da OPEP e da OPEP+, guerras e ataques e Petrobras (presidente, preço e dividendo) desde 2016, no dia da reação o Brent foi de queda de 15,43% a alta de 11,71% e o Ibovespa foi de queda de 5,12% a alta de 2,09% (fora da faixa, 3 eventos que dividem o pregão com outro fato); a ação da Petrobras e a das outras petroleiras não foram medidas (falta a licença da B3), e os casos são marcantes, não sorteados: a amostra exagera as reações grandes.",
      "limites": [
       "A reação das ações de petróleo (Petrobras, PRIO e outras) fica fora: a licença de dados da B3 para uso em produto ainda está pendente.",
       "Os eventos foram escolhidos por terem sido marcantes, não sorteados: a amostra exagera as reações grandes.",
@@ -27041,7 +27294,7 @@
        ]
       }
      ],
-     "resumo": "Nos 20 eventos de decisões da OPEP e da OPEP+, medidas do governo sobre combustível e choques de demanda desde 2016, no dia da reação o Brent foi de queda de 47,47% a alta de 12,53% e o Ibovespa foi de queda de 12,17% a alta de 1,49%; a ação da Petrobras não foi medida (falta a licença da B3), e os casos são marcantes, não sorteados.",
+     "resumo": "Nos 20 eventos de decisões da OPEP e da OPEP+, medidas do governo sobre combustível e choques de demanda desde 2016, no dia da reação o Brent foi de queda de 47,47% a alta de 12,53% e o Ibovespa foi de queda de 12,17% a alta de 1,49% (fora da faixa, 4 eventos que dividem o pregão com outro fato); a ação da Petrobras e a das outras petroleiras não foram medidas (falta a licença da B3), e os casos são marcantes, não sorteados: a amostra exagera as reações grandes.",
      "limites": [
       "A reação das ações de petróleo (Petrobras, PRIO e outras) fica fora: a licença de dados da B3 para uso em produto ainda está pendente.",
       "Os eventos foram escolhidos por terem sido marcantes, não sorteados: a amostra exagera as reações grandes.",
@@ -27097,7 +27350,7 @@
        ]
       }
      ],
-     "resumo": "Nos 39 eventos de decisões da OPEP e da OPEP+, medidas do governo sobre combustível e Petrobras (presidente, preço e dividendo) desde 2016, no dia da reação o Brent foi de queda de 11,09% a alta de 12,53% e o Ibovespa foi de queda de 5,12% a alta de 1,74%; a ação da Petrobras não foi medida (falta a licença da B3), e os casos são marcantes, não sorteados.",
+     "resumo": "Nos 39 eventos de decisões da OPEP e da OPEP+, medidas do governo sobre combustível e Petrobras (presidente, preço e dividendo) desde 2016, no dia da reação o Brent foi de queda de 11,09% a alta de 12,53% e o Ibovespa foi de queda de 5,12% a alta de 1,74% (fora da faixa, 4 eventos que dividem o pregão com outro fato); a ação da Petrobras e a das outras petroleiras não foram medidas (falta a licença da B3), e os casos são marcantes, não sorteados: a amostra exagera as reações grandes.",
      "limites": [
       "A reação das ações de petróleo (Petrobras, PRIO e outras) fica fora: a licença de dados da B3 para uso em produto ainda está pendente.",
       "Os eventos foram escolhidos por terem sido marcantes, não sorteados: a amostra exagera as reações grandes.",
@@ -27172,7 +27425,7 @@
        ]
       }
      ],
-     "resumo": "Nos 34 eventos de decisões da OPEP e da OPEP+, choques de demanda e Petrobras (presidente, preço e dividendo) desde 2016, no dia da reação o Brent foi de queda de 47,47% a alta de 8,36% e o Ibovespa foi de queda de 12,17% a alta de 1,74%; a ação da Petrobras não foi medida (falta a licença da B3), e os casos são marcantes, não sorteados.",
+     "resumo": "Nos 34 eventos de decisões da OPEP e da OPEP+, choques de demanda e Petrobras (presidente, preço e dividendo) desde 2016, no dia da reação o Brent foi de queda de 47,47% a alta de 8,36% e o Ibovespa foi de queda de 12,17% a alta de 1,74% (fora da faixa, 3 eventos que dividem o pregão com outro fato); a ação da Petrobras e a das outras petroleiras não foram medidas (falta a licença da B3), e os casos são marcantes, não sorteados: a amostra exagera as reações grandes.",
      "limites": [
       "A reação das ações de petróleo (Petrobras, PRIO e outras) fica fora: a licença de dados da B3 para uso em produto ainda está pendente.",
       "Os eventos foram escolhidos por terem sido marcantes, não sorteados: a amostra exagera as reações grandes.",
@@ -27242,7 +27495,7 @@
        ]
       }
      ],
-     "resumo": "Nos 18 eventos de guerras e ataques, medidas do governo sobre combustível e choques de demanda desde 2016, no dia da reação o Brent foi de queda de 47,47% a alta de 12,53% e o Ibovespa foi de queda de 12,17% a alta de 2,09%; a ação da Petrobras não foi medida (falta a licença da B3), e os casos são marcantes, não sorteados.",
+     "resumo": "Nos 18 eventos de guerras e ataques, medidas do governo sobre combustível e choques de demanda desde 2016, no dia da reação o Brent foi de queda de 47,47% a alta de 12,53% e o Ibovespa foi de queda de 12,17% a alta de 2,09% (fora da faixa, 1 evento que divide o pregão com outro fato); a ação da Petrobras e a das outras petroleiras não foram medidas (falta a licença da B3), e os casos são marcantes, não sorteados: a amostra exagera as reações grandes.",
      "limites": [
       "A reação das ações de petróleo (Petrobras, PRIO e outras) fica fora: a licença de dados da B3 para uso em produto ainda está pendente.",
       "Os eventos foram escolhidos por terem sido marcantes, não sorteados: a amostra exagera as reações grandes.",
@@ -27296,7 +27549,7 @@
        ]
       }
      ],
-     "resumo": "Nos 37 eventos de guerras e ataques, medidas do governo sobre combustível e Petrobras (presidente, preço e dividendo) desde 2016, no dia da reação o Brent foi de queda de 15,43% a alta de 12,53% e o Ibovespa foi de queda de 5,12% a alta de 2,09%; a ação da Petrobras não foi medida (falta a licença da B3), e os casos são marcantes, não sorteados.",
+     "resumo": "Nos 37 eventos de guerras e ataques, medidas do governo sobre combustível e Petrobras (presidente, preço e dividendo) desde 2016, no dia da reação o Brent foi de queda de 15,43% a alta de 12,53% e o Ibovespa foi de queda de 5,12% a alta de 2,09% (fora da faixa, 1 evento que divide o pregão com outro fato); a ação da Petrobras e a das outras petroleiras não foram medidas (falta a licença da B3), e os casos são marcantes, não sorteados: a amostra exagera as reações grandes.",
      "limites": [
       "A reação das ações de petróleo (Petrobras, PRIO e outras) fica fora: a licença de dados da B3 para uso em produto ainda está pendente.",
       "Os eventos foram escolhidos por terem sido marcantes, não sorteados: a amostra exagera as reações grandes.",
@@ -27369,7 +27622,7 @@
        ]
       }
      ],
-     "resumo": "Nos 32 eventos de guerras e ataques, choques de demanda e Petrobras (presidente, preço e dividendo) desde 2016, no dia da reação o Brent foi de queda de 47,47% a alta de 11,71% e o Ibovespa foi de queda de 12,17% a alta de 2,09%; a ação da Petrobras não foi medida (falta a licença da B3), e os casos são marcantes, não sorteados.",
+     "resumo": "Nos 32 eventos de guerras e ataques, choques de demanda e Petrobras (presidente, preço e dividendo) desde 2016, no dia da reação o Brent foi de queda de 47,47% a alta de 11,71% e o Ibovespa foi de queda de 12,17% a alta de 2,09%; a ação da Petrobras e a das outras petroleiras não foram medidas (falta a licença da B3), e os casos são marcantes, não sorteados: a amostra exagera as reações grandes.",
      "limites": [
       "A reação das ações de petróleo (Petrobras, PRIO e outras) fica fora: a licença de dados da B3 para uso em produto ainda está pendente.",
       "Os eventos foram escolhidos por terem sido marcantes, não sorteados: a amostra exagera as reações grandes.",
@@ -27436,7 +27689,7 @@
        ]
       }
      ],
-     "resumo": "Nos 30 eventos de medidas do governo sobre combustível, choques de demanda e Petrobras (presidente, preço e dividendo) desde 2016, no dia da reação o Brent foi de queda de 47,47% a alta de 12,53% e o Ibovespa foi de queda de 12,17% a alta de 1,74%; a ação da Petrobras não foi medida (falta a licença da B3), e os casos são marcantes, não sorteados.",
+     "resumo": "Nos 30 eventos de medidas do governo sobre combustível, choques de demanda e Petrobras (presidente, preço e dividendo) desde 2016, no dia da reação o Brent foi de queda de 47,47% a alta de 12,53% e o Ibovespa foi de queda de 12,17% a alta de 1,74% (fora da faixa, 1 evento que divide o pregão com outro fato); a ação da Petrobras e a das outras petroleiras não foram medidas (falta a licença da B3), e os casos são marcantes, não sorteados: a amostra exagera as reações grandes.",
      "limites": [
       "A reação das ações de petróleo (Petrobras, PRIO e outras) fica fora: a licença de dados da B3 para uso em produto ainda está pendente.",
       "Os eventos foram escolhidos por terem sido marcantes, não sorteados: a amostra exagera as reações grandes.",
@@ -27502,7 +27755,7 @@
        ]
       }
      ],
-     "resumo": "Nos 29 eventos de decisões da OPEP e da OPEP+, guerras e ataques, medidas do governo sobre combustível e choques de demanda desde 2016, no dia da reação o Brent foi de queda de 47,47% a alta de 12,53% e o Ibovespa foi de queda de 12,17% a alta de 2,09%; a ação da Petrobras não foi medida (falta a licença da B3), e os casos são marcantes, não sorteados.",
+     "resumo": "Nos 29 eventos de decisões da OPEP e da OPEP+, guerras e ataques, medidas do governo sobre combustível e choques de demanda desde 2016, no dia da reação o Brent foi de queda de 47,47% a alta de 12,53% e o Ibovespa foi de queda de 12,17% a alta de 2,09% (fora da faixa, 4 eventos que dividem o pregão com outro fato); a ação da Petrobras e a das outras petroleiras não foram medidas (falta a licença da B3), e os casos são marcantes, não sorteados: a amostra exagera as reações grandes.",
      "limites": [
       "A reação das ações de petróleo (Petrobras, PRIO e outras) fica fora: a licença de dados da B3 para uso em produto ainda está pendente.",
       "Os eventos foram escolhidos por terem sido marcantes, não sorteados: a amostra exagera as reações grandes.",
@@ -27567,7 +27820,7 @@
        ]
       }
      ],
-     "resumo": "Nos 48 eventos de decisões da OPEP e da OPEP+, guerras e ataques, medidas do governo sobre combustível e Petrobras (presidente, preço e dividendo) desde 2016, no dia da reação o Brent foi de queda de 15,43% a alta de 12,53% e o Ibovespa foi de queda de 5,12% a alta de 2,09%; a ação da Petrobras não foi medida (falta a licença da B3), e os casos são marcantes, não sorteados.",
+     "resumo": "Nos 48 eventos de decisões da OPEP e da OPEP+, guerras e ataques, medidas do governo sobre combustível e Petrobras (presidente, preço e dividendo) desde 2016, no dia da reação o Brent foi de queda de 15,43% a alta de 12,53% e o Ibovespa foi de queda de 5,12% a alta de 2,09% (fora da faixa, 4 eventos que dividem o pregão com outro fato); a ação da Petrobras e a das outras petroleiras não foram medidas (falta a licença da B3), e os casos são marcantes, não sorteados: a amostra exagera as reações grandes.",
      "limites": [
       "A reação das ações de petróleo (Petrobras, PRIO e outras) fica fora: a licença de dados da B3 para uso em produto ainda está pendente.",
       "Os eventos foram escolhidos por terem sido marcantes, não sorteados: a amostra exagera as reações grandes.",
@@ -27651,7 +27904,7 @@
        ]
       }
      ],
-     "resumo": "Nos 43 eventos de decisões da OPEP e da OPEP+, guerras e ataques, choques de demanda e Petrobras (presidente, preço e dividendo) desde 2016, no dia da reação o Brent foi de queda de 47,47% a alta de 11,71% e o Ibovespa foi de queda de 12,17% a alta de 2,09%; a ação da Petrobras não foi medida (falta a licença da B3), e os casos são marcantes, não sorteados.",
+     "resumo": "Nos 43 eventos de decisões da OPEP e da OPEP+, guerras e ataques, choques de demanda e Petrobras (presidente, preço e dividendo) desde 2016, no dia da reação o Brent foi de queda de 47,47% a alta de 11,71% e o Ibovespa foi de queda de 12,17% a alta de 2,09% (fora da faixa, 3 eventos que dividem o pregão com outro fato); a ação da Petrobras e a das outras petroleiras não foram medidas (falta a licença da B3), e os casos são marcantes, não sorteados: a amostra exagera as reações grandes.",
      "limites": [
       "A reação das ações de petróleo (Petrobras, PRIO e outras) fica fora: a licença de dados da B3 para uso em produto ainda está pendente.",
       "Os eventos foram escolhidos por terem sido marcantes, não sorteados: a amostra exagera as reações grandes.",
@@ -27730,7 +27983,7 @@
        ]
       }
      ],
-     "resumo": "Nos 41 eventos de decisões da OPEP e da OPEP+, medidas do governo sobre combustível, choques de demanda e Petrobras (presidente, preço e dividendo) desde 2016, no dia da reação o Brent foi de queda de 47,47% a alta de 12,53% e o Ibovespa foi de queda de 12,17% a alta de 1,74%; a ação da Petrobras não foi medida (falta a licença da B3), e os casos são marcantes, não sorteados.",
+     "resumo": "Nos 41 eventos de decisões da OPEP e da OPEP+, medidas do governo sobre combustível, choques de demanda e Petrobras (presidente, preço e dividendo) desde 2016, no dia da reação o Brent foi de queda de 47,47% a alta de 12,53% e o Ibovespa foi de queda de 12,17% a alta de 1,74% (fora da faixa, 4 eventos que dividem o pregão com outro fato); a ação da Petrobras e a das outras petroleiras não foram medidas (falta a licença da B3), e os casos são marcantes, não sorteados: a amostra exagera as reações grandes.",
      "limites": [
       "A reação das ações de petróleo (Petrobras, PRIO e outras) fica fora: a licença de dados da B3 para uso em produto ainda está pendente.",
       "Os eventos foram escolhidos por terem sido marcantes, não sorteados: a amostra exagera as reações grandes.",
@@ -27807,7 +28060,7 @@
        ]
       }
      ],
-     "resumo": "Nos 39 eventos de guerras e ataques, medidas do governo sobre combustível, choques de demanda e Petrobras (presidente, preço e dividendo) desde 2016, no dia da reação o Brent foi de queda de 47,47% a alta de 12,53% e o Ibovespa foi de queda de 12,17% a alta de 2,09%; a ação da Petrobras não foi medida (falta a licença da B3), e os casos são marcantes, não sorteados.",
+     "resumo": "Nos 39 eventos de guerras e ataques, medidas do governo sobre combustível, choques de demanda e Petrobras (presidente, preço e dividendo) desde 2016, no dia da reação o Brent foi de queda de 47,47% a alta de 12,53% e o Ibovespa foi de queda de 12,17% a alta de 2,09% (fora da faixa, 1 evento que divide o pregão com outro fato); a ação da Petrobras e a das outras petroleiras não foram medidas (falta a licença da B3), e os casos são marcantes, não sorteados: a amostra exagera as reações grandes.",
      "limites": [
       "A reação das ações de petróleo (Petrobras, PRIO e outras) fica fora: a licença de dados da B3 para uso em produto ainda está pendente.",
       "Os eventos foram escolhidos por terem sido marcantes, não sorteados: a amostra exagera as reações grandes.",
@@ -27882,7 +28135,7 @@
        ]
       }
      ],
-     "resumo": "Nos 50 eventos de decisões da OPEP e da OPEP+, guerras e ataques, medidas do governo sobre combustível, choques de demanda e Petrobras (presidente, preço e dividendo) desde 2016, no dia da reação o Brent foi de queda de 47,47% a alta de 12,53% e o Ibovespa foi de queda de 12,17% a alta de 2,09%; a ação da Petrobras não foi medida (falta a licença da B3), e os casos são marcantes, não sorteados.",
+     "resumo": "Nos 50 eventos de decisões da OPEP e da OPEP+, guerras e ataques, medidas do governo sobre combustível, choques de demanda e Petrobras (presidente, preço e dividendo) desde 2016, no dia da reação o Brent foi de queda de 47,47% a alta de 12,53% e o Ibovespa foi de queda de 12,17% a alta de 2,09% (fora da faixa, 4 eventos que dividem o pregão com outro fato); a ação da Petrobras e a das outras petroleiras não foram medidas (falta a licença da B3), e os casos são marcantes, não sorteados: a amostra exagera as reações grandes.",
      "limites": [
       "A reação das ações de petróleo (Petrobras, PRIO e outras) fica fora: a licença de dados da B3 para uso em produto ainda está pendente.",
       "Os eventos foram escolhidos por terem sido marcantes, não sorteados: a amostra exagera as reações grandes.",
@@ -27946,10 +28199,10 @@
   },
   "temas": {
    "opep": "\\bopep\\b|\\bopec\\b",
-   "guerra": "\\bguerra\\b(?! (de precos|comercial))|\\biran\\b|\\b(o|do|no|ao|pro|pelo|com o|contra o) ira\\b|\\bormuz\\b|\\brussia\\b|\\bucrania\\b|\\bisrael\\b|\\bataques?\\b|\\bconflito\\b|\\bcessar[- ]fogo\\b",
+   "guerra": "\\bguerra\\b(?! (de precos?|comercial))|\\biran\\b|\\b(o|do|no|ao|pro|pelo|com o|contra o) ira\\b(?! \\w+(ar|er|ir)\\b)|\\bormuz\\b|\\brussia\\b|\\bruss[oa]s?\\b|\\bucrania\\b|\\bisrael\\b|\\bataques?\\b|\\bconflito\\b|\\bcessar[- ]fogo\\b",
    "governo": "\\bimpost\\w*|\\btribut\\w*|\\bicms\\b|\\bsubvenc\\w*|\\bmedida provisoria\\b|\\bgoverno\\b|\\bpre-sal\\b|\\boperador\\w*|\\bexportac\\w*",
-   "choque": "\\bcovid\\b|\\bpandemia\\b|\\bguerra de precos\\b|\\bwti\\b[^.?!]{0,30}\\bnegativ\\w*|\\bpreco negativo\\b|\\babaixo de zero\\b|\\b(petroleo|barril) (ficou |chegou a )?negativo\\b(?! (hoje|ontem|no (dia|ano|mes)))",
-   "petrobras": "(?=.*\\b(petrobras|petr[34])\\b)(?=.*\\b(presidente|presidencia|presidir|ceo|comando|conselho( de administracao)?( da petrobras)? (nao )?(eleg\\w*|aprov\\w*|propo\\w*|propos|decid\\w*|vot\\w*)|indicad[oa] (para|pra|a) (presidir|presidencia|petrobras|o comando)|governo indica|deix(a|ou) (a petrobras|o cargo|a presidencia|o comando)|deixou de ser operadora|saida d[eoa] (presidente|ceo|presidencia|comando|\\w+ (da|na) petrobras)|renuncia\\w*|demissao|reajust\\w*|gasolina|diesel|politica de (preco|precos|dividendo|dividendos)|paridade|estrategia comercial|greve|caminhoneir\\w*|dividendos? extraordinari\\w*|interferencia)\\b)|(?=.*\\b(petrobras|petr[34])\\b)(?=.*\\bdividendo\\w*)(?=.*\\b(reagiu|reagiram|aconteceu|aconteceram|foi|foram|pagou|aprovou|20(1[6-9]|2[0-5]))\\b)"
+   "choque": "\\bcovid\\b|\\bpandemia\\b|\\bguerra de precos?\\b|\\babaixo de zero\\b|\\b(wti|petroleo|barril|preco)\\b[^.?!]{0,25}\\bnegativ\\w*(?=[^.?!]{0,30}\\b(2020|abril|historia|historic\\w*|primeira vez)\\b)|\\b(2020|abril)\\b[^.?!]{0,40}\\b(wti|petroleo|barril|preco)\\b[^.?!]{0,25}\\bnegativ\\w*|^\\W*(o |a )?(wti|petroleo|barril|preco do petroleo|preco do barril)( ja)? (ficou |chegou a |fechou |foi )?negativo\\W*$",
+   "petrobras": "(?=.*\\b(petrobras|petr[34])\\b)(?=.*\\b(presidentes?|presidencia|presidir|ceos?|comando|conselho( de administracao)?( da petrobras)? (nao )?(eleg\\w*|aprov\\w*|propo\\w*|propos|decid\\w*|vot\\w*)|indicad[oa] (para|pra|a) (presidir|presidencia|petrobras|o comando)|governo indica|deix(a|ou) (a petrobras|o cargo|a presidencia|o comando)|deixou de ser operadora|saida d[eoa] (presidente|ceo|presidencia|comando|\\w+ (da|na) petrobras)|renuncia\\w*|demissao|nome(a\\w*|ou|ia\\w*)|elegeu|elegeram|foi eleit[oa]|demitiu|demitiram|demitid[oa]|(pedro|o|do|ao|pelo|com o) parente|prates|magda|chambriard|castell?o branco|castello|silva e luna|jose mauro|caio paes|paes de andrade|adriano pires|(aumentou|aumentaram|subiu|baixou|baixaram|reduziu|reduziram|cortou) (o |os )?precos?|(ultimo |o )?aumento d[aoe] (preco|precos|gasolina|diesel|combustive(l|is)|petrobras)|reajust\\w*|gasolina|diesel|politica de (preco|precos|dividendo|dividendos)|paridade|estrategia comercial|greve|caminhoneir\\w*|dividendos? extraordinari\\w*|interferencia)\\b)|(?=.*\\b(petrobras|petr[34])\\b)(?=.*\\bdividendo\\w*)(?=.*\\b(reagiu|reagiram|aconteceu|aconteceram|foi|foram|pagou|aprovou|20(1[6-9]|2[0-5]))\\b)|(?=.*\\b(petrobras|petr[34])\\b)(?=.*\\b(o que aconteceu|aconteceu com|linha do tempo|eventos?|historia|historico)\\b)"
   },
   "barril": {
    "titulo": "Do barril à bomba (fato, com a data de cada número)",

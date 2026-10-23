@@ -15,7 +15,7 @@ from coletor.config import FUSO
 from . import fatos as F
 from . import textos as T
 from .filtro import Violacao, checar
-from .roteador import CONTRATO, Pedido, analisar, normalizar
+from .roteador import CONTRATO, MERCADOS, PRECO_EM_DOLAR, Pedido, analisar, normalizar
 
 DERIVATIVOS = ('mini_indice', 'mini_dolar', 'juros')
 # O mercado da pergunta e a série que mede o caminho dele.
@@ -80,6 +80,11 @@ def escolher_blocos(p: Pedido, hoje: str) -> list[F.Bloco]:
                    and not re.search(IBOV_DITO, re.sub(LUGAR_DITO, ' ', t)))
     if b3_so_lugar:
         medidos = [m for m in medidos if m != 'ibovespa']
+    # "10 mil dólares em bitcoin": o dólar é a unidade do valor, não o mercado da pergunta (como no petróleo, no roteador).
+    # O mini-dólar (WDO) mede o dólar de verdade.
+    if ('cripto' in p.mercados and 'mini_dolar' not in p.mercados
+            and not re.search(MERCADOS['dolar'], re.sub(PRECO_EM_DOLAR, ' ', t))):
+        medidos = [m for m in medidos if m != 'dolar']
     if not tem_evento and medidos:
         blocos += [F.historico(m) for m in medidos]
         # Quem pede o que fazer ou para onde vai recebe os dois lados do que já aconteceu, não uma recomendação. Em contrato
@@ -109,9 +114,19 @@ def escolher_blocos(p: Pedido, hoje: str) -> list[F.Bloco]:
             # Quem cita só a ação ("vale a pena PETR4?", "PETR4 ou PRIO3?") não recebe a história de um emissor (Res. CVM
             # 20): os eventos entram quando a pergunta cita o fato ou o petróleo. Do barril à bomba, quando ela fala de
             # combustível, ou do petróleo sem tema.
-            so_acao = not temas_petroleo and re.search(ACAO_DITA, t) and not re.search(PETROLEO_DITO, t)
+            # Com pedido de dica, direção, momento ou ranking que cita a ação ("compro PETR4 antes do dividendo
+            # extraordinário?"), ou com escolha entre ativos ("petróleo ou dólar, qual é melhor?"), os eventos da Petrobras
+            # não entram nem com o fato citado: ficam os do petróleo, quando a pergunta cita o petróleo (Mapa legal, seção
+            # 8, item 10).
+            temas_ev = temas_petroleo
+            if T.PEDEM_RECUSA & set(p.proibidos) and (re.search(ACAO_DITA, t) or {'ranking', 'comparar'} & set(p.proibidos)):
+                sem_emissor = lambda ts: tuple(x for x in ts if x != 'petrobras')  # noqa: E731
+                temas_ev = sem_emissor(temas_petroleo) or (sem_emissor(F._petroleo()['temas'])
+                                                           if re.search(PETROLEO_DITO, t) or not re.search(ACAO_DITA, t)
+                                                           else ())
+            so_acao = not temas_ev and re.search(ACAO_DITA, t) and not re.search(PETROLEO_DITO, t)
             if not so_acao:
-                blocos.append(F.petroleo_eventos(temas_petroleo))
+                blocos.append(F.petroleo_eventos(temas_ev))
                 eventos_petroleo = True
             if re.search(COMBUSTIVEL_DITO, t) or not temas_petroleo and not so_acao:
                 blocos.append(F.barril_bomba())
@@ -124,15 +139,24 @@ def escolher_blocos(p: Pedido, hoje: str) -> list[F.Bloco]:
             # tempo inteira vai para o fim, como em qualquer pergunta de cripto sem tema.
             if tema == 'binance' and 'plataforma' in p.proibidos:
                 tema = ''
-            imposto, riscos = F.cripto_imposto(), F.cripto_riscos()
-            if re.search(IMPOSTO_DITO, t):
+            # Pergunta de imposto do ETF ou do futuro: o resumo diz que a isenção de R$ 35 mil não vale para eles; de
+            # declaração: quem declara e como. O que o celular mostra primeiro não pode omitir isso (CDC, art. 37, §3º).
+            imposto_dito = bool(re.search(IMPOSTO_DITO, t))
+            variante = ('etf' if imposto_dito and (tema == 'etf' or re.search(FUTURO_CRIPTO, t))
+                        else 'declaracao' if re.search(DECLARACAO_DITA, t) else '')
+            imposto, riscos = F.cripto_imposto(variante), F.cripto_riscos()
+            if imposto_dito:
                 blocos[-1:-1] = [imposto]
                 blocos.append(riscos)
             else:
                 blocos += [imposto, riscos]
             if tema:
-                i = next(i for i, b in enumerate(blocos) if b and b.titulo in (F.TITULO_CRIPTO, F.TITULO_CRIPTO_IMPOSTO))
-                blocos.insert(i, F.cripto_marcos(tema, conceito='conceito' in p.temas))
+                # em pergunta de imposto, a linha do tempo vem depois do imposto; a definição só vira a 1ª linha quando o
+                # "o que é" é do próprio termo ("o que é a lei das stablecoins nos EUA?" quer a lei, não a stablecoin)
+                antes = (F.TITULO_CRIPTO,) if imposto_dito else (F.TITULO_CRIPTO, F.TITULO_CRIPTO_IMPOSTO)
+                i = next(i for i, b in enumerate(blocos) if b and b.titulo in antes)
+                conceito = 'conceito' in p.temas and bool(re.search(CONCEITO_CRIPTO, t))
+                blocos.insert(i, F.cripto_marcos(tema, conceito=conceito))
             else:
                 blocos.append(F.cripto_marcos())
     if pede_dinheiro or set(DERIVATIVOS[:2]) & set(p.mercados):
@@ -146,6 +170,12 @@ def escolher_blocos(p: Pedido, hoje: str) -> list[F.Bloco]:
         blocos = _cambio_primeiro(p, blocos)
     elif 'cripto' in p.mercados:  # em pergunta de câmbio ("exchange my euros"), o câmbio continua na frente
         blocos = _cripto_primeiro(blocos)
+    # A linha do pedido promete a taxa-base da FGV "logo abaixo": ela vai em 2º, depois de qualquer reordenamento.
+    if pede_dinheiro:
+        fgv = [b for b in blocos if b.titulo == F.TITULO_FGV]
+        if fgv:
+            blocos = [b for b in blocos if b.titulo != F.TITULO_FGV]
+            blocos.insert(min(1, len(blocos)), fgv[0])
     if not blocos:
         blocos.append(F.economia())
     return blocos
@@ -156,17 +186,37 @@ CRIPTO_TITULOS = (F.TITULO_MARCOS, F.TITULO_CRIPTO, F.TITULO_CRIPTO_IMPOSTO, F.T
 # da cripto.
 IBOV_DITO = (r'\bibov\w*|\bbovespa\b|\bacoes\b|\bacao\b|\bbova11\b|\bbolsa\b(?! de (cripto|bitcoin))'
              r'|\bstocks?\b(?![- ]to[- ]flow)|\bindices?\b(?! de (medo|dominancia))')
-# "bitcoin na bolsa", "ETF de bitcoin na bolsa": a bolsa como lugar da cripto, igual à B3.
-LUGAR_DITO = r'\b(cripto\w*|bitcoins?|btc|ethereum|eth|hash11|etfs?)( de \w+)? (na|pela) bolsa\b'
-TARIFA_DITA = r'\btarifa\w*|\bsanc(ao|oes)\b|\bguerra comercial\b'
+# "bitcoin na bolsa", "ETF de bitcoin na bolsa": a bolsa como lugar da cripto, igual à B3. Também a escolha do lugar
+# ("corretora ou bolsa, onde compro bitcoin?", "bolsa ou exchange?") e o "fundo de índice" (o ETF), que não são o Ibovespa.
+LUGAR_DITO = (r'\b(cripto\w*|bitcoins?|btc|ethereum|eth|hash11|etfs?|futuros?)( de \w+)? (na|pela|da|via) (bolsa|b3)\b'
+              r'|\b(corretora|exchange|direto) (ou|vs|x|versus) (a |na |pela )?bolsa\b'
+              r'|\bbolsa (ou|vs|x|versus) (a |o |na |no |pela |pelo )?(corretora|exchange|direto)\b'
+              r'|\b(fundos?|etfs?) de indices?\b')
+TARIFA_DITA = (r'\btarifa\w*|\bsobretaxa\w*|\btaxac\w* (d[aoe]s? )?(trump|eua|estados unidos|americana)\b|\bsanc(ao|oes)\b'
+               r'|\bguerra comercial\b')
 ACAO_DITA = r'\b(petrobras|petr[34]|prio3?|petroleiras?|acao|acoes)\b'
 PETROLEO_DITO = r'\b(petroleo|brent|wti|barril|opep|opec|ormuz|combustive(l|is)|gasolina|diesel)\b'
 COMBUSTIVEL_DITO = (r'\b(gasolina|diesel|etanol|combustive(l|is)|bomba|posto|litro|reajust\w*|ipca|inflacao|defasa\w*'
                     r'|paridade|politica de preco\w*)\b')
-IMPOSTO_DITO = r'\bimpost\w*|\bdeclar\w*|\birpf?\b|\bdarf\b|\bleao\b|\btribut\w*|\bisen\w*'
+# "declarar" e "declaração" (não "declarou", nem "declarar guerra"); o "IR" dito com verbo ou preposição ("bitcoin paga IR?",
+# "o IR da cripto"), sem "de ir" ("é hora de ir pro bitcoin?").
+DECLARACAO_DITA = r'\bdeclar(ar|o|a|as|amos|ei|ando|ado|ados|acao|acoes)\b(?! guerra\b)'
+IMPOSTO_DITO = (r'\bimpost\w*|' + DECLARACAO_DITA + r'|\birpf?\b|\bdarf\b|\bleao\b|\btribut\w*|\bisen\w*'
+                r'|\b(paga|pagar|pago|pagam|pagou|pagando|cobra|cobram|cobrar|incide|tem|o|do|no) ir\b'
+                r'|\bir (da|do|sobre|em|no|na) (cripto\w*|bitcoins?|btc|ether|eth)\b')
+FUTURO_CRIPTO = r'\bfuturos? (de|do) (bitcoins?|btc|cripto\w*|ether|ethereum|eth)\b'
+# O "o que é" do próprio termo do tema ("o que é halving?", "me explica o halving", "halving, o que é?").
+TERMO_CRIPTO = r'(halvings?|stablecoins?|usdt|usdc|tether|etfs?|hash11|ftx|fundos? de indice)'
+CONCEITO_CRIPTO = (rf'\bo que (e|sao|significa|foi|quer dizer) (o |a |os |as |um |uma )?{TERMO_CRIPTO}\b'
+                   rf'|\bme explica\w* (o |a |os |as )?{TERMO_CRIPTO}\b|\b{TERMO_CRIPTO}\b\W+o que (e|significa)\b'
+                   rf'|\bcomo funciona (o |a |os |as )?{TERMO_CRIPTO}\b')
+# A pergunta fala da defasagem do preço da Petrobras, que o repertório não calcula: dizer isso no topo (D8).
+DEFASAGEM_DITA = r'\bdefasa\w*|\bparidade\b|\babaixo do preco internacional\b'
 # Pergunta de preço ou de movimento de cripto: o repertório não tem a cotação.
-PRECO_CRIPTO = (r'\b(quanto (ta|esta|vale|custa)|preco|cotacao|caiu|subiu|cai|sobe|reagiu|valoriz\w*|desvaloriz\w*)\b'
-                r'|\bo que aconteceu com o (bitcoin|btc|cripto)')
+# Também o gerúndio, o plural, os sinônimos e o internetês ("tá caindo?", "despencou?", "as criptos caíram?", "qnt tá?").
+PRECO_CRIPTO = (r'\b((quanto|qnt|qto) (ta|esta|vale|custa)|preco|cotacao|caiu|cairam|subiu|subiram|cai|caem|sobe|sobem'
+                r'|caindo|subindo|em (alta|queda)|despenc\w*|desab\w*|derret\w*|dispar\w*|reagiu|valoriz\w*|desvaloriz\w*)\b'
+                r'|\bo que (aconteceu|houve) com (o |os |a |as )?(bitcoins?|btc|cripto\w*|ether(eum)?|eth|solana)\b')
 
 
 def _cripto_primeiro(blocos: list[F.Bloco]) -> list[F.Bloco]:
@@ -210,6 +260,8 @@ def _abertura(p: Pedido, achou_repertorio: bool) -> list[str]:
         linhas.append(T.POR_PEDIDO['plataforma'])
     if 'cripto' in p.mercados and re.search(PRECO_CRIPTO, normalizar(p.pergunta)):
         linhas.append(T.SEM_PRECO_CRIPTO)
+    if 'petroleo' in p.mercados and re.search(DEFASAGEM_DITA, normalizar(p.pergunta)):
+        linhas.append(T.SEM_DEFASAGEM)
     if p.voto_informado:
         linhas.append(T.VOTO_INFORMADO)
     if not achou_repertorio:
@@ -324,7 +376,7 @@ def fatos_texto(r: Resposta) -> str:
         if b.limites:
             partes.append('Limitações: ' + ' '.join(b.limites))
     fixos = [T.AVISO, T.RECUSA, T.FECHO, T.RISCO_DERIVATIVO, T.RISCO_CRIPTO, T.SEM_REPERTORIO, T.NORMAS, T.VOTO_INFORMADO,
-             T.SEM_PRECO_CRIPTO, T.RISCO_DERIVATIVO_CRIPTO,
+             T.SEM_PRECO_CRIPTO, T.RISCO_DERIVATIVO_CRIPTO, T.SEM_DEFASAGEM,
              *T.POR_PEDIDO.values()]
     return '\n'.join(partes + ['## Textos fixos'] + fixos)
 

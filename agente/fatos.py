@@ -345,7 +345,7 @@ def _resumo_lado(v: float, casas: int, un: str, queda: bool, dia_: bool) -> str:
     return f'a maior {palavra} foi de {num(abs(v), casas)}{un}'
 
 
-def dois_lados(mercado: str) -> Bloco:
+def dois_lados(mercado: str) -> Bloco | None:
     """Para quem pergunta se compra ou para onde vai: o que já aconteceu dos dois lados nos últimos 12 meses, na mesma
     ordem e com os mesmos espaços (quando caiu, quando subiu), mais a taxa-base. Nunca o próximo movimento. Todo número
     sai de preços de dentro dos 12 meses (a mesma faixa do "foi de X a Y" do caminho)."""
@@ -359,6 +359,8 @@ def dois_lados(mercado: str) -> Bloco:
     else:
         r12, m12 = (s12.pct_change() * 100).dropna(), ((s12 / s12.shift(MES_PREGOES) - 1) * 100).dropna()
         un, casas = '%', 2
+    if r12.empty or m12.empty:
+        return None  # série curta demais para um mês de pregões: sem os dois lados, em vez de quebrar a resposta
     d_q, d_a, m_q, m_a = r12.idxmin(), r12.idxmax(), m12.idxmin(), m12.idxmax()
     inicio = lambda d: s12.index[s12.index.get_loc(d) - MES_PREGOES]  # noqa: E731
     fontes = (fonte, F_ESTUDO)
@@ -1005,9 +1007,14 @@ TITULO_CRIPTO_IMPOSTO = 'Imposto e formas de ter cripto no Brasil (regra conferi
 TITULO_CRIPTO_RISCOS = 'Riscos da cripto, com caso e fonte (fato)'
 
 
-def cripto_imposto() -> Bloco:
-    b = _bloco_json(_cripto()['imposto'])
+def cripto_imposto(variante: str = '') -> Bloco:
+    """O bloco do imposto. `variante`: 'etf' (pergunta de imposto do ETF ou do futuro: o resumo diz que a isenção de R$ 35
+    mil não vale para eles) ou 'declaracao' (pergunta de declaração: o resumo traz quem declara e como)."""
+    d = _cripto()['imposto']
+    b = _bloco_json(d)
     assert b.titulo == TITULO_CRIPTO_IMPOSTO
+    if variante:
+        b.resumo = d[f'resumo_{variante}']
     return b
 
 
@@ -1037,7 +1044,8 @@ def cripto_marcos(tema: str = '', conceito: bool = False) -> Bloco:
         b.add(definicao['texto'], *_fontes_json(definicao['fontes']))
     for m in marcos:
         b.add(f'{dia(m["data"])}: {m["titulo"]}.', *_fontes_json(m['fontes']))
-    if conceito and definicao:
+    # A FTX é a corretora que quebrou: a definição (o pedido de recuperação e a acusação ao fundador) diz mais que a data
+    if definicao and (conceito or tema == 'ftx'):
         b.resumo = definicao['texto']
     elif tema:
         # data e dois-pontos, como no bloco: o título fica como está (sem adivinhar maiúscula de nome próprio)
@@ -1099,7 +1107,7 @@ def petroleo_eventos(temas: tuple[str, ...] | str = ()) -> Bloco:
             partes.append(f'na B3 ({dia(e["b3_dia"])}), o Ibovespa {mov(e["ibov"], 2)} e o dólar {mov(e["dolar"], 2)}')
         reacao = '; '.join(partes) if partes else 'sem dado da reação ainda'
         if e.get('mesmo_pregao'):
-            reacao += f' (o pregão é o mesmo de {e["mesmo_pregao"]["com"]}: a variação não separa um fato do outro)'
+            reacao += f' (o pregão é o mesmo {_de(e["mesmo_pregao"]["com"])}: a variação não separa um fato do outro)'
         fontes = e['fonte'] if isinstance(e['fonte'], list) else [e['fonte']]
         b.add(f'{dia(e["data"])}, {e["titulo"]}: no dia da reação, {reacao}.', *[Fonte(f['nome'], f['url']) for f in fontes],
               F_BRENT, F_IBOV, F_PTAX, F_ESTUDO)
@@ -1111,9 +1119,14 @@ def petroleo_eventos(temas: tuple[str, ...] | str = ()) -> Bloco:
                 f'{"evento" if len(divididos) == 1 else "eventos"}).') if divididos else ''
         b.add(f'Nos {len(evs)} eventos, no dia da reação: o Brent {faixa_mov(min(br), max(br), 2)}; o Ibovespa '
               f'{faixa_mov(min(ib), max(ib), 2)}; o dólar {faixa_mov(min(dl), max(dl), 2)}.{fora}', F_ESTUDO)
+        # A faixa não inclui a medida dividida com outro fato: o resumo (que vai para as 3 linhas) diz isso, como o texto
+        # inteiro. A ação de nenhuma petroleira é medida, não só a da Petrobras.
+        fora_resumo = (f' (fora da faixa, {len(divididos)} {"evento que divide" if len(divididos) == 1 else "eventos que dividem"} '
+                       f'o pregão com outro fato)') if divididos else ''
         b.resumo = (f'Nos {len(evs)} eventos de {nome_tema} desde 2016, no dia da reação o Brent {faixa_mov(min(br), max(br), 2)} '
-                    f'e o Ibovespa {faixa_mov(min(ib), max(ib), 2)}; a ação da Petrobras não foi medida (falta a licença da '
-                    f'B3), e os casos são marcantes, não sorteados.')
+                    f'e o Ibovespa {faixa_mov(min(ib), max(ib), 2)}{fora_resumo}; a ação da Petrobras e a das outras '
+                    f'petroleiras não foram medidas (falta a licença da B3), e os casos são marcantes, não sorteados: a amostra '
+                    f'exagera as reações grandes.')
     b.linhas.append(taxa_base('brent', 'petróleo Brent'))
     b.limites += ['A reação das ações de petróleo (Petrobras, PRIO e outras) fica fora: a licença de dados da B3 para uso em '
                   'produto ainda está pendente.',
@@ -1127,6 +1140,11 @@ def petroleo_eventos(temas: tuple[str, ...] | str = ()) -> Bloco:
         b.limites.append(f'Em {incertos} {"evento" if incertos == 1 else "eventos"} o horário do anúncio não foi confirmado: a '
                          f'reação pode ter sido no pregão seguinte.')
     return b
+
+
+def _de(x: str) -> str:
+    """'de' com o artigo do que vem depois: 'de a reação' vira 'da reação', 'de o 1º turno' vira 'do 1º turno'."""
+    return f'd{x}' if re.match(r'(a|o|as|os) ', x) else f'de {x}'
 
 
 def barril_bomba() -> Bloco:

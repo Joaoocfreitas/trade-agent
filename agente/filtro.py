@@ -250,9 +250,11 @@ def faltas(texto: str) -> list[Violacao]:
         f.append(Violacao('D2', 'falta "rentabilidade passada não indica rentabilidade futura"'))
     if any(not _pequeno(v) for _, v, _ in numeros(texto)) and not URL.search(texto):
         f.append(Violacao('D1', 'tem número e não tem fonte com link'))
-    # "futuro de bitcoin" (o contrato) pede o D4; "futuro de cripto é valor mobiliário" (a frase do D5) não
-    if re.search(r'\bmini[- ]?(indice|dolar)\b|\bwin\b|\bwdo\b|\bdi futuro\b|\bfuturos? de (bitcoin|ether|solana)\b'
-                 r'|\bopc(ao|oes) (de|sobre)[^.]*\bbitcoin\b', t) and not re.search(
+    # "futuro de bitcoin" (o contrato) pede o D4, também por ticker e no plural ("futuros de BTC", "opções de ether");
+    # "futuro de cripto é valor mobiliário" (a frase do D5) não
+    if re.search(r'\bmini[- ]?(indice|dolar)\b|\bwin\b|\bwdo\b|\bdi futuro\b'
+                 r'|\bfuturos? de (bitcoins?|btc|ether|ethereum|eth|solana|sol)\b'
+                 r'|\bopc(ao|oes) (de|sobre)[^.]*\b(bitcoins?|btc|ether|ethereum|eth|solana)\b', t) and not re.search(
             r'perder mais do que|perda pode passar', t):
         f.append(Violacao('D4', 'fala de derivativo e não avisa que a perda pode passar do depositado'))
     if re.search(r'\bcripto|\bbitcoin\b', t) and 'nao e valor mobiliario' not in t:

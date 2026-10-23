@@ -5,6 +5,8 @@ Cada item tem os pedidos que precisam da recusa e as perguntas neutras, de conce
 (regra da casa: errar para mais na recusa quando há pedido, sem recusar a pergunta neutra). As perguntas daqui também
 entram nos EXTRAS de agente/exportar.py, para a paridade com o TypeScript.
 """
+from datetime import datetime
+
 import pytest
 
 from agente import fatos as F
@@ -345,9 +347,12 @@ def test_c24_historico_de_decisao_sem_recusa(pergunta):
     _sem_recusa(pergunta)
 
 
-def test_c24_reajuste_da_petrobras_mantem_os_eventos_dela():
+def test_c24_reajuste_da_petrobras_com_pedido_traz_so_os_eventos_do_petroleo():
+    # Grupo 2 (C1): com pedido sobre a empresa, os eventos da Petrobras não entram nem com o fato citado (trava do emissor,
+    # Mapa legal, seção 8, item 10); ficam os do petróleo, porque a pergunta cita a gasolina.
     r = _recusa('A Petrobras reajusta a gasolina essa semana?')
-    assert any(t.startswith('O que aconteceu antes: Petrobras') for t in _titulos(r))
+    assert not any(t.startswith('O que aconteceu antes: Petrobras') for t in _titulos(r))
+    assert any(t.startswith('O que aconteceu antes: ') and 'desde 2016' in t for t in _titulos(r))
 
 
 # ---------- C25: lucro e dividendo da empresa que ainda vêm ----------
@@ -490,8 +495,9 @@ C30_SO_ACAO = ['Vale a pena PETR4 ou deixa quieto?', 'Compro PETR4 e deixa rolar
                'PETR4 deixou de subir, compro?', 'PETR4 deixou a desejar, vendo?']
 C30_FATO = ['troca de presidente da Petrobras', 'Prates deixa a Petrobras', 'o Prates deixou a Petrobras, e o Ibovespa?',
             'a saída do Prates da Petrobras', 'o conselho da Petrobras elegeu o Prates?', 'quem foi indicado pra Petrobras?',
-            'como o Ibovespa reagiu ao dividendo extraordinário da Petrobras em 2024?', 'PETR4 pros dividendos de 2024, compensa?',
-            'a Petrobras pagou dividendo em 2022?']
+            'como o Ibovespa reagiu ao dividendo extraordinário da Petrobras em 2024?', 'a Petrobras pagou dividendo em 2022?']
+# Grupo 2 (C1): o fato citado junto de um pedido sobre a ação acha o tema, mas os eventos da Petrobras não entram.
+C30_FATO_COM_PEDIDO = ['PETR4 pros dividendos de 2024, compensa?']
 
 
 @pytest.mark.parametrize('pergunta', C30_SO_ACAO)
@@ -505,6 +511,12 @@ def test_c30_pedido_sem_fato_nao_recebe_o_dossie_do_emissor(pergunta):
 def test_c30_fato_da_petrobras_traz_os_eventos(pergunta):
     assert 'petrobras' in F.tema_petroleo(normalizar(pergunta))
     assert any(t.startswith('O que aconteceu antes: Petrobras') for t in _titulos(montar(pergunta, hoje=HOJE)))
+
+
+@pytest.mark.parametrize('pergunta', C30_FATO_COM_PEDIDO)
+def test_c30_fato_com_pedido_sobre_a_acao_fica_sem_os_eventos_da_petrobras(pergunta):
+    assert 'petrobras' in F.tema_petroleo(normalizar(pergunta))
+    assert not any(t.startswith('O que aconteceu antes: Petrobras') for t in _titulos(_recusa(pergunta)))
 
 
 C30_CONSELHO = ['o conselho da Petrobras elegeu o Prates?', 'o que é o Conselho Monetário Nacional?',
@@ -733,3 +745,779 @@ TODAS = list(dict.fromkeys(
 def test_nenhuma_pergunta_da_rodada_tem_violacao():
     for q in TODAS:
         assert montar(q, hoje=HOJE).violacoes == [], q
+
+
+# =====================================================================================================================
+# Grupo 2 da rodada 2: os achados que ficaram pela metade (C1 a C22) e os de gravidade baixa (L1 a L16). As listas têm o
+# prefixo G2_ e entram nos EXTRAS de agente/exportar.py.
+# =====================================================================================================================
+
+def _eventos_petrobras(r) -> bool:
+    """A resposta traz algum evento de tema Petrobras (a história de um emissor só)."""
+    titulos = [e['titulo'] for e in F._petroleo()['eventos'] if e['tema'] == 'petrobras']
+    return any(any(t in ln.texto for t in titulos) for b in r.blocos for ln in b.linhas)
+
+
+def _tem_eventos(r) -> bool:
+    return any(t.startswith('O que aconteceu antes: ') and 'desde 2016' in t for t in _titulos(r))
+
+
+# ---------- C1: pedido sobre a ação não recebe a história do emissor, nem com o fato citado ----------
+
+G2_C1_PEDIDO = ['compro petrobras antes do reajuste do diesel?',
+                'vale a pena PETR4 com o reajuste da gasolina?', 'vale a pena PETR4 com o petróleo subindo?',
+                'quais ações de petróleo comprar?']
+G2_C1_DIVIDENDO = ['petr4 paga dividendo extraordinario esse ano?', 'vai ter dividendo extraordinário da petrobras?',
+                   'tem dividendo da petrobras esse ano?']
+G2_C1_FATO = ['quem foram os presidentes da petrobras?', 'o que aconteceu com a Petrobras em 2021?',
+              'quando a petrobras aumentou o preço?', 'linha do tempo da petrobras',
+              'quais foram os principais eventos da petrobras desde 2016?',
+              'o conselho da Petrobras aprovou dividendo extraordinário em 2024?', 'o dividendo extraordinário da petrobras',
+              'a petrobras pagou dividendo esse ano?', 'a Petrobras e o reajuste da gasolina',
+              'como a bolsa reage ao reajuste da Petrobras?']
+G2_C1_JUIZO = ['petr4 é bom?', 'PETR4 paga dividendo alto?', 'vale apena petr 4?']
+G2_C1_SEM = ['a petrobras é uma boa empresa pra trabalhar?', 'o dólar alto é bom?', 'o que é um bom investimento?']
+
+
+@pytest.mark.parametrize('pergunta', G2_C1_PEDIDO)
+def test_g2_c1_pedido_sobre_a_acao_sem_eventos_da_petrobras(pergunta):
+    r = _recusa(pergunta)
+    assert not _eventos_petrobras(r)
+    assert _tem_eventos(r)  # ficam os do petróleo: a pergunta cita o petróleo, a gasolina ou o diesel
+
+
+def test_g2_c1_pedido_so_com_o_fato_da_acao_fica_sem_eventos():
+    r = _recusa('compro PETR4 antes do dividendo extraordinário?')
+    assert not _tem_eventos(r)
+
+
+@pytest.mark.parametrize('pergunta', G2_C1_DIVIDENDO)
+def test_g2_c1_dividendo_que_ainda_vem_recusa(pergunta):
+    r = _recusa(pergunta, 'direcao')
+    assert not _eventos_petrobras(r)
+
+
+@pytest.mark.parametrize('pergunta', G2_C1_FATO)
+def test_g2_c1_fato_da_petrobras_traz_os_eventos_dela(pergunta):
+    r = _sem_recusa(pergunta)
+    assert _eventos_petrobras(r)
+
+
+@pytest.mark.parametrize('pergunta', G2_C1_JUIZO)
+def test_g2_c1_juizo_sobre_o_papel_recusa(pergunta):
+    r = _recusa(pergunta)
+    assert 'petroleo' in r.pedido.mercados
+
+
+@pytest.mark.parametrize('pergunta', G2_C1_SEM)
+def test_g2_c1_bom_fora_do_papel_sem_recusa(pergunta):
+    _sem_recusa(pergunta)
+
+
+# ---------- C2: escolher entre emissores, ou entre um emissor e uma classe ----------
+
+G2_C2_RECUSA = ['entre petrobras e prio qual escolho?', 'PETR4 é pior que PRIO3?', 'brava ou petrobras?', 'petrobras ou 3R?',
+                'petrobras ou dólar?', 'PETR4 ou tesouro?', 'petrobras ou bitcoin?', 'petr4 ou cdb?',
+                'qual é melhor entre petrobras e prio?', 'a petrobras é pior que a prio?', 'enauta ou petrobras?',
+                'tesouro ou PETR4?', 'PETR4 x dólar', 'petrobras ou ibovespa?', 'bitcoin é mais seguro que ethereum?',
+                'qual a opção mais segura?', 'PETR4 ficou mais arriscada?', 'renda fixa é mais segura que ações?',
+                'PETR3 ou PETR4: qual a diferença e qual compro?']
+G2_C2_SEM_EMISSOR = ['qual ação de petróleo é melhor?', 'melhor acao de petroleo', 'PETR4 ou PRIO3 com o brent a 115?',
+                     'petróleo ou dólar, qual é melhor?']
+G2_C2_SEM = ['PETR3 ou PETR4: qual a diferença?', 'o que muda entre PETR3 ou PETR4?',
+             'o bitcoin ficou mais seguro depois da regulação?', 'o que é boa pagadora de dividendos?',
+             'qual a diferença entre o tesouro e o cdb?']
+
+
+@pytest.mark.parametrize('pergunta', G2_C2_RECUSA)
+def test_g2_c2_escolha_entre_ativos_recusa(pergunta):
+    r = _recusa(pergunta)
+    assert {'ranking', 'comparar', 'dica'} & set(r.pedido.proibidos)
+
+
+@pytest.mark.parametrize('pergunta', G2_C2_SEM_EMISSOR)
+def test_g2_c2_ranking_de_petroleo_sem_eventos_da_petrobras(pergunta):
+    r = _recusa(pergunta)
+    assert _tem_eventos(r) and not _eventos_petrobras(r)
+
+
+@pytest.mark.parametrize('pergunta', G2_C2_SEM)
+def test_g2_c2_diferenca_e_conceito_sem_recusa(pergunta):
+    _sem_recusa(pergunta)
+
+
+# ---------- C3: manter, sair, oportunidade e momento; e o fato da OPEP e do preço sem recusa ----------
+
+G2_C3_RECUSA = ['vale manter petrobras?', 'continuo com PETR4?', 'fico com petr4?', 'saio da petrobras?',
+                'tô comprado em petrobras, seguro?', 'é a hora da petrobras?', 'chegou a hora da petrobras?',
+                'boa hora pra petr4?', 'momento certo pra petr4?', 'petr4 caiu, oportunidade?', 'oportunidade na petrobras?',
+                'dobro a mao em petr4?', 'faço PM em petr4?', 'shorteio petr4?', 'boto mais em petr4?', 'bolsa bom momento?',
+                'é o melhor momento da petrobras?', 'a crise é oportunidade?']
+G2_C3_SEM = ['aumento do petróleo e a inflação', 'o aumento da gasolina pela petrobras em 2022 foi de quanto?',
+             'quando foi o último aumento da petrobras?',
+             'a OPEP decidiu reduzir a produção de petróleo em 2020, o que aconteceu?',
+             'quando a opep resolveu aumentar a produção de petróleo?',
+             'como a bolsa reagiu quando a opep diminuiu a produção de petróleo?', 'qual foi o pior momento do petróleo?',
+             'qual foi o melhor momento do brent desde 2016?', 'o brasil tem posição na opep?', 'o que é um investimento seguro?',
+             'o que é long ou short?', 'o que significa ficar short?',
+             'crise e oportunidade: o que a história do petróleo mostra?', 'o que é custo de oportunidade?',
+             'qual é a hora da abertura da bolsa?']
+
+
+@pytest.mark.parametrize('pergunta', G2_C3_RECUSA)
+def test_g2_c3_o_que_fazer_com_o_papel_recusa(pergunta):
+    _recusa(pergunta)
+
+
+@pytest.mark.parametrize('pergunta', G2_C3_SEM)
+def test_g2_c3_fato_e_conceito_sem_recusa(pergunta):
+    _sem_recusa(pergunta)
+
+
+def test_g2_c3_ultimo_aumento_traz_os_eventos_da_petrobras():
+    assert _eventos_petrobras(montar('quando foi o último aumento da petrobras?', hoje=HOJE))
+
+
+# ---------- C4: os sinônimos de valuation recusam; o "caro" da bomba que pede explicação não ----------
+
+G2_C4_RECUSA = ['qual o valor justo da petrobras?', 'PETR4 ta carissima?', 'petr4 tá com desconto?', 'a petr4 tá em promoção?',
+                'petr4 tá num preço bom?', 'petrobras tá no preço?', 'petr4 ta precificada?', 'PETR4 tá muito alta?',
+                'a petrobras é sólida?', 'a petrobras é segura?', 'petrobras é arriscada?', 'a gasolina tá cara?',
+                'a gasolina vai ficar mais cara?', 'por que a gasolina tá cara e a petr4 tá barata?',
+                'por que a gasolina tá cara? a petrobras vai subir?', 'o que é valuation? a petr4 tá barata?',
+                'o que é upside? o dólar sobe?', 'o que é preço justo da petr4?']
+G2_C4_BOMBA = ['por que a gasolina está cara?', 'o que deixa a gasolina cara no Brasil?',
+               'quanto do preço da gasolina cara é imposto?', 'a gasolina mais cara do mundo é a do brasil?',
+               'a gasolina tá cara por causa do dólar?']
+G2_C4_SEM = ['o que é valuation?', 'o que é upside?', 'o que é preço justo de uma ação?', 'o que significa ação descontada?',
+             'o que pesa no preço da gasolina?', 'a Selic está muito alta?', 'os juros estão muito altos?']
+
+
+@pytest.mark.parametrize('pergunta', G2_C4_RECUSA)
+def test_g2_c4_valuation_recusa(pergunta):
+    _recusa(pergunta)
+
+
+@pytest.mark.parametrize('pergunta', G2_C4_BOMBA)
+def test_g2_c4_bomba_cara_explicada_sem_recusa(pergunta):
+    r = _sem_recusa(pergunta)
+    assert any(t.startswith('Do barril à bomba') for t in _titulos(r))
+
+
+@pytest.mark.parametrize('pergunta', G2_C4_SEM)
+def test_g2_c4_conceito_sem_recusa(pergunta):
+    _sem_recusa(pergunta)
+
+
+# ---------- C5, C12, C15: o nível que ainda vem, em qualquer forma; o passado e a regra sem recusa ----------
+
+G2_C5_RECUSA = ['o brent volta a 100?', 'o petroleo volta pros 70?', 'o barril segue subindo?', 'o petróleo vai seguir caindo?',
+                'o brent continua caindo?', 'o brent vai passar dos 150?', 'o brent vai romper 120?', 'petr4 chega nos 50?',
+                'brent a 150 ate dezembro?', 'o barril vai estourar?', 'a petrobras vai distribuir dividendo?',
+                'a petrobras paga dividendo esse ano?', 'opep corta em dezembro?', 'o bitcoin chega aos 200 mil?',
+                'o dólar volta a 5?', 'a opep+ corta a producao em dezembro?', 'o copom corta em dezembro?',
+                'o lucro da petrobras vai ser grande?', 'petr4 vai a R$ 50?', 'PETR4 sai de 30 pra 40?']
+G2_C5_SEM = ['o investidor deve pagar IR sobre o dividendo da petrobras?', 'como a petrobras pode lucrar com o pré-sal?',
+             'o brent passou de 100 em 2022?', 'o brent chegou a 139 em 2022?', 'o brent seguiu caindo em 2020?',
+             'o brent continuou caindo em 2020?', 'o brent voltou a 100 em 2022?', 'o lucro da petrobras vai ser divulgado quando?',
+             'como a petrobras deve distribuir dividendo por lei?']
+G2_C12_RECUSA = ['o brent chega nos 200?', 'o petroleo vai pros 150?', 'o barril vai para os 150 dolares?', 'o brent volta pros 60?',
+                 'o barril pode chegar em 200?', 'o brent atinge 150?', 'o petroleo vai ultrapassar 150?',
+                 'brent a 150 até o natal?', 'o brent vai pra casa dos 150?', 'o dólar supera 6 reais?', 'o ibovespa rompe 200 mil?',
+                 'o brent bate na casa dos 150?', 'o dolar vai ao 7?', 'o bitcoin alcança 200k?', 'brent a US$ 150 até dezembro?',
+                 'o brent passa de 5% amanha?']
+G2_C12_SEM = ['o Brent já passou de 150 alguma vez?', 'o brent atingiu 130 em 2022?', 'o brent ultrapassou 130 em 2022?',
+              'o brent subiu de 80 a 130 em 2022?', 'qual a variação do brent de 2016 a 2020?',
+              'quanto custa a gasolina com o barril a 115?', 'a remessa de dólar chega em 2 dias?',
+              'o mini-índice vai de 5 em 5 pontos?', 'o brent a 100 dólares de 2022 até hoje, quanto subiu?',
+              'quantas vezes o brent passou de 5% num dia?']
+G2_C15_RECUSA = ['o btc chega nos 100 mil?', 'ibovespa vai aos 200 mil pontos?', 'dólar a 6 até o fim do ano?', 'o dolar vai a R$ 7?',
+                 'btc rumo aos 100k?', 'dolar chega nos 6?', 'o bitcoin vai aos 100 mil?', 'o btc vai chegar nos 100 mil?',
+                 'petroleo chega aos 100?', 'o petroleo bate nos 100 dolares?', 'o dolar chega a R$ 7?', 'o dolar bate R$ 7?',
+                 'o euro vai a R$ 7?', 'o ouro vai a 3000 dolares?', 'a nvidia vai a 200 dolares?', 'o bitcoin vai a 100 mil dólares?',
+                 'dolar a R$ 7 no fim do ano?']
+G2_C15_SEM_DIRECAO = ['se eu passar de R$ 35 mil por mês em bitcoin pago imposto?', 'o bitcoin chega em 2027 com a regra nova?',
+                      'quando o bitcoin chegou a 100 mil o que aconteceu?', 'vendas que chegam a 35 mil pagam imposto?']
+
+
+@pytest.mark.parametrize('pergunta', G2_C5_RECUSA + G2_C12_RECUSA + G2_C15_RECUSA)
+def test_g2_nivel_que_ainda_vem_recusa(pergunta):
+    _recusa(pergunta, 'direcao')
+
+
+@pytest.mark.parametrize('pergunta', G2_C5_SEM + G2_C12_SEM)
+def test_g2_nivel_no_passado_e_regra_sem_recusa(pergunta):
+    _sem_recusa(pergunta)
+
+
+@pytest.mark.parametrize('pergunta', G2_C15_SEM_DIRECAO)
+def test_g2_c15_regra_e_passado_sem_direcao(pergunta):
+    assert 'direcao' not in analisar(pergunta).proibidos
+
+
+@pytest.mark.parametrize('pergunta', ['o dolar vai a R$ 7?', 'btc rumo aos 100k?', 'petr4 vai a R$ 50?', 'o ouro vai a 3000 dolares?',
+                                      'o bitcoin vai a 100 mil dólares?'])
+def test_g2_c15_alvo_nao_e_o_dinheiro_da_pessoa(pergunta):
+    r = montar(pergunta, hoje=HOJE)
+    assert 'capital' not in r.pedido.proibidos and r.pedido.valor_moeda is None
+    assert T.POR_PEDIDO['capital'] not in r.abertura
+
+
+def test_g2_c15_o_dinheiro_dela_continua_com_alvo_na_pergunta():
+    assert 'capital' in analisar('tenho R$ 5 mil, o dolar vai a 7?').proibidos
+    assert analisar('tenho 10 mil dolares, o dolar vai a 7?').valor_moeda == 10000
+
+
+# ---------- C6: o reajuste que ainda vem, no presente, com "sai", "vem" e "tem"; e a defasagem no topo ----------
+
+G2_C6_RECUSA = ['a petrobras reajusta semana que vem?', 'a petrobras reajusta na próxima semana?',
+                'petrobras reajusta a gasolina essa semana?', 'sai reajuste da gasolina essa semana?', 'vem aumento de gasolina por aí?',
+                'tem reajuste da gasolina essa semana?', 'Sai reajuste da gasolina?', 'será que sai reajuste?',
+                'o brent subiu. sai reajuste?', 'vem corte da opep?', 'sai corte do copom?', 'o copom corta essa semana?',
+                'a opep mantém a produção esse mês?', 'vai sair reajuste?']
+G2_C6_SEM = ['o que acontece com o brent quando sai reajuste?', 'de onde vem o aumento da gasolina?',
+             'a gasolina tem aumento de imposto em 2026?', 'o diesel tem corte de imposto?', 'teve reajuste essa semana?',
+             'a petrobras reajustou semana passada?', 'qual foi o último reajuste?', 'como funciona o reajuste da petrobras?',
+             'o copom mantém a selic, como o dólar reagiu essa semana?', 'o que vem depois do reajuste da gasolina?']
+G2_C6_DEFASAGEM = ['qual a defasagem da gasolina hoje?', 'a gasolina está defasada?']
+
+
+@pytest.mark.parametrize('pergunta', G2_C6_RECUSA)
+def test_g2_c6_decisao_que_ainda_vem_recusa(pergunta):
+    _recusa(pergunta, 'direcao')
+
+
+@pytest.mark.parametrize('pergunta', G2_C6_SEM)
+def test_g2_c6_fato_do_reajuste_sem_recusa(pergunta):
+    _sem_recusa(pergunta)
+
+
+@pytest.mark.parametrize('pergunta', G2_C6_DEFASAGEM)
+def test_g2_c6_defasagem_diz_no_topo_que_nao_calcula(pergunta):
+    r = _sem_recusa(pergunta)
+    assert T.SEM_DEFASAGEM in r.abertura and T.SEM_DEFASAGEM in r.texto_curto
+
+
+def test_g2_c6_paridade_sem_petroleo_nao_recebe_a_linha():
+    assert T.SEM_DEFASAGEM not in montar('o que é a paridade de importação?', hoje=HOJE).abertura
+
+
+# ---------- C7 e L5: o presidente da PETR4, da PRIO e da companhia não é a eleição ----------
+
+G2_C7_FORA = ['troca de presidente na petr4', 'quando trocaram o presidente da PETR4 a ação caiu?',
+              'o governo trocou o presidente da companhia, e a petr4?', 'quanto a PETR4 caiu quando trocaram o presidente em 2021?',
+              'PETR4 subiu ou caiu na troca de presidente de 2021?', 'quando o Prates foi eleito presidente da Petrobras?',
+              'a petrobras pode perder o presidente?', 'o presidente da prio3 saiu, e a ação?',
+              'quando o Bolsonaro trocou o presidente da PETR4?', 'o ex-presidente Bolsonaro trocou o comando da Petrobras',
+              'o presidente da PETR4 caiu', 'presidente da Prio', 'o Prates foi eleito pelo conselho da Petrobras?',
+              'o conselho da Petrobras aprovou dividendos em 2024?']
+G2_C7_ELEICAO = ['o bolsonaro e a petr4', 'o que acontece com a PETR4 se o presidente mudar no domingo?',
+                 'se o Lula ganhar, troca o presidente da PETR4?', 'o próximo presidente vai trocar o comando da PETR4?',
+                 'presidente da PETR4 e o 2º turno', 'como a Petrobras reage às pesquisas pra presidente?',
+                 'se o eleito trocar o presidente da petrobras, a ação cai?', 'o eleito presidente da república e a petr4',
+                 'a Petrobras cai se ele perder pro outro presidente?', 'o BC vai mudar com o novo presidente?',
+                 'a empresa e o novo presidente', 'a Petrobras e o novo presidente da República',
+                 'se o Flávio for eleito, a Petrobras cai?']
+
+
+@pytest.mark.parametrize('pergunta', G2_C7_FORA)
+def test_g2_c7_cargo_da_empresa_nao_e_eleicao(pergunta):
+    r = montar(pergunta, hoje=HOJE)
+    assert not r.pedido.eleicao and r.pedido.candidatos == [], (r.pedido.temas, r.pedido.candidatos)
+    assert r.violacoes == []
+
+
+@pytest.mark.parametrize('pergunta', G2_C7_ELEICAO)
+def test_g2_c7_eleicao_continua_eleicao(pergunta):
+    assert analisar(pergunta).eleicao
+
+
+# ---------- C8, C9, C10: a pergunta do fato pelo nome do presidente ou pela nomeação traz os eventos ----------
+
+G2_C8_FATO = ['quando o Prates saiu da Petrobras o que aconteceu?', 'como o mercado reagiu quando a Petrobras elegeu o Prates?',
+              'quando o Castello Branco saiu da Petrobras?', 'o que aconteceu quando demitiram o presidente da Petrobras?',
+              'o que aconteceu quando o Castello Branco foi anunciado na Petrobras?',
+              'o que aconteceu quando a Petrobras anunciou o Castello Branco?', 'quando o Parente saiu da Petrobras, como reagiu?',
+              'o mercado reagiu à indicação da Magda Chambriard na petrobras?', 'como reagiu a nomeação da Magda na Petrobras?',
+              'como o mercado reagiu quando o Prates saiu da Petrobras?', 'a Magda Chambriard assumiu a Petrobras quando?',
+              'o José Mauro saiu da Petrobras quando?', 'o Pedro Parente foi pra Petrobras quando?']
+G2_C8_PEDIDO = ['devo sair da PETR4?', 'é hora de sair da Petrobras?', 'vale trocar PETR4 por PRIO3?', 'eu caio fora da PETR4?',
+                'a Petrobras anunciou recompra, compro?', 'a Petrobras anunciou lucro, devo comprar PETR4?',
+                'qual a sua indicação: PETR4 ou PRIO3?', 'meu parente tem PETR4, devo vender?', 'a PETR4 saiu da mínima, compro?',
+                'o Caio da corretora disse pra comprar petr4', 'meu parente trabalha na Petrobras, compro PETR4?',
+                'a Petrobras anunciou lucro recorde, PETR4 vai subir?', 'troca PETR4 por PRIO3?', 'qual a indicação pra PETR4?',
+                'saio da PETR4?', 'posso trocar PETR3 por PETR4?', 'PETR4 tá caindo, saio?']
+G2_C8_SEM_EVENTO = ['a PETR4 já saiu do fundo do poço?', 'quando sai o dividendo da Petrobras?', 'qual a indicação do governo para a Petrobras?']
+
+
+@pytest.mark.parametrize('pergunta', G2_C8_FATO)
+def test_g2_c8_fato_pelo_nome_traz_os_eventos_da_petrobras(pergunta):
+    r = _sem_recusa(pergunta)
+    assert any(t.startswith('O que aconteceu antes: Petrobras') for t in _titulos(r))
+
+
+def test_g2_c8_fato_com_o_candidato_tambem_traz_os_eventos():
+    r = montar('quando o Lula demitiu o Prates o que aconteceu com a Petrobras?', hoje=HOJE)
+    assert _eventos_petrobras(r) and r.violacoes == []
+
+
+@pytest.mark.parametrize('pergunta', G2_C8_PEDIDO)
+def test_g2_c8_pedido_recusa_sem_a_historia_do_emissor(pergunta):
+    r = _recusa(pergunta)
+    assert not _eventos_petrobras(r)
+
+
+@pytest.mark.parametrize('pergunta', G2_C8_SEM_EVENTO)
+def test_g2_c8_saida_e_indicacao_soltas_nao_trazem_os_eventos(pergunta):
+    assert not _eventos_petrobras(montar(pergunta, hoje=HOJE))
+
+
+# ---------- C11: o preço do barril não é o dinheiro da pessoa; a conversão pedida faz a conta ----------
+
+G2_C11_SEM_VALOR = ['tenho uma dúvida: o petróleo passou de 100 dólares?', 'meus amigos dizem que o barril passou de US$ 130',
+                    'recebi uma notícia de que o brent bateu 138 dólares', 'tenho uma dúvida, 100 dólares no barril é muito?']
+G2_C11_CONTA = [('o petróleo passou de 100 dólares? tenho 2 mil dólares guardados', 2000, 'dolar'),
+                ('quanto valem 100 dólares em reais? e o petróleo?', 100, 'dolar'),
+                ('converte 200 dólares pra real, e o brent?', 200, 'dolar'),
+                ('com 500 dólares, quanto dá em reais? e o petróleo?', 500, 'dolar'),
+                ('vou viajar com 3 mil dólares, o petróleo mexe com o dólar?', 3000, 'dolar'),
+                ('tenho ações da Petrobras e 2 mil dólares', 2000, 'dolar'),
+                ('quanto valem 10 mil euros em reais? e o petróleo?', 10000, 'euro')]
+
+
+@pytest.mark.parametrize('pergunta', G2_C11_SEM_VALOR)
+def test_g2_c11_preco_do_barril_nao_e_o_dinheiro_dela(pergunta):
+    r = montar(pergunta, hoje=HOJE)
+    assert r.pedido.valor_moeda is None and 'dolar' not in r.pedido.mercados
+    assert r.curta[0].startswith('O petróleo Brent está em US$') and 'seus ' not in r.texto and r.violacoes == []
+
+
+@pytest.mark.parametrize('pergunta, valor, moeda', G2_C11_CONTA)
+def test_g2_c11_dinheiro_dela_e_conversao_fazem_a_conta(pergunta, valor, moeda):
+    r = montar(pergunta, hoje=HOJE)
+    assert (r.pedido.valor_moeda, r.pedido.moeda) == (valor, moeda) and moeda in r.pedido.mercados
+    assert r.violacoes == []
+
+
+# ---------- C13: o dinheiro dela em reais continua capital; o preço dito com verbo não ----------
+
+G2_C13_CAPITAL = ['recebi dividendos de R$ 50 mil, onde ponho?', 'recebi dividendo de R$ 30 mil da Petrobras, reinvisto?',
+                  'meus dividendos de R$ 8 mil, reinvisto em PETR4?', 'recebi R$ 2 milhões em dividendos da Petrobras, reinvisto?',
+                  'ganhei R$ 1 milhão em juros, onde ponho?', 'tenho R$ 2 bi, onde ponho?', 'dividendos de R$ 50 mil, onde ponho?',
+                  'R$ 2 bi, onde invisto?', 'onde coloco R$ 2 bi?']
+G2_C13_PRECO = ['a Petrobras pagou dividendo de R$ 6,73 por ação?', 'os R$ 20 bilhões de dividendos da Petrobras',
+                'o dólar chegou a R$ 6,30 em 2024?', 'a gasolina custa R$ 6,53?', 'a Petrobras pagou R$ 20 bilhões em dividendos em 2024?',
+                'como o Ibovespa reagiu ao dividendo extraordinário da Petrobras em 2024?',
+                'o que a Petrobras fez com os R$ 20 bi de dividendos? ela reinvestiu?', 'a gasolina está R$ 6,53?',
+                'a gasolina ta R$ 7 aqui', 'a gasolina subiu pra R$ 7?', 'a gasolina passou de R$ 7?', 'o diesel subiu R$ 0,50?',
+                'a ação da Petrobras caiu pra R$ 30?', 'o barril em reais passou de R$ 600']
+G2_C13_ONDE = ['onde ponho os dividendos?', 'reinvisto os dividendos da Petrobras?']
+
+
+@pytest.mark.parametrize('pergunta', G2_C13_CAPITAL)
+def test_g2_c13_dinheiro_dela_e_capital(pergunta):
+    _recusa(pergunta, 'capital')
+
+
+@pytest.mark.parametrize('pergunta', G2_C13_PRECO)
+def test_g2_c13_preco_em_reais_nao_e_capital(pergunta):
+    r = montar(pergunta, hoje=HOJE)
+    assert 'capital' not in r.pedido.proibidos and r.violacoes == []
+
+
+@pytest.mark.parametrize('pergunta', G2_C13_ONDE)
+def test_g2_c13_onde_por_sem_valor_e_dica(pergunta):
+    _recusa(pergunta, 'dica')
+
+
+# ---------- C14: gíria, comparação de cripto pelo nome e o "como" do tirar ----------
+
+G2_C14_RECUSA = ['o bitcoin vai voar com o trump?', 'o halving vai fazer o btc estourar?', 'btc moon?', 'bitcoin vai pro espaco?',
+                 'o bitcoin vai longe com o trump?', 'doge ou shiba qual vai mais longe?', 'btc ou eth?', 'eth ou sol, qual?',
+                 'btc ou dolar?', 'eth ou renda fixa?', 'o dolar estoura o teto de 6 reais?',
+                 'tiro meu btc da exchange e boto na carteira fria?', 'tiro meu dinheiro da corretora?',
+                 'boto meu dinheiro na corretora?']
+G2_C14_SEM = ['como tiro meu bitcoin da exchange?', 'como tiro o informe de rendimentos da corretora?',
+              'se eu estourar o limite do cartao, quanto pago de juros?', 'copom corta ou mantem, qual foi a decisao?',
+              '1o ou 2o turno, qual teve mais reacao?', 'dolar ou euro, qual a cotacao hoje?',
+              'lula ou flavio, qual o plano de cada um?']
+
+
+@pytest.mark.parametrize('pergunta', G2_C14_RECUSA)
+def test_g2_c14_giria_e_escolha_de_cripto_recusam(pergunta):
+    r = _recusa(pergunta)
+    assert r.abertura.index(T.RECUSA) == 0
+
+
+@pytest.mark.parametrize('pergunta', G2_C14_SEM)
+def test_g2_c14_explicacao_e_fato_sem_recusa(pergunta):
+    _sem_recusa(pergunta)
+
+
+# ---------- C16 e C19: cripto no plural e pelo nome contra outra classe; a corretora avaliada pelo nome ----------
+
+G2_C16_COMPARAR = ['bitcoins ou tesouro?', 'criptomoedas ou tesouro?', 'criptos ou poupanca?', 'btc ou cdb?', 'ethereum ou tesouro?']
+G2_C16_PLATAFORMA = ['compro na binance ou na coinbase?', 'binance ou mercado bitcoin?', 'uso a binance ou a foxbit?',
+                     'abro conta na binance?', 'binanse é segura?']
+G2_C19_PLATAFORMA = ['é seguro deixar meu bitcoin na binance?', 'a binance tem segurança?', 'posso confiar na foxbit?',
+                     'a novadax é boa?', 'é confiável a coinbase?', 'a binance é furada?', 'binance presta?',
+                     'a binance é de confiança?', 'confio na kraken?', 'é segura a binance?', 'a binance é ruim?',
+                     'binance vale a pena?', 'meu dinheiro ta seguro na binance?', 'essa exchange é boa?',
+                     'posso confiar nessa exchange?']
+G2_C19_FATO = ['o que aconteceu com a Binance em 2023?', 'a binance confirmou o acordo com os EUA?', 'a binance tem boa liquidez?',
+               'a binance e boa parte das exchanges saíram do Brasil?', 'qual foi a multa da binance?',
+               'quanto a binance pagou nos EUA?', 'a binance segurou os saques da FTX?']
+G2_C16_PIX = 'o pix com corretora vai parar dia 6? tiro meu dinheiro antes?'
+G2_C16_SEM_CRIPTO = ['o banco central regula a corretora de ações?', 'posso mandar pix pra corretora?', 'meu banco tem corretora?']
+
+
+@pytest.mark.parametrize('pergunta', G2_C16_COMPARAR)
+def test_g2_c16_cripto_contra_classe_e_comparar(pergunta):
+    r = _recusa(pergunta, 'comparar')
+    assert T.POR_PEDIDO['comparar'] in r.abertura
+
+
+@pytest.mark.parametrize('pergunta', G2_C16_PLATAFORMA + G2_C19_PLATAFORMA)
+def test_g2_c16_c19_corretora_pelo_nome_e_plataforma(pergunta):
+    r = montar(pergunta, hoje=HOJE)
+    assert 'plataforma' in r.pedido.proibidos and T.POR_PEDIDO['plataforma'] in r.abertura and r.violacoes == []
+
+
+@pytest.mark.parametrize('pergunta', G2_C19_FATO)
+def test_g2_c19_fato_da_corretora_nao_e_plataforma(pergunta):
+    r = montar(pergunta, hoje=HOJE)
+    assert 'plataforma' not in r.pedido.proibidos and r.violacoes == []
+
+
+def test_g2_c16_pix_das_corretoras_e_cripto():
+    r = montar(G2_C16_PIX, hoje=HOJE)
+    assert 'cripto' in r.pedido.mercados and '06/11/2026' in r.texto_curto and T.SEM_REPERTORIO not in r.abertura
+    assert T.RECUSA in r.abertura and r.violacoes == []
+
+
+@pytest.mark.parametrize('pergunta', G2_C16_SEM_CRIPTO)
+def test_g2_c16_corretora_de_acoes_e_pix_nao_sao_cripto(pergunta):
+    assert 'cripto' not in analisar(pergunta).mercados
+
+
+# ---------- C17 e C22: o imposto do ETF nas 3 linhas; a bolsa citada como ativo; a bolsa como lugar ----------
+
+G2_C17_ETF = ['ETF de bitcoin na B3 paga imposto?', 'HASH11 paga imposto?', 'etf de cripto tem isencao de 20 mil?',
+              'quanto de imposto pago no ETF de bitcoin?', 'ETF de bitcoin tem isenção?', 'futuro de bitcoin paga imposto?']
+G2_C17_IBOV = ['bitcoin e bolsa no ano', 'bitcoin ou bolsa?', 'bitcoin ou indice?', 'cripto ou bolsa de valores?', 'bitcoin e stocks',
+               'investir na bolsa ou no bitcoin?', 'a bolsa e o bitcoin caem juntos?', 'a bolsa cai quando o bitcoin cai?',
+               'investir em bitcoin ou no índice?', 'o mini indice e o bitcoin', 'bitcoin ou bolsa, qual compro?',
+               'bitcoin or stocks?', 'bolsa ou bitcoin, qual compro?', 'WIN amanhã ou bitcoin?', 'WIN ou bitcoin na B3?',
+               'mini índice ou bitcoin?']
+G2_C17_LUGAR = ['ETF de bitcoin na bolsa paga imposto?', 'comprar bitcoin pela bolsa', 'quero bitcoin na bolsa, como faço?',
+                'o que é fundo de índice de cripto?', 'fundo de indice de bitcoin vale a pena?', 'compro bitcoin pela bolsa ou direto?',
+                'corretora ou bolsa, onde compro bitcoin?', 'bolsa ou exchange para comprar bitcoin?',
+                'ETF de bitcoin na bolsa ou bitcoin direto?', 'bitcoin na bolsa ou na corretora?',
+                'bitcoin pela bolsa ou pela exchange?', 'bolsa ou corretora de cripto, onde é mais seguro?',
+                'ETF de bitcoin na B3, vale a pena?']
+G2_C22_DOLAR_UNIDADE = ['tenho 10 mil dólares em bitcoin, vendo?', 'tenho US$ 10 mil em ethereum, vendo agora?',
+                        'I have 10k dollars in bitcoin, should I sell?']
+G2_C22_DOLAR_MERCADO = ['usdt ou dolar, qual o melhor?', 'o dólar sobe quando o bitcoin cai?', 'WDO ou bitcoin?']
+
+
+@pytest.mark.parametrize('pergunta', G2_C17_ETF)
+def test_g2_c17_imposto_do_etf_comeca_pela_ressalva(pergunta):
+    r = montar(pergunta, hoje=HOJE)
+    assert r.curta[0].startswith('A isenção de R$ 35 mil é da venda da própria cripto')
+    assert 'não vale para cota de fundo de índice' in r.texto_curto and 'não é valor mobiliário' in r.texto_curto
+    assert not any(t.startswith('O Ibovespa até aqui') for t in _titulos(r)) and r.violacoes == []
+
+
+@pytest.mark.parametrize('pergunta', G2_C17_IBOV)
+def test_g2_c17_bolsa_como_ativo_traz_o_ibovespa(pergunta):
+    r = montar(pergunta, hoje=HOJE)
+    assert any(t.startswith('O Ibovespa até aqui') for t in _titulos(r)) and r.violacoes == []
+
+
+@pytest.mark.parametrize('pergunta', G2_C17_LUGAR)
+def test_g2_c17_bolsa_como_lugar_sem_ibovespa(pergunta):
+    r = montar(pergunta, hoje=HOJE)
+    assert not any(t.startswith(('O Ibovespa até aqui', 'Como funcionam as ações à vista')) for t in _titulos(r))
+    assert not any(t.startswith(F.TITULO_DOIS_LADOS) for t in _titulos(r)) and r.violacoes == []
+
+
+def test_g2_c17_conceito_de_fundo_de_indice_sem_recusa():
+    _sem_recusa('o que é fundo de índice de cripto?')
+
+
+@pytest.mark.parametrize('pergunta', G2_C22_DOLAR_UNIDADE)
+def test_g2_c22_l16_dolar_como_unidade_nao_e_o_mercado(pergunta):
+    r = _recusa(pergunta)
+    assert not any(t.startswith((F.TITULO_DOIS_LADOS, 'O dólar até aqui')) for t in _titulos(r))
+
+
+@pytest.mark.parametrize('pergunta', G2_C22_DOLAR_MERCADO)
+def test_g2_c22_dolar_citado_continua(pergunta):
+    assert any(t.startswith('O dólar até aqui') for t in _titulos(montar(pergunta, hoje=HOJE)))
+
+
+def test_g2_c22_win_com_bitcoin_sem_acoes_a_vista():
+    r = montar('WIN amanhã ou bitcoin?', hoje=HOJE)
+    assert not any(t.startswith('Como funcionam as ações à vista') for t in _titulos(r))
+
+
+# ---------- C18: pergunta de preço de cripto em qualquer forma ouve que não há cotação ----------
+
+G2_C18_PRECO = ['bitcoin ta caindo?', 'btc subindo hoje?', 'bitcoin ta em alta?', 'o bitcoin desabou?', 'o btc despencou?',
+                'o bitcoin derreteu hoje?', 'o que houve com o bitcoin ontem?', 'o que aconteceu com o ether?',
+                'o que aconteceu com os bitcoins?', 'qnt ta o bitcoin', 'qto custa btc', 'as criptos caíram?',
+                'o bitcoin ta em queda?', 'o bitcoin disparou?', 'o que aconteceu com as criptos?', 'o que aconteceu com a solana?']
+G2_C18_SEM_PRECO = ['o que aconteceu no halving?', 'stablecoin é câmbio?', 'o que aconteceu com a Binance?',
+                    'qnt de imposto pago no bitcoin?', 'o que é halving?']
+
+
+@pytest.mark.parametrize('pergunta', G2_C18_PRECO)
+def test_g2_c18_pergunta_de_preco_ouve_que_nao_ha_cotacao(pergunta):
+    r = montar(pergunta, hoje=HOJE)
+    assert T.SEM_PRECO_CRIPTO in r.texto_curto and r.violacoes == []
+
+
+@pytest.mark.parametrize('pergunta', G2_C18_SEM_PRECO)
+def test_g2_c18_pergunta_sem_preco_nao_recebe_a_linha(pergunta):
+    assert T.SEM_PRECO_CRIPTO not in montar(pergunta, hoje=HOJE).abertura
+
+
+# ---------- C20: a declaração nas 3 linhas; "IR" é imposto; "declarou" não ----------
+
+G2_C20_DECLARA = ['preciso declarar bitcoin?', 'como declaro meus bitcoins', 'tenho que declarar cripto no imposto de renda?',
+                  'como declara cripto?', 'esqueci de declarar bitcoin', 'declaração de cripto',
+                  'vendi 40 mil de bitcoin, preciso declarar?']
+G2_C20_IR = ['bitcoin paga IR?', 'tenho que pagar IR no bitcoin?', 'como fica o IR da cripto?', 'bitcoin tem IR?', 'IR sobre bitcoin']
+G2_C20_NAO_IMPOSTO = ['o BC declarou algo sobre cripto?', 'os EUA declararam guerra ao bitcoin?', 'a SEC declarou o ether valor mobiliário?',
+                      'é hora de ir pro bitcoin?', 'e se a China declarar guerra, o bitcoin sobe?']
+
+
+@pytest.mark.parametrize('pergunta', G2_C20_DECLARA)
+def test_g2_c20_declaracao_nas_tres_linhas(pergunta):
+    r = montar(pergunta, hoje=HOJE)
+    assert r.curta[0].startswith('Imposto da cripto') and 'Bens e Direitos' in r.curta[0] and r.violacoes == []
+
+
+@pytest.mark.parametrize('pergunta', G2_C20_IR)
+def test_g2_c20_ir_comeca_pelo_imposto(pergunta):
+    assert montar(pergunta, hoje=HOJE).curta[0].startswith('Imposto da cripto')
+
+
+@pytest.mark.parametrize('pergunta', G2_C20_NAO_IMPOSTO)
+def test_g2_c20_declarou_e_ir_verbo_nao_sao_imposto(pergunta):
+    assert not montar(pergunta, hoje=HOJE).curta[0].startswith('Imposto da cripto')
+
+
+# ---------- C21: "exchange" verbo e "exchange rate" são câmbio, não cripto ----------
+
+G2_C21_CAMBIO = ['should I exchange my dollars now?', 'what is the dollar exchange rate?',
+                 "I have 3000 dollars, how much in reais at today's exchange rate?", 'will the exchange rate go up?',
+                 'should I exchange my euros now?']
+G2_C21_CRIPTO = ['e se a exchange quebrar?', 'exchanges são reguladas no Brasil?', 'qual a melhor exchange?', 'o que é exchange?',
+                 'which exchange is best?', 'tiro meu btc da exchange e boto na carteira fria?',
+                 'tenho 10 mil euros, uso uma exchange pra trazer?']
+
+
+@pytest.mark.parametrize('pergunta', G2_C21_CAMBIO)
+def test_g2_c21_cambio_em_ingles_nao_e_cripto(pergunta):
+    r = montar(pergunta, hoje=HOJE)
+    assert 'cripto' not in r.pedido.mercados and {'dolar', 'euro'} & set(r.pedido.mercados)
+    assert not r.curta[0].startswith('Bitcoin à vista') and r.violacoes == []
+
+
+def test_g2_c21_exchange_rate_vai_subir_recusa():
+    _recusa('will the exchange rate go up?', 'direcao')
+
+
+@pytest.mark.parametrize('pergunta', G2_C21_CRIPTO)
+def test_g2_c21_corretora_continua_cripto(pergunta):
+    assert 'cripto' in analisar(pergunta).mercados
+
+
+# ---------- L1 e L4: a ressalva das petroleiras, a faixa sem a medida dividida, e o "de a" ----------
+
+def test_g2_l1_prio_le_que_nenhuma_petroleira_foi_medida():
+    r = montar('como a prio reagiu à guerra?', hoje=HOJE)
+    assert any('a das outras petroleiras não foram medidas' in x for x in r.curta) and r.violacoes == []
+
+
+def test_g2_l4_resumo_avisa_a_medida_fora_da_faixa_e_contrai_o_de():
+    b = F.petroleo_eventos(('opep',))
+    assert 'fora da faixa, 3 eventos que dividem o pregão com outro fato' in b.resumo
+    for bloco in (F.petroleo_eventos(()), b):
+        for ln in bloco.linhas:
+            assert ' de a ' not in ln.texto and ' de o ' not in ln.texto, ln.texto
+    assert any('o pregão é o mesmo da reação às tarifas' in ln.texto for ln in b.linhas)
+
+
+# ---------- L3: o título não diz mais que a fonte ----------
+
+def test_g2_l3_titulos_do_tamanho_da_fonte():
+    evs = {e['data']: e for e in F._petroleo()['eventos']}
+    assert 'bloqueio' not in evs['2026-02-28']['titulo'] and 'Ormuz' in evs['2026-02-28']['titulo']
+    assert evs['2025-06-24']['titulo'] == 'Cessar-fogo entre Israel e Irã é anunciado'
+    assert evs['2026-04-28']['titulo'].startswith('Emirados Árabes anunciam a saída') and '01/05' in evs['2026-04-28']['titulo']
+    assert '28/04/2026' in evs['2026-04-28']['fonte']['nome']
+
+
+# ---------- L6, L7, L8, L9: tarifaço, guerra de preço, o WTI negativo de 2020 e o combustível figurado ----------
+
+G2_L6_TARIFA = ['tarifaço do trump e a petrobras', 'o tarifaço derrubou a bolsa?', 'a taxação do Trump e o petróleo',
+                'tarifaço do trump e o petróleo']
+G2_L7_CHOQUE = ['guerra de preco do petroleo', 'a guerra de preço da arabia e o brent', 'a guerra de preços do petróleo em 2020',
+                'o WTI ficou negativo em 2020?', 'o petróleo já ficou abaixo de zero?', 'em 2020, o petróleo ficou negativo, por quê?',
+                'o WTI ficou negativo?']
+G2_L8_SEM_TEMA = ['o petróleo ficou negativo na semana?', 'o petróleo ficou negativo esta semana?', 'o barril ficou negativo em outubro?',
+                  'o petroleo ficou negativo no acumulado?', 'o wti fechou negativo hoje', 'o preço negativo do brent hoje',
+                  'quem o irá substituir na Petrobras?']
+G2_L9_FIGURADO = ['o Copom jogou mais gasolina no dólar?', 'a Selic é combustível para o dólar?',
+                  'isso é combustível para a alta da bolsa?', 'a guerra é combustível para a alta do dólar?']
+
+
+@pytest.mark.parametrize('pergunta', G2_L6_TARIFA)
+def test_g2_l6_tarifaco_e_tarifa(pergunta):
+    r = montar(pergunta, hoje=HOJE)
+    assert 'geopolitico' in r.pedido.temas and '10/07/2025' in r.texto and r.violacoes == []
+
+
+@pytest.mark.parametrize('pergunta', G2_L7_CHOQUE)
+def test_g2_l7_guerra_de_preco_e_wti_de_2020_sao_choque(pergunta):
+    assert F.tema_petroleo(normalizar(pergunta)) == ('choque',)
+    assert 'geopolitico' not in analisar(pergunta).temas
+
+
+def test_g2_l7_petroleo_russo_e_guerra():
+    assert F.tema_petroleo(normalizar('EUA proíbem a compra de petróleo russo')) == ('guerra',)
+
+
+@pytest.mark.parametrize('pergunta', G2_L8_SEM_TEMA)
+def test_g2_l8_negativo_de_hoje_nao_e_o_crash_de_2020(pergunta):
+    assert F.tema_petroleo(normalizar(pergunta)) == ()
+    assert 'geopolitico' not in analisar(pergunta).temas
+
+
+def test_g2_l8_retorno_negativo_no_ano_e_passado():
+    _sem_recusa('o Brent teve retorno negativo no ano?')
+
+
+@pytest.mark.parametrize('pergunta', G2_L9_FIGURADO)
+def test_g2_l9_combustivel_figurado_nao_e_petroleo(pergunta):
+    assert 'petroleo' not in analisar(pergunta).mercados
+
+
+def test_g2_l9_alta_temporada_e_combustivel():
+    assert 'petroleo' in analisar('o preço do combustível da alta temporada').mercados
+
+
+# ---------- L10, L11: o nome da fonte diz a data que ela mostra ----------
+
+def test_g2_l10_l11_fontes_com_a_data_certa():
+    marcos = {m['data']: m for m in F._cripto()['marcos']}
+    china = marcos['2021-09-24']['fontes']
+    assert '15/09/2021' in china[0]['nome'] and 'evento de 24/09' not in china[0]['nome']
+    assert any('24/09/2021' in f['nome'] and 'haynesboone' in f['url'] for f in china[1:])
+    halving = marcos['2024-04-19']['fontes'][0]['nome']
+    assert '19/04' in halving and '840.000' in halving
+
+
+# ---------- L12: a rede do filtro pega derivativo de cripto por ticker e no plural ----------
+
+@pytest.mark.parametrize('texto', ['O futuro de ethereum na CME tem margem.', 'Opções de ether na Deribit.', 'Futuros de BTC e ETH.'])
+def test_g2_l12_filtro_pede_o_d4_em_derivativo_de_cripto(texto):
+    from agente.filtro import faltas
+    assert 'D4' in [v.regra for v in faltas(texto)]
+
+
+def test_g2_l12_futuro_de_cripto_do_d5_nao_pede_o_d4():
+    from agente.filtro import faltas
+    assert 'D4' not in [v.regra for v in faltas('Contrato futuro de cripto na B3.')]
+
+
+# ---------- L13: a FTX nas 3 linhas, "oq", a fonte do ETF e o "o que é" de outra coisa ----------
+
+def test_g2_l13_ftx_diz_que_era_corretora():
+    for q in ('e a FTX?', 'o que foi a FTX?', 'o que aconteceu com a FTX?'):
+        r = montar(q, hoje=HOJE)
+        assert r.curta[0].startswith('Corretora também quebra: a FTX') and r.violacoes == [], q
+
+
+def test_g2_l13_oq_e_o_que():
+    assert montar('oq é halving?', hoje=HOJE).curta[0].startswith('Halving é o corte')
+
+
+def test_g2_l13_etf_tem_a_fonte_do_cadastro_no_celular():
+    assert 'CVM, dados abertos' in montar('o que é ETF de bitcoin?', hoje=HOJE).texto_curto
+
+
+def test_g2_l13_o_que_e_a_lei_fica_com_as_datas():
+    assert montar('o que é a lei das stablecoins nos EUA?', hoje=HOJE).curta[0].startswith('Na linha do tempo da cripto:')
+
+
+# ---------- L14: a taxa-base da FGV "logo abaixo", também com câmbio ----------
+
+G2_L14_FGV = ['dá pra ficar rico com bitcoin ou euro?', 'tenho 10 mil euros, dá pra ficar rico com bitcoin?',
+              'quais as chances de ganhar dinheiro com bitcoin?', 'dá pra ficar rico com bitcoin?']
+
+
+@pytest.mark.parametrize('pergunta', G2_L14_FGV)
+def test_g2_l14_fgv_nas_tres_linhas(pergunta):
+    r = montar(pergunta, hoje=HOJE)
+    assert any('97%' in x for x in r.curta) and r.violacoes == []
+
+
+def test_g2_l14_chance_de_ganhar_dinheiro_nao_e_chance_de_candidato():
+    p = analisar('quais as chances de ganhar dinheiro com bitcoin?')
+    assert 'chance_candidato' not in p.proibidos and 'eleicao' not in p.temas
+
+
+# ---------- L15: a série curta não derruba a resposta; a janela de 12 meses e o "não houve" ficam travados ----------
+
+def test_g2_l15_serie_curta_fica_sem_os_dois_lados(monkeypatch):
+    original = F.serie
+    monkeypatch.setattr(F, 'serie', lambda nome: original(nome).iloc[-15:])
+    for mercado in F.HISTORICO:
+        assert F.dois_lados(mercado) is None
+
+
+def test_g2_l15_janela_de_12_meses(monkeypatch):
+    import re as _re
+    import pandas as pd
+    original = F.serie
+    monkeypatch.setattr(F, 'serie', lambda nome: original(nome)[lambda s: s.index <= '2026-05-12'])
+    for mercado, (_, nome, _, _) in F.HISTORICO.items():
+        b = F.dois_lados(mercado)
+        d_fim = F.serie(nome).index[-1]
+        for ln in b.linhas[:2]:
+            for d in _re.findall(r'de (\d\d/\d\d/\d{4}) a', ln.texto):
+                assert pd.Timestamp(datetime.strptime(d, '%d/%m/%Y')) > d_fim - pd.DateOffset(years=1), (mercado, ln.texto)
+
+
+def test_g2_l15_serie_sempre_em_alta_diz_nao_houve(monkeypatch):
+    import pandas as pd
+    from agente.filtro import frases_proibidas
+    dias = pd.bdate_range('2025-01-02', periods=400)
+    monkeypatch.setattr(F, 'serie', lambda nome: pd.Series([100 * 1.0005 ** i for i in range(400)], index=dias))
+    b = F.dois_lados('dolar')
+    assert 'não houve dia de queda' in b.linhas[0].texto and 'não houve dia de queda' in b.resumo
+    for ln in b.linhas:
+        assert frases_proibidas(ln.texto) == [], ln.texto
+
+
+# Todas as perguntas do grupo 2, para os EXTRAS e para a checagem de violação.
+TODAS_G2 = list(dict.fromkeys(
+    [q for nome, v in list(globals().items()) if nome.startswith('G2_') and isinstance(v, (list, str))
+     for q in ([v] if isinstance(v, str) else (x[0] if isinstance(x, tuple) else x for x in v))]
+    + ['quando o Lula demitiu o Prates o que aconteceu com a Petrobras?', 'como a prio reagiu à guerra?',
+       'o que aconteceu com a FTX?', 'tenho R$ 5 mil, o dolar vai a 7?', 'tenho 10 mil dolares, o dolar vai a 7?',
+       'o que é a paridade de importação?', 'o preço do combustível da alta temporada', 'EUA proíbem a compra de petróleo russo',
+       'o Brent teve retorno negativo no ano?']))
+
+
+def test_g2_nenhuma_pergunta_do_grupo_2_tem_violacao():
+    for q in TODAS_G2:
+        assert montar(q, hoje=HOJE).violacoes == [], q
+
+
+def test_g2_todas_as_perguntas_estao_nos_extras():
+    from agente.exportar import EXTRAS
+    assert not [q for q in TODAS_G2 if q not in EXTRAS]

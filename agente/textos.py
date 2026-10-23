@@ -28,6 +28,9 @@ RISCO_DERIVATIVO_CRIPTO = ('No futuro ou na opção de cripto, como no mini-índ
 # Pergunta de preço de cripto: o repertório não tem a cotação (nenhuma fonte grátis permite uso comercial).
 SEM_PRECO_CRIPTO = 'O repertório ainda não mostra o preço do bitcoin: nenhuma fonte gratuita permite uso comercial da cotação.'
 
+# Pergunta de defasagem da gasolina (D8): o repertório não calcula, e isso vai no topo, não só nas limitações.
+SEM_DEFASAGEM = 'O repertório não calcula a defasagem entre o preço da Petrobras e o do mercado internacional.'
+
 # D5
 RISCO_CRIPTO = ('Cripto à vista, em regra, não é valor mobiliário e não tem a proteção da regulação da CVM. Quem regula '
                 'e autoriza as corretoras de cripto é o Banco Central, num processo que ainda está em curso. Futuro de '

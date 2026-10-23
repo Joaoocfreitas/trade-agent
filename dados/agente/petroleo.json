@@ -6,7 +6,7 @@
    "nome": "decisões da OPEP e da OPEP+"
   },
   "guerra": {
-   "regex": "\\bguerra\\b(?! (de precos|comercial))|\\biran\\b|\\b(o|do|no|ao|pro|pelo|com o|contra o) ira\\b|\\bormuz\\b|\\brussia\\b|\\bucrania\\b|\\bisrael\\b|\\bataques?\\b|\\bconflito\\b|\\bcessar[- ]fogo\\b",
+   "regex": "\\bguerra\\b(?! (de precos?|comercial))|\\biran\\b|\\b(o|do|no|ao|pro|pelo|com o|contra o) ira\\b(?! \\w+(ar|er|ir)\\b)|\\bormuz\\b|\\brussia\\b|\\bruss[oa]s?\\b|\\bucrania\\b|\\bisrael\\b|\\bataques?\\b|\\bconflito\\b|\\bcessar[- ]fogo\\b",
    "nome": "guerras e ataques"
   },
   "governo": {
@@ -14,11 +14,11 @@
    "nome": "medidas do governo sobre combustível"
   },
   "choque": {
-   "regex": "\\bcovid\\b|\\bpandemia\\b|\\bguerra de precos\\b|\\bwti\\b[^.?!]{0,30}\\bnegativ\\w*|\\bpreco negativo\\b|\\babaixo de zero\\b|\\b(petroleo|barril) (ficou |chegou a )?negativo\\b(?! (hoje|ontem|no (dia|ano|mes)))",
+   "regex": "\\bcovid\\b|\\bpandemia\\b|\\bguerra de precos?\\b|\\babaixo de zero\\b|\\b(wti|petroleo|barril|preco)\\b[^.?!]{0,25}\\bnegativ\\w*(?=[^.?!]{0,30}\\b(2020|abril|historia|historic\\w*|primeira vez)\\b)|\\b(2020|abril)\\b[^.?!]{0,40}\\b(wti|petroleo|barril|preco)\\b[^.?!]{0,25}\\bnegativ\\w*|^\\W*(o |a )?(wti|petroleo|barril|preco do petroleo|preco do barril)( ja)? (ficou |chegou a |fechou |foi )?negativo\\W*$",
    "nome": "choques de demanda"
   },
   "petrobras": {
-   "regex": "(?=.*\\b(petrobras|petr[34])\\b)(?=.*\\b(presidente|presidencia|presidir|ceo|comando|conselho( de administracao)?( da petrobras)? (nao )?(eleg\\w*|aprov\\w*|propo\\w*|propos|decid\\w*|vot\\w*)|indicad[oa] (para|pra|a) (presidir|presidencia|petrobras|o comando)|governo indica|deix(a|ou) (a petrobras|o cargo|a presidencia|o comando)|deixou de ser operadora|saida d[eoa] (presidente|ceo|presidencia|comando|\\w+ (da|na) petrobras)|renuncia\\w*|demissao|reajust\\w*|gasolina|diesel|politica de (preco|precos|dividendo|dividendos)|paridade|estrategia comercial|greve|caminhoneir\\w*|dividendos? extraordinari\\w*|interferencia)\\b)|(?=.*\\b(petrobras|petr[34])\\b)(?=.*\\bdividendo\\w*)(?=.*\\b(reagiu|reagiram|aconteceu|aconteceram|foi|foram|pagou|aprovou|20(1[6-9]|2[0-5]))\\b)",
+   "regex": "(?=.*\\b(petrobras|petr[34])\\b)(?=.*\\b(presidentes?|presidencia|presidir|ceos?|comando|conselho( de administracao)?( da petrobras)? (nao )?(eleg\\w*|aprov\\w*|propo\\w*|propos|decid\\w*|vot\\w*)|indicad[oa] (para|pra|a) (presidir|presidencia|petrobras|o comando)|governo indica|deix(a|ou) (a petrobras|o cargo|a presidencia|o comando)|deixou de ser operadora|saida d[eoa] (presidente|ceo|presidencia|comando|\\w+ (da|na) petrobras)|renuncia\\w*|demissao|nome(a\\w*|ou|ia\\w*)|elegeu|elegeram|foi eleit[oa]|demitiu|demitiram|demitid[oa]|(pedro|o|do|ao|pelo|com o) parente|prates|magda|chambriard|castell?o branco|castello|silva e luna|jose mauro|caio paes|paes de andrade|adriano pires|(aumentou|aumentaram|subiu|baixou|baixaram|reduziu|reduziram|cortou) (o |os )?precos?|(ultimo |o )?aumento d[aoe] (preco|precos|gasolina|diesel|combustive(l|is)|petrobras)|reajust\\w*|gasolina|diesel|politica de (preco|precos|dividendo|dividendos)|paridade|estrategia comercial|greve|caminhoneir\\w*|dividendos? extraordinari\\w*|interferencia)\\b)|(?=.*\\b(petrobras|petr[34])\\b)(?=.*\\bdividendo\\w*)(?=.*\\b(reagiu|reagiram|aconteceu|aconteceram|foi|foram|pagou|aprovou|20(1[6-9]|2[0-5]))\\b)|(?=.*\\b(petrobras|petr[34])\\b)(?=.*\\b(o que aconteceu|aconteceu com|linha do tempo|eventos?|historia|historico)\\b)",
    "nome": "Petrobras (presidente, preço e dividendo)"
   }
  },
@@ -567,7 +567,7 @@
    "data": "2025-06-24",
    "reacao": "2025-06-24",
    "reacao_incerta": false,
-   "titulo": "Cessar-fogo entre Israel e Irã entra em vigor",
+   "titulo": "Cessar-fogo entre Israel e Irã é anunciado",
    "tema": "guerra",
    "confianca": "media",
    "fonte": {
@@ -579,7 +579,7 @@
    "data": "2026-02-28",
    "reacao": "2026-03-02",
    "reacao_incerta": false,
-   "titulo": "Guerra de EUA e Israel contra o Irã e bloqueio de Ormuz",
+   "titulo": "Guerra de EUA e Israel contra o Irã; o conflito afeta o tráfego em Ormuz",
    "tema": "guerra",
    "confianca": "alta",
    "fonte": {
@@ -651,11 +651,11 @@
    "data": "2026-04-28",
    "reacao": "2026-04-28",
    "reacao_incerta": false,
-   "titulo": "Emirados Árabes deixam a OPEP e a OPEP+",
+   "titulo": "Emirados Árabes anunciam a saída da OPEP e da OPEP+ (a partir de 01/05)",
    "tema": "opep",
    "confianca": "media",
    "fonte": {
-    "nome": "Imprensa (Khaleej Times); a nota oficial dos Emirados não foi lida",
+    "nome": "Imprensa (Khaleej Times, 28/04/2026); a nota oficial dos Emirados não foi lida",
     "url": "https://www.khaleejtimes.com/uae-announces-decision-to-withdraw-from-opec-opec-from-may-1"
    }
   },
