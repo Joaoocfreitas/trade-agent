@@ -439,7 +439,7 @@
 "fontes": ["https://g1.globo.com/economia/noticia/2025/12/05/dolar-ibovespa.ghtml", "https://g1.globo.com/economia/noticia/2025/12/08/dolar-ibovespa.ghtml", "https://pt.wikipedia.org/wiki/Elei%C3%A7%C3%A3o_presidencial_no_Brasil_em_2026", "https://api.cotacoes.uol.com/currency/interday/list/paged/?format=JSON&fields=bidvalue,askvalue,variationpercentbid,date&currency=1&size=500", "https://sistemaswebb3-listados.b3.com.br/indexStatisticsProxy/IndexCall/GetPortfolioDay/eyJpbmRleCI6IklCT1YiLCJsYW5ndWFnZSI6InB0LWJyIiwieWVhciI6IjIwMjUifQ=="],
 "confianca": "alta"},
 
-{"data": "2026-03-02", "evento": "Guerra EUA/Israel x Irã e bloqueio de Ormuz", "tipo": "geopolitico",
+{"data": "2026-03-02", "evento": "Guerra EUA/Israel x Irã; o conflito afeta o tráfego em Ormuz", "tipo": "geopolitico",
 "o_que_aconteceu": "EUA e Israel atacaram o Irã em 28/02/2026 (sábado), e o ataque matou o líder supremo Ali Khamenei e outros dirigentes. O conflito afetou o tráfego pelo Estreito de Ormuz, por onde passa cerca de 20% do petróleo consumido no mundo (g1). A descrição de 'maior ruptura de oferta da história' vem da Wikipédia e não foi conferida nesta rodada.",
 "o_que_se_esperava": "Havia negociação nuclear em curso. Uma guerra aberta com a morte de Khamenei não estava no preço.",
 "surpresa": "alta", "ibov_dia_pct": 0.28, "dolar_dia_pct": 0.59,

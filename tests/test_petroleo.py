@@ -138,10 +138,17 @@ def test_tema_do_petroleo(pergunta, temas):
     assert F.tema_petroleo(normalizar(pergunta)) == temas
 
 
+# As manchetes sem palavra do próprio tema (a emenda dos combustíveis e a liberação de estoques da AIE): ficam sem tema.
+SEM_PALAVRA_DE_TEMA = ('Emenda Constitucional 123', 'Agência Internacional de Energia anuncia')
+
+
 def test_titulo_de_cada_evento_cai_no_proprio_tema():
     for e in PETROLEO['eventos']:
         temas = F.tema_petroleo(normalizar(e['titulo']))
-        assert not temas or e['tema'] in temas, (e['titulo'], temas)
+        if e['titulo'].startswith(SEM_PALAVRA_DE_TEMA):
+            assert not temas, (e['titulo'], temas)
+        else:
+            assert e['tema'] in temas, (e['titulo'], temas)
 
 
 def test_ataque_ao_ira_e_irã_o_verbo():

@@ -392,12 +392,16 @@ def _focus() -> dict:
     return _json('series/focus.json')
 
 
-def _realizado(ano: int) -> dict:
-    """O que de fato aconteceu num ano fechado: PTAX do último dia útil, meta Selic em 31/12 e IPCA de 12 meses em dez."""
+def _realizado(ano: int) -> dict | None:
+    """O que de fato aconteceu num ano fechado: PTAX do último dia útil, meta Selic em 31/12 e IPCA de 12 meses em dez.
+    Sem algum desses dados (série curta), None: o ano sai da comparação em vez de derrubar a resposta."""
     ptax, selic, ipca = serie('ptax'), serie('selic_meta'), serie('ipca_12m')
     p = ptax[ptax.index.year == ano]
-    return {'Câmbio': (p.index[-1], float(p.iloc[-1])), 'Selic': float(selic[selic.index <= f'{ano}-12-31'].iloc[-1]),
-            'IPCA': float(ipca[ipca.index == f'{ano}-12-01'].iloc[0])}
+    s = selic[selic.index <= f'{ano}-12-31']
+    i = ipca[ipca.index == f'{ano}-12-01']
+    if p.empty or s.empty or i.empty:
+        return None
+    return {'Câmbio': (p.index[-1], float(p.iloc[-1])), 'Selic': float(s.iloc[-1]), 'IPCA': float(i.iloc[0])}
 
 
 TITULO_EXPECTATIVAS = 'O que o mercado espera'
@@ -434,11 +438,12 @@ def expectativas(mercado: str) -> Bloco:
     for k in ordem:
         b.add(linhas[k], *fontes[k])
     # O Focus também erra: a última mediana registrada no ano anterior contra o que aconteceu.
-    anos = sorted(f['historico'], key=int)
+    realizados = {a: _realizado(int(a)) for a in sorted(f['historico'], key=int)}
+    anos = [a for a, r in realizados.items() if r is not None]
     erros = {'Câmbio': [], 'Selic': [], 'IPCA': []}
     pares = {'Câmbio': [], 'Selic': [], 'IPCA': []}
     for ano_h in anos:
-        esperado, real = f['historico'][ano_h], _realizado(int(ano_h))
+        esperado, real = f['historico'][ano_h], realizados[ano_h]
         d_ptax, ptax_real = real['Câmbio']
         pares['Câmbio'].append(f'{ano_h}, R$ {num(esperado["Câmbio"]["mediana"], 2)} contra R$ {num(ptax_real, 4)}')
         pares['Selic'].append(f'{ano_h}, {num(esperado["Selic"]["mediana"], 2)}% contra {num(real["Selic"], 2)}%')
@@ -449,6 +454,21 @@ def expectativas(mercado: str) -> Bloco:
     nomes = {'Câmbio': ('Câmbio', 'a PTAX do último dia útil do ano', F_PTAX),
              'Selic': ('Selic', 'a meta em 31/12', F_SELIC), 'IPCA': ('IPCA', 'o IPCA do ano', F_IPCA)}
     chave = {'dolar': ['Câmbio', 'Selic'], 'euro': ['Câmbio', 'Selic'], 'juros': ['Selic', 'IPCA']}.get(mercado, ['Selic', 'IPCA', 'Câmbio'])
+    quem = lambda n: (f'Os economistas que o Banco Central consulta toda semana (boletim Focus, {n} instituições '  # noqa: E731
+                      f'em {dia(data)})')
+    if not anos:
+        # Sem nenhum ano fechado para comparar (série curta), fica só a expectativa, atribuída, sem a frase do erro.
+        b.limites.append('A expectativa é a mediana das instituições que respondem ao Focus, não uma previsão do Thoran.')
+        if mercado in ('dolar', 'euro'):
+            sujeito = quem(c0['respondentes'])
+            if mercado == 'euro':
+                sujeito = SEM_FOCUS_EURO + sujeito[0].lower() + sujeito[1:]
+            b.resumo = (f'{sujeito} esperam o dólar a R$ {num(c0["mediana"], 2)} no fim de {ano}; as respostas vão de '
+                        f'R$ {num(c0["minimo"], 2)} a R$ {num(c0["maximo"], 2)}. É a expectativa deles, não do Thoran.')
+        else:
+            b.resumo = (f'{quem(s0["respondentes"])} esperam os juros básicos (Selic) em {num(s0["mediana"], 2)}% no fim de '
+                        f'{ano}; hoje estão em {num(selic_hoje, 2)}%. É a expectativa deles, não do Thoran.')
+        return b
     for ind in chave:
         nome, real_txt, fonte_real = nomes[ind]
         b.add(f'O Focus também erra. {nome}: a mediana do último boletim do ano anterior, cerca de 12 meses antes, contra '
@@ -468,8 +488,6 @@ def expectativas(mercado: str) -> Bloco:
     periodo = f'de {anos[0]} a {anos[-1]}'
     lados = lambda ind: ', para os dois lados' if dois_lados_de(ind) else ''  # noqa: E731
     # Para quem está começando: quem são, o que esperam e quanto já erraram, sem sigla.
-    quem = lambda n: (f'Os economistas que o Banco Central consulta toda semana (boletim Focus, {n} instituições '  # noqa: E731
-                      f'em {dia(data)})')
     if mercado in ('dolar', 'euro'):
         e = [abs(x) for x in erros['Câmbio']]
         sujeito = quem(c0['respondentes'])

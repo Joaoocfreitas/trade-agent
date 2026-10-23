@@ -1,5 +1,5 @@
 {
- "gerado_em": "2026-10-23T15:40:43-03:00",
+ "gerado_em": "2026-10-23T18:20:09-03:00",
  "textos": {
   "AVISO": "⚠️ Sou uma IA e posso errar. Isto não é recomendação de investimento: a empresa não é analista credenciada na APIMEC nem consultora autorizada pela CVM. Rentabilidade passada não indica rentabilidade futura.",
   "RECUSA": "Não digo se você deve comprar, vender ou esperar, nem para onde o preço vai: isso seria análise ou consultoria. Mostro o que dá para saber hoje, com fonte, para você decidir.",
@@ -7909,10 +7909,10 @@
      ]
     },
     {
-     "texto": "02/03/2026, Guerra EUA/Israel x Irã e bloqueio de Ormuz: Ibovespa +0,28% e dólar +0,98% no pregão da reação.",
+     "texto": "02/03/2026, Guerra EUA/Israel x Irã; o conflito afeta o tráfego em Ormuz: Ibovespa +0,28% e dólar +0,98% no pregão da reação.",
      "fontes": [
       {
-       "nome": "Reportagem sobre \"Guerra EUA/Israel x Irã e bloqueio de Ormuz\"",
+       "nome": "Reportagem sobre \"Guerra EUA/Israel x Irã; o conflito afeta o tráfego em Ormuz\"",
        "url": "https://g1.globo.com/economia/noticia/2026/03/02/dolar-ibovespa.ghtml"
       },
       {
@@ -19767,7 +19767,7 @@
      {
       "data": "2026-03-02",
       "dia_da_reacao": "2026-03-02",
-      "titulo": "Guerra EUA/Israel x Irã e bloqueio de Ormuz",
+      "titulo": "Guerra EUA/Israel x Irã; o conflito afeta o tráfego em Ormuz",
       "valor": 0.28,
       "caminho": [
        0.04,
@@ -24657,7 +24657,7 @@
    "halving": "\\bhalving\\b|\\bhalvings\\b|\\bcorte da recompensa\\b",
    "etf": "\\betfs?\\b|\\bhash11\\b|\\bfundo de indice\\b",
    "ftx": "\\bftx\\b|\\bquebr\\w* (de|da) (corretora|exchange)\\b|\\bfaliu\\b|\\bfalencia\\b",
-   "stablecoin": "\\bstablecoins?\\b|\\busdt\\b|\\busdc\\b|\\btether\\b",
+   "stablecoin": "\\bstablecoins?\\b|\\busdt\\b|\\busdc\\b|\\btether\\b|\\bgenius act\\b",
    "binance": "\\bbinance\\b",
    "trump": "\\btrump\\b|\\breserva estrategica\\b",
    "china": "\\bchina\\b|\\bchines\\w*\\b",
@@ -28199,10 +28199,10 @@
   },
   "temas": {
    "opep": "\\bopep\\b|\\bopec\\b",
-   "guerra": "\\bguerra\\b(?! (de precos?|comercial))|\\biran\\b|\\b(o|do|no|ao|pro|pelo|com o|contra o) ira\\b(?! \\w+(ar|er|ir)\\b)|\\bormuz\\b|\\brussia\\b|\\bruss[oa]s?\\b|\\bucrania\\b|\\bisrael\\b|\\bataques?\\b|\\bconflito\\b|\\bcessar[- ]fogo\\b",
+   "guerra": "\\bguerra\\b(?! ((de|do|dos) )?precos?\\b| comercial)|\\biran\\b|\\b(do|no|ao|pro|pelo|com o|contra o) ira\\b|(?<!\\bquem )(?<!\\bque )(?<!\\bninguem )(?<!\\balguem )(?<!\\bnao )(?<!\\bele )(?<!\\bela )(?<!\\bvoce )\\bo ira\\b|\\bo ira\\b(?! \\w{3,}(ar|er|ir)\\b)|\\bormuz\\b|\\brussia\\b|\\bruss[oa]s?\\b|\\bucrania\\b|\\bisrael\\b|\\bataques?\\b|\\bconflito\\b|\\bcessar[- ]fogo\\b",
    "governo": "\\bimpost\\w*|\\btribut\\w*|\\bicms\\b|\\bsubvenc\\w*|\\bmedida provisoria\\b|\\bgoverno\\b|\\bpre-sal\\b|\\boperador\\w*|\\bexportac\\w*",
-   "choque": "\\bcovid\\b|\\bpandemia\\b|\\bguerra de precos?\\b|\\babaixo de zero\\b|\\b(wti|petroleo|barril|preco)\\b[^.?!]{0,25}\\bnegativ\\w*(?=[^.?!]{0,30}\\b(2020|abril|historia|historic\\w*|primeira vez)\\b)|\\b(2020|abril)\\b[^.?!]{0,40}\\b(wti|petroleo|barril|preco)\\b[^.?!]{0,25}\\bnegativ\\w*|^\\W*(o |a )?(wti|petroleo|barril|preco do petroleo|preco do barril)( ja)? (ficou |chegou a |fechou |foi )?negativo\\W*$",
-   "petrobras": "(?=.*\\b(petrobras|petr[34])\\b)(?=.*\\b(presidentes?|presidencia|presidir|ceos?|comando|conselho( de administracao)?( da petrobras)? (nao )?(eleg\\w*|aprov\\w*|propo\\w*|propos|decid\\w*|vot\\w*)|indicad[oa] (para|pra|a) (presidir|presidencia|petrobras|o comando)|governo indica|deix(a|ou) (a petrobras|o cargo|a presidencia|o comando)|deixou de ser operadora|saida d[eoa] (presidente|ceo|presidencia|comando|\\w+ (da|na) petrobras)|renuncia\\w*|demissao|nome(a\\w*|ou|ia\\w*)|elegeu|elegeram|foi eleit[oa]|demitiu|demitiram|demitid[oa]|(pedro|o|do|ao|pelo|com o) parente|prates|magda|chambriard|castell?o branco|castello|silva e luna|jose mauro|caio paes|paes de andrade|adriano pires|(aumentou|aumentaram|subiu|baixou|baixaram|reduziu|reduziram|cortou) (o |os )?precos?|(ultimo |o )?aumento d[aoe] (preco|precos|gasolina|diesel|combustive(l|is)|petrobras)|reajust\\w*|gasolina|diesel|politica de (preco|precos|dividendo|dividendos)|paridade|estrategia comercial|greve|caminhoneir\\w*|dividendos? extraordinari\\w*|interferencia)\\b)|(?=.*\\b(petrobras|petr[34])\\b)(?=.*\\bdividendo\\w*)(?=.*\\b(reagiu|reagiram|aconteceu|aconteceram|foi|foram|pagou|aprovou|20(1[6-9]|2[0-5]))\\b)|(?=.*\\b(petrobras|petr[34])\\b)(?=.*\\b(o que aconteceu|aconteceu com|linha do tempo|eventos?|historia|historico)\\b)"
+   "choque": "\\bcovid\\b|\\bpandemia\\b|\\bguerra (de |do |dos )?precos?\\b|\\babaixo de zero\\b|\\b(wti|petroleo|barril|preco)\\b[^.?!]{0,25}\\bnegativ\\w*(?=[^.?!]{0,30}\\b(2020|abril|historia|historic\\w*|primeira vez)\\b)|\\b(2020|abril)\\b[^.?!]{0,40}\\b(wti|petroleo|barril|preco)\\b[^.?!]{0,25}\\bnegativ\\w*|^\\W*(o |a )?(wti|petroleo|barril|preco do petroleo|preco do barril)( ja)? (ficou |chegou a |fechou |foi )?negativo\\W*$|^(?!.*\\b(hoje|ontem|semanas?|mes|meses|anos?|acumulado|trimestre|semestre|pregao|sessao|periodo|janeiro|fevereiro|marco|maio|junho|julho|agosto|setembro|outubro|novembro|dezembro)\\b).*?\\b(wti|petroleo|barril)\\b( americano| de petroleo)?\\W{0,3}((ja )?(fica|ficou|ficaram|chegou a ficar|chegou a|foi a|esteve) )?negativo\\b",
+   "petrobras": "(?=.*\\b(petrobras|petr[34])\\b)(?=.*\\b(presidentes?|presidencia|presidir|ceos?|comando|conselho( de administracao)?( da petrobras)? (nao )?(eleg\\w*|aprov\\w*|propo\\w*|propos|decid\\w*|vot\\w*)|indicad[oa] (para|pra|a) (presidir|presidencia|petrobras|o comando)|governo indica|deix(a|ou) (a petrobras|o cargo|a presidencia|o comando)|deixou de ser operadora|saida d[eoa] (presidente|ceo|presidencia|comando|\\w+ (da|na) petrobras)|renuncia\\w*|demissao|nome(a\\w*|ou|ia\\w*)|elegeu|elegeram|foi eleit[oa]|demitiu|demitiram|demitid[oa]|pedro parente|(o|do|ao|pelo|com o) parente\\b(?! d[oa] (meu|minha|seu|sua|um|uma)\\b| (meu|minha)\\b)|jean paul|prates|magda|chambriard|castell?o branco|castello|silva e luna|jose mauro|caio paes|paes de andrade|adriano pires|(aumentou|aumentaram|subiu|baixou|baixaram|reduziu|reduziram|cortou) (o |os )?precos?|(ultimo |o )?aumento d[aoe] (preco|precos|gasolina|diesel|combustive(l|is)|petrobras)|reajust\\w*|gasolina|diesel|politica de (preco|precos|dividendo|dividendos)|paridade|estrategia comercial|greve|caminhoneir\\w*|dividendos? extraordinari\\w*|interferencia)\\b)|(?=.*\\b(petrobras|petr[34])\\b)(?=.*\\bdividendo\\w*)(?=.*\\b(reagiu|reagiram|aconteceu|aconteceram|foi|foram|pagou|aprov\\w*|20(1[6-9]|2[0-5]))\\b)|(?=.*\\b(petrobras|petr[34])\\b)(?=.*\\b(o que aconteceu|aconteceu com|linha do tempo|eventos?|historia|historico)\\b)"
   },
   "barril": {
    "titulo": "Do barril à bomba (fato, com a data de cada número)",

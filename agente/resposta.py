@@ -82,8 +82,10 @@ def escolher_blocos(p: Pedido, hoje: str) -> list[F.Bloco]:
         medidos = [m for m in medidos if m != 'ibovespa']
     # "10 mil dólares em bitcoin": o dólar é a unidade do valor, não o mercado da pergunta (como no petróleo, no roteador).
     # O mini-dólar (WDO) mede o dólar de verdade.
+    # O dólar em stablecoin ("10 mil dólares em USDT") e a conversão ("quanto dá em reais?") ficam: a cotação é a resposta.
     if ('cripto' in p.mercados and 'mini_dolar' not in p.mercados
-            and not re.search(MERCADOS['dolar'], re.sub(PRECO_EM_DOLAR, ' ', t))):
+            and not re.search(MERCADOS['dolar'], re.sub(PRECO_EM_DOLAR, ' ', t))
+            and not re.search(r'\b(usdt|usdc|tether|stablecoins?)\b|\b(em|pra|para) reais\b|\bquanto (da|vale|valem|e)\b', t)):
         medidos = [m for m in medidos if m != 'dolar']
     if not tem_evento and medidos:
         blocos += [F.historico(m) for m in medidos]
@@ -155,7 +157,10 @@ def escolher_blocos(p: Pedido, hoje: str) -> list[F.Bloco]:
                 # "o que é" é do próprio termo ("o que é a lei das stablecoins nos EUA?" quer a lei, não a stablecoin)
                 antes = (F.TITULO_CRIPTO,) if imposto_dito else (F.TITULO_CRIPTO, F.TITULO_CRIPTO_IMPOSTO)
                 i = next(i for i, b in enumerate(blocos) if b and b.titulo in antes)
-                conceito = 'conceito' in p.temas and bool(re.search(CONCEITO_CRIPTO, t))
+                # com um marco depois do termo ("o que é o ETF de bitcoin aprovado pela SEC?", "... nos EUA?", "de 2024?"),
+                # o marco fica nas 3 linhas, e não a definição brasileira
+                conceito = ('conceito' in p.temas and bool(re.search(CONCEITO_CRIPTO, t))
+                            and not re.search(rf'\b{TERMO_CRIPTO}\b[^?]*\b(aprovad\w*|sec|eua|estados unidos|genius|lei|20\d\d)\b', t))
                 blocos.insert(i, F.cripto_marcos(tema, conceito=conceito))
             else:
                 blocos.append(F.cripto_marcos())
@@ -192,19 +197,24 @@ LUGAR_DITO = (r'\b(cripto\w*|bitcoins?|btc|ethereum|eth|hash11|etfs?|futuros?)( 
               r'|\b(corretora|exchange|direto) (ou|vs|x|versus) (a |na |pela )?bolsa\b'
               r'|\bbolsa (ou|vs|x|versus) (a |o |na |no |pela |pelo )?(corretora|exchange|direto)\b'
               r'|\b(fundos?|etfs?) de indices?\b')
-TARIFA_DITA = (r'\btarifa\w*|\bsobretaxa\w*|\btaxac\w* (d[aoe]s? )?(trump|eua|estados unidos|americana)\b|\bsanc(ao|oes)\b'
-               r'|\bguerra comercial\b')
+TARIFA_DITA = (r'\btarifa(s|co|cos|sso)?\b|\bsobretaxa\w*|\btaxac\w* (d[aoe]s?) (trump|eua|estados unidos)\b|\btaxac\w* (do )?trump\b'
+               r'|\btaxac\w* americana\b(?![^.?!]{0,40}\b(dividend|stock|aco|renda)\w*)|\bsanc(ao|oes)\b|\bguerra comercial\b')
 ACAO_DITA = r'\b(petrobras|petr[34]|prio3?|petroleiras?|acao|acoes)\b'
 PETROLEO_DITO = r'\b(petroleo|brent|wti|barril|opep|opec|ormuz|combustive(l|is)|gasolina|diesel)\b'
 COMBUSTIVEL_DITO = (r'\b(gasolina|diesel|etanol|combustive(l|is)|bomba|posto|litro|reajust\w*|ipca|inflacao|defasa\w*'
                     r'|paridade|politica de preco\w*)\b')
 # "declarar" e "declaração" (não "declarou", nem "declarar guerra"); o "IR" dito com verbo ou preposição ("bitcoin paga IR?",
 # "o IR da cripto"), sem "de ir" ("é hora de ir pro bitcoin?").
-DECLARACAO_DITA = r'\bdeclar(ar|o|a|as|amos|ei|ando|ado|ados|acao|acoes)\b(?! guerra\b)'
+DECLARACAO_DITA = r'\bdeclar(ar|o|a|as|amos|ei|ando|ado|ados|acao|acoes)\b(?! guerra\b)|\bbens e direitos\b'
 IMPOSTO_DITO = (r'\bimpost\w*|' + DECLARACAO_DITA + r'|\birpf?\b|\bdarf\b|\bleao\b|\btribut\w*|\bisen\w*'
                 r'|\b(paga|pagar|pago|pagam|pagou|pagando|cobra|cobram|cobrar|incide|tem|o|do|no) ir\b'
-                r'|\bir (da|do|sobre|em|no|na) (cripto\w*|bitcoins?|btc|ether|eth)\b')
-FUTURO_CRIPTO = r'\bfuturos? (de|do) (bitcoins?|btc|cripto\w*|ether|ethereum|eth)\b'
+                # "quanto pago de IR no ETF?", "IR no ETF de bitcoin", "IR de cripto"; sem "ir no/na + cripto", que é o verbo
+                # ("posso ir no bitcoin?")
+                r'|\b(pag\w*|quanto|qnt|qto|qnto) de ir\b'
+                r'|\bir (da|do|de|sobre|em|no|na|nos|nas) (etfs?|hash11|cotas?|futuros?)\b'
+                r'|\bir (da|do|de|sobre|em) (cripto\w*|bitcoins?|btc|ether|eth)\b')
+FUTURO_CRIPTO = (r'\bfuturos? (de|do) (bitcoins?|btc|cripto\w*|ether|ethereum|eth)\b'
+                 r'|\b(bitcoins?|btc|cripto\w*|ether|ethereum|eth) futuros?\b')
 # O "o que é" do próprio termo do tema ("o que é halving?", "me explica o halving", "halving, o que é?").
 TERMO_CRIPTO = r'(halvings?|stablecoins?|usdt|usdc|tether|etfs?|hash11|ftx|fundos? de indice)'
 CONCEITO_CRIPTO = (rf'\bo que (e|sao|significa|foi|quer dizer) (o |a |os |as |um |uma )?{TERMO_CRIPTO}\b'
@@ -214,9 +224,11 @@ CONCEITO_CRIPTO = (rf'\bo que (e|sao|significa|foi|quer dizer) (o |a |os |as |um
 DEFASAGEM_DITA = r'\bdefasa\w*|\bparidade\b|\babaixo do preco internacional\b'
 # Pergunta de preço ou de movimento de cripto: o repertório não tem a cotação.
 # Também o gerúndio, o plural, os sinônimos e o internetês ("tá caindo?", "despencou?", "as criptos caíram?", "qnt tá?").
-PRECO_CRIPTO = (r'\b((quanto|qnt|qto) (ta|esta|vale|custa)|preco|cotacao|caiu|cairam|subiu|subiram|cai|caem|sobe|sobem'
-                r'|caindo|subindo|em (alta|queda)|despenc\w*|desab\w*|derret\w*|dispar\w*|reagiu|valoriz\w*|desvaloriz\w*)\b'
-                r'|\bo que (aconteceu|houve) com (o |os |a |as )?(bitcoins?|btc|cripto\w*|ether(eum)?|eth|solana)\b')
+PRECO_CRIPTO = (r'\b((quanto|qnt|qto|qnto) (ta|esta|vale|custa)|preco|cotacao|caiu|cairam|subiu|subiram|cai|caem|sobe|sobem'
+                r'|caindo|subindo|em (alta|queda|baixa)|despenc\w*|desab\w*|derret\w*|dispar\w*|reagiu|valoriz\w*|desvaloriz\w*'
+                # "qual o valor do bitcoin?", "vale quanto?", "quanto é?", "afundou?", "tombou?", "recuou?", "dumpando?"
+                r'|(qual|quale) (o )?valor|(vale|valendo|ta|esta|e) quanto|quanto e|afund\w*|tomb\w*|recu\w*|dump\w*)\b'
+                r'|\bo que (aconteceu|houve|rolou) com (o |os |a |as )?(bitcoins?|btc|cripto\w*|ether(eum)?|eth|solana)\b')
 
 
 def _cripto_primeiro(blocos: list[F.Bloco]) -> list[F.Bloco]:

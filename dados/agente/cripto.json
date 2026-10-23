@@ -528,7 +528,7 @@
    ]
   },
   "stablecoin": {
-   "regex": "\\bstablecoins?\\b|\\busdt\\b|\\busdc\\b|\\btether\\b",
+   "regex": "\\bstablecoins?\\b|\\busdt\\b|\\busdc\\b|\\btether\\b|\\bgenius act\\b",
    "datas": [
     "2025-07-18",
     "2026-02-02"
