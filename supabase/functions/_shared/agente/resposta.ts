@@ -13,6 +13,8 @@ type Textos = {
   RECUSA: string
   FECHO: string
   RISCO_DERIVATIVO: string
+  RISCO_DERIVATIVO_CRIPTO: string
+  SEM_PRECO_CRIPTO: string
   RISCO_CRIPTO: string
   POR_PEDIDO: Record<string, string>
   PEDEM_RECUSA: string[]
@@ -82,6 +84,14 @@ type Cotacoes = {
 export const BASE = base as unknown as Base
 // fatos.tema_cripto: as expressões do JSON, na ordem dele (a de inserção das chaves, que o JSON.parse mantém).
 const TEMAS_CRIPTO = Object.entries(BASE.cripto.temas).map(([tema, padrao]) => [tema, new RegExp(padrao)] as const)
+// As linhas da linha do tempo inteira (sem tema): a definição de um tema é a 1ª linha dele que não está nela.
+const MARCOS_DATADOS = new Set(BASE.cripto.marcos[''].linhas.map((ln) => ln.texto))
+// A pessoa falou do índice mesmo, e não só da B3 como lugar ("ETF de bitcoin na B3").
+const IBOV_DITO = /\bibov\w*|\bbovespa\b|\bacoes\b|\bacao\b|\bbova11\b/
+const IMPOSTO_DITO = /\bimpost\w*|\bdeclar\w*|\birpf?\b|\bdarf\b|\bleao\b|\btribut\w*|\bisen\w*/
+// Pergunta de preço ou de movimento de cripto: o repertório não tem a cotação.
+const PRECO_CRIPTO = new RegExp(String.raw`\b(quanto (ta|esta|vale|custa)|preco|cotacao|caiu|subiu|cai|sobe|reagiu|valoriz\w*|` +
+  String.raw`desvaloriz\w*)\b|\bo que aconteceu com o (bitcoin|btc|cripto)`)
 const T = BASE.textos
 const PEDEM_RECUSA = new Set(T.PEDEM_RECUSA)
 const MEDIDOS = ['ibovespa', 'dolar', 'juros']
@@ -341,13 +351,19 @@ export function escolherBlocos(p: Pedido, hoje: string): Bloco[] {
     const alvo = ({ mini_indice: 'ibovespa', mini_dolar: 'dolar' } as Record<string, string>)[m] ?? m
     if (BASE.historico[alvo] && !medidos.includes(alvo)) medidos.push(alvo)
   }
+  // "ETF de bitcoin na B3": a B3 é o lugar da cripto, não o Ibovespa. Sem caminho nem dois lados do índice.
+  const b3SoLugar = p.mercados.includes('cripto') && !IBOV_DITO.test(normalizar(p.pergunta))
+  if (b3SoLugar) tirarTodos(medidos, 'ibovespa')
   if (!temEvento && medidos.length) {
     for (const m of medidos) blocos.push(copia(BASE.historico[m]))
     // Quem pede o que fazer ou para onde vai recebe os dois lados do que já aconteceu, não uma recomendação. Em contrato
     // (WIN, WDO) não: o lado que importa é a taxa-base da FGV, que precisa caber nas 3 linhas.
     if (algum(['dica', 'direcao', 'momento'], p.proibidos) && !algum(['mini_indice', 'mini_dolar'], p.mercados)) {
-      const lados = BASE.dois_lados[medidos[0]]
-      blocos.push(lados ? copia(lados) : null)
+      // de cada mercado citado, não só do primeiro
+      for (const m of medidos) {
+        const lados = BASE.dois_lados[m]
+        blocos.push(lados ? copia(lados) : null)
+      }
     }
     blocos.push(expectativas(medidos[0]), calendario(medidos[0], hoje))
   } else if (p.temas.includes('economia') || p.temas.includes('copom')) {
@@ -358,20 +374,29 @@ export function escolherBlocos(p: Pedido, hoje: string): Bloco[] {
   if (p.proibidos.includes('binaria')) blocos.push(copia(BASE.binaria))
   if (temConta(p)) blocos.push(conta(p.pontos as number, p.contratos, p.mercados.includes('mini_indice') ? 'mini_indice' : 'mini_dolar'))
   for (const m of p.mercados) {
-    // pergunta de contrato: a regra de IR das ações à vista não vale para o WIN
-    if (m === 'ibovespa' && p.mercados.includes('mini_indice')) continue
+    // contrato (WIN) ou cripto na B3: a regra de IR das ações à vista não vale
+    if (m === 'ibovespa' && (p.mercados.includes('mini_indice') || b3SoLugar)) continue
     const b = BASE.mercado[m]
     blocos.push(b ? copia(b) : null)
     if (m === 'cripto') {
-      // Regras, imposto, riscos e a linha do tempo. Se a pessoa citou um tema (halving, FTX, ETF...), a linha do tempo
-      // vem antes das regras (o blocos[-1:-1] do Python: logo antes do último).
-      const tema = temaCripto(normalizar(p.pergunta))
-      const extra = [copia(BASE.cripto.imposto), copia(BASE.cripto.riscos)]
-      if (tema) {
-        blocos.splice(blocos.length - 1, 0, copia(BASE.cripto.marcos[tema]))
-        blocos.push(...extra)
+      // Regras, imposto, riscos e a linha do tempo. Tema citado (halving, FTX, ETF...): a linha do tempo antes das regras,
+      // com a definição primeiro se a pessoa perguntou "o que é". Pergunta de imposto: o imposto primeiro (o blocos[-1:-1]
+      // do Python: logo antes do último, que é o das regras).
+      const t = normalizar(p.pergunta)
+      const tema = temaCripto(t)
+      const [imposto, riscos] = [copia(BASE.cripto.imposto), copia(BASE.cripto.riscos)]
+      if (IMPOSTO_DITO.test(t)) {
+        blocos.splice(blocos.length - 1, 0, imposto)
+        blocos.push(riscos)
       } else {
-        blocos.push(...extra, copia(BASE.cripto.marcos['']))
+        blocos.push(imposto, riscos)
+      }
+      if (tema) {
+        const i = blocos.findIndex((x) => x !== null && (x.titulo === BASE.titulo_cripto || x.titulo === imposto.titulo))
+        if (i < 0) throw new Error('sem o bloco das regras nem o do imposto') // o next() do Python levantaria StopIteration
+        blocos.splice(i, 0, criptoMarcos(tema, p.temas.includes('conceito')))
+      } else {
+        blocos.push(copia(BASE.cripto.marcos['']))
       }
     }
   }
@@ -382,7 +407,8 @@ export function escolherBlocos(p: Pedido, hoje: string): Bloco[] {
   }
   blocos = blocos.filter((b) => b)
   if (ehCambio(p)) blocos = cambioPrimeiro(p, blocos as Bloco[])
-  if (p.mercados.includes('cripto')) blocos = criptoPrimeiro(blocos as Bloco[])
+  // em pergunta de câmbio ("exchange my euros"), o câmbio continua na frente
+  else if (p.mercados.includes('cripto')) blocos = criptoPrimeiro(blocos as Bloco[])
   if (!blocos.length) blocos.push(copia(BASE.economia))
   return blocos as Bloco[]
 }
@@ -392,11 +418,29 @@ export function temaCripto(perguntaNormalizada: string): string {
   return TEMAS_CRIPTO.find(([, padrao]) => padrao.test(perguntaNormalizada))?.[0] ?? ''
 }
 
+/** fatos.cripto_marcos(tema, conceito): os marcos do tema, prontos na base. `conceito` (a pessoa perguntou "o que é..."):
+ * a definição do tema, quando há, vira o resumo. Ela é a 1ª linha do bloco, e a única que não está na linha do tempo
+ * inteira. */
+function criptoMarcos(tema: string, conceito: boolean): Bloco {
+  const b = copia(BASE.cripto.marcos[tema])
+  const definicao = b.linhas.length && !MARCOS_DATADOS.has(b.linhas[0].texto) ? b.linhas[0].texto : null
+  if (conceito && definicao) b.resumo = definicao
+  return b
+}
+
 /** _cripto_primeiro do Python. Pergunta que cita cripto: os blocos de cripto na frente ("ETF de bitcoin na B3" fala de
- * cripto, não do nível do Ibovespa), na ordem em que já estavam. */
+ * cripto, não do nível do Ibovespa), na ordem em que já estavam. A taxa-base da FGV, quando há ("dá pra ficar rico?"),
+ * logo depois do 1º. */
 function criptoPrimeiro(blocos: Bloco[]): Bloco[] {
   const eh = (b: Bloco) => BASE.cripto.titulos.includes(b.titulo)
-  return [...blocos.filter(eh), ...blocos.filter((b) => !eh(b))]
+  const ehFgv = (b: Bloco) => b.titulo === BASE.fgv.titulo
+  const cripto = blocos.filter(eh)
+  return [...cripto.slice(0, 1), ...blocos.filter(ehFgv), ...cripto.slice(1), ...blocos.filter((b) => !eh(b) && !ehFgv(b))]
+}
+
+/** list.remove de todas as ocorrências, no lugar. */
+function tirarTodos(xs: string[], x: string): void {
+  for (let i = xs.indexOf(x); i >= 0; i = xs.indexOf(x)) xs.splice(i, 1)
 }
 
 /** _cambio_primeiro do Python. Pergunta de câmbio: na frente, a conta com os números da pessoa; com eleição, o euro nos
@@ -427,6 +471,7 @@ function abertura(p: Pedido, achouRepertorio: boolean): string[] {
   if (p.mercados.includes('memecoin') && algum(p.proibidos, PEDEM_RECUSA) && !p.proibidos.includes('plataforma')) {
     linhas.push(T.POR_PEDIDO.plataforma)
   }
+  if (p.mercados.includes('cripto') && PRECO_CRIPTO.test(normalizar(p.pergunta))) linhas.push(T.SEM_PRECO_CRIPTO)
   if (p.voto_informado) linhas.push(T.VOTO_INFORMADO)
   if (!achouRepertorio) linhas.push(T.SEM_REPERTORIO)
   return linhas
@@ -451,9 +496,10 @@ const CONTRATO_DE_JUROS = new RegExp(CONTRATO.source + String.raw`|\bfuturos?\b`
 function avisos(r: Resposta): string[] {
   const lista: string[] = []
   const derivativo = algum(BASE.derivativos.slice(0, 2), r.pedido.mercados) ||
-    (r.pedido.mercados.includes('juros') && CONTRATO_DE_JUROS.test(normalizar(r.pergunta)))
+    (r.pedido.mercados.includes('juros') && CONTRATO_DE_JUROS.test(normalizar(r.pergunta))) ||
+    r.blocos.some((b) => b.titulo === BASE.cripto.imposto.titulo) // ele cita o futuro de bitcoin
   if (derivativo || r.blocos.some((b) => b.titulo.startsWith('A taxa-base de quem faz day'))) {
-    lista.push(T.RISCO_DERIVATIVO)
+    lista.push(r.pedido.mercados.includes('cripto') ? T.RISCO_DERIVATIVO_CRIPTO : T.RISCO_DERIVATIVO)
   }
   // o bloco da cripto já traz o D5: não repete
   if (algum(['cripto', 'memecoin'], r.pedido.mercados) && !r.blocos.some((b) => b.titulo === BASE.titulo_cripto)) {
@@ -503,7 +549,7 @@ function renderizar(r: Resposta): [string, string] {
   // Versão curta: as fontes das 3 linhas (até 4). Uma de cada linha por vez, na ordem das linhas, para nenhuma ficar
   // sem fonte; dentro de cada uma, primeiro as séries oficiais e as pesquisas (o arquivo do TSE é grande demais para o
   // celular).
-  const oficial = (f: Fonte) => ['Banco Central', 'Ipeadata', 'Tesouro', 'Pesquisa', 'B3', 'Chague'].some((p) => f.nome.startsWith(p))
+  const oficial = (f: Fonte) => ['Banco Central', 'Ipeadata', 'Tesouro', 'Pesquisa', 'Chague'].some((p) => f.nome.startsWith(p))
   const porLinha: Fonte[][] = []
   for (const resumo of r.curta) {
     const b = r.blocos.find((x) => x.resumo && x.resumo === resumo)
@@ -538,6 +584,7 @@ function fatosTexto(r: Resposta): string {
     if (b.limites.length) partes.push('Limitações: ' + b.limites.join(' '))
   }
   const fixos = [T.AVISO, T.RECUSA, T.FECHO, T.RISCO_DERIVATIVO, T.RISCO_CRIPTO, T.SEM_REPERTORIO, T.NORMAS, T.VOTO_INFORMADO,
+    T.SEM_PRECO_CRIPTO, T.RISCO_DERIVATIVO_CRIPTO,
     ...Object.values(T.POR_PEDIDO)]
   return [...partes, '## Textos fixos', ...fixos].join('\n')
 }

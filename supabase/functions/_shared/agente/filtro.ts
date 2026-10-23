@@ -2,6 +2,7 @@
 //
 // Segue a tabela "O que o filtro barra" da nota de regras. Vale para a resposta da IA e para a do modo sem IA: as duas
 // passam por aqui antes de chegar à pessoa.
+import { EXCH } from './roteador.ts' // uma lista só de corretoras, no roteador e no filtro
 import { simples, type Violacao } from './texto.ts'
 
 // Os padrões de frase rodam sobre simples(texto), que é ASCII: ali \b, \w e \d do JS valem o mesmo que no Python, mas
@@ -52,7 +53,6 @@ const SUJ = String.raw`(o |a |os |as )?(ibovespa|ibov|bolsa|indice|mini-indice|m
 const DIR = String.raw`(sobe|sobem|subira|subiria|subir|suba|cai|caem|caira|cairia|cair|caia|dispara|disparar|despenca|despencar|` +
   String.raw`derrete|derreter|valoriza|valorizar|desvaloriza|desvalorizar|aprecia|apreciar|se apreciar|recua|recuar|cede|` +
   String.raw`ceder|fecha|fechar|abre|abrir|melhora|piora|reagir bem|reagir mal|reage bem|reage mal|vai bem|vai mal)`
-const EXCH = String.raw`(binance|coinbase|mercado bitcoin|foxbit|bybit|okx|kraken|novadax|bitso|bitget|kucoin)`
 
 // (regra, padrão, isenções). Padrões sobre o texto em minúsculas e sem acento.
 // Isenções: 'recusa' (oração com verbo de recusa ou "ninguém sabe"), 'atribuicao' (o fato é de quem disse), 'ambas'
@@ -336,7 +336,9 @@ export function numerosSemFonte(texto: string, fatos: string): string[] {
 
 // ---------- o que toda resposta precisa ter ----------
 
-const DERIVATIVO = /\bmini[- ]?(indice|dolar)\b|\bwin\b|\bwdo\b|\bdi futuro\b/
+// "futuro de bitcoin" (o contrato) pede o D4; "futuro de cripto é valor mobiliário" (a frase do D5) não
+const DERIVATIVO = new RegExp(String.raw`\bmini[- ]?(indice|dolar)\b|\bwin\b|\bwdo\b|\bdi futuro\b|\bfuturos? de (bitcoin|ether|solana)\b` +
+  String.raw`|\bopc(ao|oes) (de|sobre)[^.]*\bbitcoin\b`)
 const AVISO_DE_PERDA = /perder mais do que|perda pode passar/
 const CRIPTO = /\bcripto|\bbitcoin\b/
 

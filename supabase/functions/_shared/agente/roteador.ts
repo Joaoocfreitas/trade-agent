@@ -23,6 +23,8 @@ const PALAVRAS = new RegExp(`${ESPACO}+`)
 
 // Símbolo de moeda que o simples() apagaria: vira palavra antes ("€150.000" → "euros 150.000").
 const SIMBOLOS: ReadonlyArray<readonly [string, string]> = [['€', ' euros ']]
+/** Corretoras de cripto pelo nome: a mesma lista do filtro de saída (filtro.ts importa daqui). */
+export const EXCH = r`(binance|coinbase|mercado bitcoin|foxbit|bybit|okx|kraken|novadax|bitso|bitget|kucoin)`
 // A ordem importa: o "⬆️" (com o seletor de variação U+FE0F) sai antes do "⬆" sozinho.
 const EMOJI: ReadonlyArray<readonly [string, string]> = [
   ['📈', ' sobe '], ['📉', ' cai '], ['🚀', ' dispara '], ['🔥', ' dispara '], ['💰', ' lucro '], ['🤑', ' lucro '],
@@ -63,8 +65,8 @@ export const MERCADOS = {
   euro: rx(r`\beuros?\b|\beur\b`),
   juros: rx(r`\bjuros\b|\bdi1?\b|\bdi futuro\b|\bselic\b|\brenda fixa\b|\btesouro\b|\bprefixad\w*`),
   cripto: rx(
-    r`\bcripto\w*|\bbitcoin\b|\bbtc\b|\bethereum\b|\bexchanges?\b|\bstablecoins?\b|\bsolana\b`,
-    r`|\bhalving\b|\bftx\b|\busdt\b|\busdc\b|\btether\b`,
+    r`\bcripto\w*|\bbitcoins?\b|\bbtc\b|\bethereum\b|\bethers?\b|\beth\b|\bxrp\b|\bexchanges?\b|\bstablecoins?\b`,
+    r`|\bsolana\b|\bhalving\b|\bftx\b|\busdt\b|\busdc\b|\btether\b|\bhash11\b|\bdoge\w*|\bshiba\b|\b`, EXCH, r`\b`,
   ),
   memecoin: rx(r`\bmeme ?coins?\b|\bmemecoins?\b|\$trump\b|\$libra\b|\$melania\b|\btokens?\b|\bmoeda do candidato\b`),
   previsao: rx(r`\bpolymarket\b|\bkalshi\b|\bmercados? de previs\w*`),
@@ -109,8 +111,9 @@ export const PROIBIDOS = {
     r`|\bexposicao\b|\baplicar\b|\binvestir\b|\bbuy\b|\bsell\b|\bshould i\b|\bwould you\b`,
     // mover o dinheiro, na 1ª pessoa ("trago o dinheiro?", "troco?"), menos "como mando dinheiro pra fora?" (P5)
     r`|(?<!como )(?<!como eu )\b(troco|trago|mando|envio|converto|transfiro|remeto)\b|\bdeixo (la|aqui|parado|onde esta)\b`,
-    // como no "e agora", o \W* guloso come o \n final que o $ do Python aceitaria
-    r`|(?<=.{10})\be ai(\?|\W*$)|\bconviene\b|\b(debo|deberia) (cambiar|traer|mandar|enviar)\b`,
+    r`|\b(tiro|boto)\b[^.?!]{0,40}\b(exchange|corretora|carteira)\b`,
+    // como no "e agora", o \W* guloso come o \n final que o $ do Python aceitaria; o "." do Python só recusa o \n
+    r`|(?<=[^\n]{10})\be ai(\?|\W*$)|\bconviene\b|\b(debo|deberia) (cambiar|traer|mandar|enviar)\b`,
   ),
   direcao: rx(
     r`\bvai (subir|cair|disparar|despencar|bombar|valorizar|explodir|fechar|abrir)\b|\bvao (subir|cair)\b|\bchances?\b`,
@@ -135,7 +138,8 @@ export const PROIBIDOS = {
     r`|\bmeu objetivo\b|\bmeu prazo\b`,
   ),
   comparar: rx(
-    r`\bmelhor\b[^\n]{0,40}\bou\b|\bvale mais\b|\b(dolar|bolsa|cripto|bitcoin|renda fixa|tesouro|acoes|ouro|poupanca|cdb)\b`,
+    r`\bmelhor\b[^\n]{0,40}\bou\b|\bou\b[^\n]{0,40}\b(qual )?(o |a )?melhor\b`,
+    r`|\bvale mais\b|\b(dolar|bolsa|cripto|bitcoin|renda fixa|tesouro|acoes|ouro|poupanca|cdb)\b`,
     r`[^\n]{0,25}\bou\b[^\n]{0,25}\b(dolar|bolsa|cripto|bitcoin|renda fixa|tesouro|acoes|ouro|poupanca|cdb)\b`,
   ),
   ranking: rx(
@@ -150,6 +154,9 @@ export const PROIBIDOS = {
   plataforma: rx(
     r`\bqual (a )?(melhor )?(exchange|corretora|plataforma|app)\b|\bonde (eu )?(compro|opero|abro conta)\b`,
     r`|\bque (exchange|corretora)\b`,
+    // avaliar uma corretora citada pelo nome ou apontada ("a Binance é segura?") também é indicar (N7)
+    r`|\b`, EXCH, r`\b[^.?!]{0,30}\b(segur[ao]s?|confiave(l|is)|golpe)\b`,
+    r`|\b(essa|esta) (corretora|exchange|plataforma|app)\b[^.?!]{0,20}\b(segur[ao]|confiavel|golpe)\b`,
   ),
   aposta: rx(r`\bapost\w*|\baposto\b|\bbets?\b|\bpolymarket\b|\bkalshi\b|\bvpn\b`),
   voto: rx(
@@ -190,8 +197,10 @@ const FUTURO = rx(
   r`\b(sobe|sobem|subir|suba|subira|subiria|desce|descer|cai|caem|cair|caia|caira|cairia|despenc\w*|dispar\w*|derret\w*`,
   r`|valoriz\w*|desvaloriz\w*|aprecia\w*|recua\w*|fecha|fechar|abre|abrir|pra cima|para cima|pra baixo|para baixo|topo`,
   r`|fundo|barat[oa]|caro|vies|palpite|visao|acha|acham|opiniao|tendencia|provavel|esperado|retorno|potencial`,
-  r`|vai bem|vai mal|reage bem|reage mal|vai a \d|chega a \d|pra onde|para onde|go up|go down|rise|fall|rally`,
-  r`|bajar|probabilidad\w*|chances?)\b`,
+  r`|vai bem|vai mal|reage bem|reage mal|vai a \d+|chega a \d+|pra onde|para onde|go up|go down|rise|fall|rally`,
+  r`|bajar|probabilidad\w*|chances?`,
+  // gíria de cripto, em formas fechadas: "bombardeio" e "pump and dump" (conceito) não entram
+  r`|explod\w*|decol\w*|bombar|bombando|bombou|pumpa\w*|pumpar|pra lua|para a lua|to the moon)\b`,
 )
 const CONDICIONAL = rx(
   r`\bse (o |a )?(\w+ ){0,2}(ganhar|vencer|perder|for eleito|for reeleito|cortar|cortarem|subir|aumentar|baixar|`,
@@ -496,8 +505,9 @@ export function analisar(pergunta: string): Pedido {
   // lado da reação nos turnos, o valor dela viraria indicação de momento. Pergunta de contrato (mini-dólar) também não.
   const [valor, moeda, gasto, gastoMoeda] = cambio(t)
   const contratoFuturo = p.mercados.some((x) => x === 'mini_indice' || x === 'mini_dolar') || CONTRATO.test(t)
+  const cripto = p.mercados.some((x) => x === 'cripto' || x === 'memecoin') // "10 mil dólares em USDT" é cripto, não câmbio
   if (valor !== null && moeda !== null && !contratoFuturo) {
-    if (quanto || momentoTroca) {
+    if (quanto || momentoTroca || cripto) {
       // a pessoa contou o valor e ele não é usado: a linha do capital diz por quê
       if (!p.proibidos.includes('capital')) p.proibidos.push('capital')
     } else {
