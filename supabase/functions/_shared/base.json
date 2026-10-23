@@ -1,5 +1,5 @@
 {
- "gerado_em": "2026-10-23T12:40:17-03:00",
+ "gerado_em": "2026-10-23T14:34:34-03:00",
  "textos": {
   "AVISO": "⚠️ Sou uma IA e posso errar. Isto não é recomendação de investimento: a empresa não é analista credenciada na APIMEC nem consultora autorizada pela CVM. Rentabilidade passada não indica rentabilidade futura.",
   "RECUSA": "Não digo se você deve comprar, vender ou esperar, nem para onde o preço vai: isso seria análise ou consultoria. Mostro o que dá para saber hoje, com fonte, para você decidir.",
@@ -27949,7 +27949,7 @@
    "guerra": "\\bguerra\\b(?! (de precos|comercial))|\\biran\\b|\\b(o|do|no|ao|pro|pelo|com o|contra o) ira\\b|\\bormuz\\b|\\brussia\\b|\\bucrania\\b|\\bisrael\\b|\\bataques?\\b|\\bconflito\\b|\\bcessar[- ]fogo\\b",
    "governo": "\\bimpost\\w*|\\btribut\\w*|\\bicms\\b|\\bsubvenc\\w*|\\bmedida provisoria\\b|\\bgoverno\\b|\\bpre-sal\\b|\\boperador\\w*|\\bexportac\\w*",
    "choque": "\\bcovid\\b|\\bpandemia\\b|\\bguerra de precos\\b|\\bwti\\b[^.?!]{0,30}\\bnegativ\\w*|\\bpreco negativo\\b|\\babaixo de zero\\b|\\b(petroleo|barril) (ficou |chegou a )?negativo\\b(?! (hoje|ontem|no (dia|ano|mes)))",
-   "petrobras": "(?=.*\\b(petrobras|petr[34])\\b)(?=.*\\b(presidente|presidencia|presidir|ceo|comando|conselho|indicad[oa]|governo indica|deixa|deixou|saida|renuncia\\w*|demissao|reajust\\w*|gasolina|diesel|politica de (preco|precos|dividendo|dividendos)|paridade|estrategia comercial|greve|caminhoneir\\w*|dividendos? extraordinari\\w*|interferencia)\\b)|(?=.*\\b(petrobras|petr[34])\\b)(?=.*\\bdividendo\\w*)(?=.*\\b(reagiu|reagiram|aconteceu|aconteceram|foi|foram|pagou|aprovou|20\\d\\d)\\b)"
+   "petrobras": "(?=.*\\b(petrobras|petr[34])\\b)(?=.*\\b(presidente|presidencia|presidir|ceo|comando|conselho( de administracao)?( da petrobras)? (nao )?(eleg\\w*|aprov\\w*|propo\\w*|propos|decid\\w*|vot\\w*)|indicad[oa] (para|pra|a) (presidir|presidencia|petrobras|o comando)|governo indica|deix(a|ou) (a petrobras|o cargo|a presidencia|o comando)|deixou de ser operadora|saida d[eoa] (presidente|ceo|presidencia|comando|\\w+ (da|na) petrobras)|renuncia\\w*|demissao|reajust\\w*|gasolina|diesel|politica de (preco|precos|dividendo|dividendos)|paridade|estrategia comercial|greve|caminhoneir\\w*|dividendos? extraordinari\\w*|interferencia)\\b)|(?=.*\\b(petrobras|petr[34])\\b)(?=.*\\bdividendo\\w*)(?=.*\\b(reagiu|reagiram|aconteceu|aconteceram|foi|foram|pagou|aprovou|20(1[6-9]|2[0-5]))\\b)"
   },
   "barril": {
    "titulo": "Do barril à bomba (fato, com a data de cada número)",

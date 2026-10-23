@@ -74,8 +74,10 @@ def escolher_blocos(p: Pedido, hoje: str) -> list[F.Bloco]:
     # A linha do tempo que fica numa pergunta de petróleo não tira o caminho do Brent nem os dois lados.
     tem_evento = p.eleicao or 'copom' in p.temas or any(x not in coberto or 'petroleo' not in p.mercados for x in tipos)
     medidos = [m for m in dict.fromkeys(MEDIDO.get(m, m) for m in p.mercados) if m in F.HISTORICO]
-    # "ETF de bitcoin na B3": a B3 é o lugar da cripto, não o Ibovespa. Sem caminho nem dois lados do índice.
-    b3_so_lugar = 'cripto' in p.mercados and not re.search(IBOV_DITO, normalizar(p.pergunta))
+    # "ETF de bitcoin na B3", "bitcoin na bolsa": a B3 é o lugar da cripto, não o Ibovespa. Sem caminho nem dois lados do
+    # índice. "Bitcoin ou bolsa?", "bitcoin ou WIN?" citam o índice: os dois mercados.
+    b3_so_lugar = ('cripto' in p.mercados and 'mini_indice' not in p.mercados
+                   and not re.search(IBOV_DITO, re.sub(LUGAR_DITO, ' ', t)))
     if b3_so_lugar:
         medidos = [m for m in medidos if m != 'ibovespa']
     if not tem_evento and medidos:
@@ -98,6 +100,7 @@ def escolher_blocos(p: Pedido, hoje: str) -> list[F.Bloco]:
         blocos.append(F.binaria())
     if p.conta:
         blocos.append(F.conta(p.pontos, p.contratos, 'mini_indice' if 'mini_indice' in p.mercados else 'mini_dolar'))
+    eventos_petroleo = False  # o estudo dos eventos de petróleo também mede o dólar, não o euro
     for m in p.mercados:
         if m == 'ibovespa' and ('mini_indice' in p.mercados or b3_so_lugar):
             continue  # contrato (WIN) ou cripto na B3: a regra de IR das ações à vista não vale
@@ -109,6 +112,7 @@ def escolher_blocos(p: Pedido, hoje: str) -> list[F.Bloco]:
             so_acao = not temas_petroleo and re.search(ACAO_DITA, t) and not re.search(PETROLEO_DITO, t)
             if not so_acao:
                 blocos.append(F.petroleo_eventos(temas_petroleo))
+                eventos_petroleo = True
             if re.search(COMBUSTIVEL_DITO, t) or not temas_petroleo and not so_acao:
                 blocos.append(F.barril_bomba())
         if m == 'cripto':
@@ -116,6 +120,10 @@ def escolher_blocos(p: Pedido, hoje: str) -> list[F.Bloco]:
             # regras, com a definição primeiro se a pessoa perguntou "o que é". Pergunta de imposto: o imposto primeiro.
             t = normalizar(p.pergunta)
             tema = F.tema_cripto(t)
+            # Quem escolhe ou avalia uma corretora pelo nome não recebe a história de uma delas no topo (N7): a linha do
+            # tempo inteira vai para o fim, como em qualquer pergunta de cripto sem tema.
+            if tema == 'binance' and 'plataforma' in p.proibidos:
+                tema = ''
             imposto, riscos = F.cripto_imposto(), F.cripto_riscos()
             if re.search(IMPOSTO_DITO, t):
                 blocos[-1:-1] = [imposto]
@@ -129,8 +137,9 @@ def escolher_blocos(p: Pedido, hoje: str) -> list[F.Bloco]:
                 blocos.append(F.cripto_marcos())
     if pede_dinheiro or set(DERIVATIVOS[:2]) & set(p.mercados):
         blocos.append(F.fgv())
-    # O estudo do Copom e da linha do tempo mede o dólar, não o euro: dizer isso, em vez de responder só com o dólar.
-    if 'euro' in p.mercados and ('copom' in p.temas or any(t in p.temas for t in F.TIPOS)):
+    # O estudo do Copom, da linha do tempo e dos eventos de petróleo mede o dólar, não o euro: dizer isso, em vez de
+    # responder só com o dólar.
+    if 'euro' in p.mercados and ('copom' in p.temas or any(t in p.temas for t in F.TIPOS) or eventos_petroleo):
         blocos.append(F.euro_sem_estudo())
     blocos = [b for b in blocos if b]
     if p.cambio:
@@ -143,8 +152,12 @@ def escolher_blocos(p: Pedido, hoje: str) -> list[F.Bloco]:
 
 
 CRIPTO_TITULOS = (F.TITULO_MARCOS, F.TITULO_CRIPTO, F.TITULO_CRIPTO_IMPOSTO, F.TITULO_CRIPTO_RISCOS)
-# A pessoa falou do índice mesmo, e não só da B3 como lugar.
-IBOV_DITO = r'\bibov\w*|\bbovespa\b|\bacoes\b|\bacao\b|\bbova11\b'
+# A pessoa falou do índice mesmo, e não só da B3 como lugar. "Bolsa de cripto", "índice de medo" e "stock-to-flow" são
+# da cripto.
+IBOV_DITO = (r'\bibov\w*|\bbovespa\b|\bacoes\b|\bacao\b|\bbova11\b|\bbolsa\b(?! de (cripto|bitcoin))'
+             r'|\bstocks?\b(?![- ]to[- ]flow)|\bindices?\b(?! de (medo|dominancia))')
+# "bitcoin na bolsa", "ETF de bitcoin na bolsa": a bolsa como lugar da cripto, igual à B3.
+LUGAR_DITO = r'\b(cripto\w*|bitcoins?|btc|ethereum|eth|hash11|etfs?)( de \w+)? (na|pela) bolsa\b'
 TARIFA_DITA = r'\btarifa\w*|\bsanc(ao|oes)\b|\bguerra comercial\b'
 ACAO_DITA = r'\b(petrobras|petr[34]|prio3?|petroleiras?|acao|acoes)\b'
 PETROLEO_DITO = r'\b(petroleo|brent|wti|barril|opep|opec|ormuz|combustive(l|is)|gasolina|diesel)\b'

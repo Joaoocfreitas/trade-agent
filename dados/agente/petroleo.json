@@ -1,5 +1,5 @@
 {
- "_leia": "Eventos de petróleo e Petrobras de 2016 a 2026, com a fonte de cada um (a primária quando houver), conferidos em 23/10/2026 (nota do cofre \"Petróleo e Petrobras 2016–2026\"). A reação é calculada no código: Brent pela EIA, Ibovespa e dólar no pregão da B3. A cotação das ações fica fora até a licença de dados da B3.",
+ "_leia": "Eventos de petróleo e Petrobras de 2016 a 2026, com a fonte de cada um (a primária quando houver), conferidos em 23/10/2026 (nota do cofre \"Petróleo e Petrobras 2016–2026\"). A reação é calculada no código: Brent pela EIA, Ibovespa e dólar no pregão da B3. A cotação das ações fica fora até a licença de dados da B3. O tema \"petrobras\" só aceita como dividendo que já saiu os anos fechados (hoje 2016–2025, no regex): suba o limite na virada do ano, porque ano que ainda vem não é fato (Mapa legal, seção 8, item 10).",
  "temas": {
   "opep": {
    "regex": "\\bopep\\b|\\bopec\\b",
@@ -18,7 +18,7 @@
    "nome": "choques de demanda"
   },
   "petrobras": {
-   "regex": "(?=.*\\b(petrobras|petr[34])\\b)(?=.*\\b(presidente|presidencia|presidir|ceo|comando|conselho|indicad[oa]|governo indica|deixa|deixou|saida|renuncia\\w*|demissao|reajust\\w*|gasolina|diesel|politica de (preco|precos|dividendo|dividendos)|paridade|estrategia comercial|greve|caminhoneir\\w*|dividendos? extraordinari\\w*|interferencia)\\b)|(?=.*\\b(petrobras|petr[34])\\b)(?=.*\\bdividendo\\w*)(?=.*\\b(reagiu|reagiram|aconteceu|aconteceram|foi|foram|pagou|aprovou|20\\d\\d)\\b)",
+   "regex": "(?=.*\\b(petrobras|petr[34])\\b)(?=.*\\b(presidente|presidencia|presidir|ceo|comando|conselho( de administracao)?( da petrobras)? (nao )?(eleg\\w*|aprov\\w*|propo\\w*|propos|decid\\w*|vot\\w*)|indicad[oa] (para|pra|a) (presidir|presidencia|petrobras|o comando)|governo indica|deix(a|ou) (a petrobras|o cargo|a presidencia|o comando)|deixou de ser operadora|saida d[eoa] (presidente|ceo|presidencia|comando|\\w+ (da|na) petrobras)|renuncia\\w*|demissao|reajust\\w*|gasolina|diesel|politica de (preco|precos|dividendo|dividendos)|paridade|estrategia comercial|greve|caminhoneir\\w*|dividendos? extraordinari\\w*|interferencia)\\b)|(?=.*\\b(petrobras|petr[34])\\b)(?=.*\\bdividendo\\w*)(?=.*\\b(reagiu|reagiram|aconteceu|aconteceram|foi|foram|pagou|aprovou|20(1[6-9]|2[0-5]))\\b)",
    "nome": "Petrobras (presidente, preço e dividendo)"
   }
  },
