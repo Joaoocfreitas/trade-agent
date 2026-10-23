@@ -62,7 +62,10 @@ export const MERCADOS = {
   // Logo depois do dólar: a ordem das chaves é a ordem de p.mercados, como no dict do Python.
   euro: rx(r`\beuros?\b|\beur\b`),
   juros: rx(r`\bjuros\b|\bdi1?\b|\bdi futuro\b|\bselic\b|\brenda fixa\b|\btesouro\b|\bprefixad\w*`),
-  cripto: rx(r`\bcripto\w*|\bbitcoin\b|\bbtc\b|\bethereum\b|\bexchanges?\b|\bstablecoins?\b|\bsolana\b`),
+  cripto: rx(
+    r`\bcripto\w*|\bbitcoin\b|\bbtc\b|\bethereum\b|\bexchanges?\b|\bstablecoins?\b|\bsolana\b`,
+    r`|\bhalving\b|\bftx\b|\busdt\b|\busdc\b|\btether\b`,
+  ),
   memecoin: rx(r`\bmeme ?coins?\b|\bmemecoins?\b|\$trump\b|\$libra\b|\$melania\b|\btokens?\b|\bmoeda do candidato\b`),
   previsao: rx(r`\bpolymarket\b|\bkalshi\b|\bmercados? de previs\w*`),
 } satisfies Record<string, RegExp>
