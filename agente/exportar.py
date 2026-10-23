@@ -91,6 +91,15 @@ def base() -> dict:
             'titulo': F.TITULO_CONTA_CAMBIO, 'limite_euro': F.LIMITE_PTAX_EURO,
         },
         'euro_turnos': _bloco(F.euro_turnos()),
+        # cripto sem preço: os blocos prontos, a linha do tempo de cada tema e as expressões que acham o tema
+        'cripto': {
+            'imposto': _bloco(F.cripto_imposto()), 'riscos': _bloco(F.cripto_riscos()),
+            'marcos': {'': _bloco(F.cripto_marcos()), **{t: _bloco(F.cripto_marcos(t)) for t in F._cripto()['temas']}},
+            'temas': {t: v['regex'] for t, v in F._cripto()['temas'].items()},
+            'titulos': [F.TITULO_MARCOS, F.TITULO_CRIPTO, F.TITULO_CRIPTO_IMPOSTO, F.TITULO_CRIPTO_RISCOS],
+        },
+        'dois_lados': {k: _bloco(F.dois_lados(k)) for k in F.HISTORICO},
+        'titulo_dois_lados': F.TITULO_DOIS_LADOS,
         'resumo_hoje': F.RESUMO_HOJE,
     }
 
@@ -136,6 +145,11 @@ EXTRAS = [
     'euro e Copom: o que acontece com o euro quando o Copom surpreende?', 'como o real reagiu à eleição?', 'quanto tá o euro hoje?',
     'Como estão o euro e a bolsa?', 'vale a pena renda fixa agora?', 'O DI futuro sobe no Copom?', 'como mando dinheiro pra fora?',
     'O que é câmbio?', 'O que a eleição traz para o dólar?', 'tenho 0,5 euro', 'como os juros reagem à eleição?',
+    # 23/10/2026: cripto sem preço e os dois lados.
+    'quero comprar bitcoin hoje, vale a pena?', 'o que aconteceu no halving?', 'e a FTX?', 'bitcoin e o Trump',
+    'ETF de bitcoin na B3', 'stablecoin é câmbio?', 'Binance é segura?', 'bitcoin vai subir?',
+    'como funciona o imposto do bitcoin?', 'o dólar vai cair?', 'compro ibovespa?', 'euro sobe?', 'China e bitcoin',
+    'regulação de cripto no Brasil', 'USDT é seguro?', 'devo vender meus prefixados?',
 ]
 
 

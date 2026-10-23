@@ -1,5 +1,5 @@
 {
- "gerado_em": "2026-10-22T19:54:00-03:00",
+ "gerado_em": "2026-10-23T11:43:53-03:00",
  "textos": {
   "AVISO": "⚠️ Sou uma IA e posso errar. Isto não é recomendação de investimento: a empresa não é analista credenciada na APIMEC nem consultora autorizada pela CVM. Rentabilidade passada não indica rentabilidade futura.",
   "RECUSA": "Não digo se você deve comprar, vender ou esperar, nem para onde o preço vai: isso seria análise ou consultoria. Mostro o que dá para saber hoje, com fonte, para você decidir.",
@@ -8255,16 +8255,51 @@
    "titulo": "Como funciona a cripto no Brasil",
    "linhas": [
     {
-     "texto": "Cripto à vista, em regra, não é valor mobiliário e não tem a proteção da regulação da CVM; quem regula as corretoras de cripto é o Banco Central, num processo de autorização que ainda está em curso. Futuro de cripto e cota de ETF de cripto são valores mobiliários, e um token pode ser valor mobiliário conforme os direitos que dá.",
+     "texto": "Cripto à vista, como o bitcoin, em regra não é valor mobiliário: quem regula as corretoras de cripto é o Banco Central, e não a CVM.",
      "fontes": [
       {
        "nome": "Lei 14.478/2022 (ativos virtuais)",
        "url": "https://www.planalto.gov.br/ccivil_03/_ato2019-2022/2022/lei/l14478.htm"
       },
       {
-       "nome": "Parecer de Orientação CVM 40/2022",
-       "url": "https://conteudo.cvm.gov.br/legislacao/pareceres-orientacao/pare040.html"
+       "nome": "Decreto 11.563/2023",
+       "url": "https://www.planalto.gov.br/ccivil_03/_ato2023-2026/2023/decreto/d11563.htm"
+      }
+     ]
+    },
+    {
+     "texto": "Futuro e opção de cripto são valores mobiliários (Lei 6.385, art. 2º, VIII), e ETF de cripto é fundo regulado pela CVM e negociado na B3.",
+     "fontes": [
+      {
+       "nome": "Lei 6.385/1976 (mercado de valores mobiliários)",
+       "url": "https://www.planalto.gov.br/ccivil_03/leis/l6385compilada.htm"
       },
+      {
+       "nome": "Parecer de Orientação CVM 40/2022",
+       "url": "https://conteudo.cvm.gov.br/export/sites/cvm/legislacao/pareceres-orientacao/anexos/Pare040.pdf"
+      }
+     ]
+    },
+    {
+     "texto": "As corretoras de cripto que já operavam têm até 30/10/2026 para pedir autorização ao Banco Central. A partir de 06/11/2026, bancos e instituições de pagamento, inclusive no Pix, não podem operar com corretora de cripto não autorizada.",
+     "fontes": [
+      {
+       "nome": "Resolução BCB 520/2025",
+       "url": "https://www.bcb.gov.br/estabilidadefinanceira/exibenormativo?tipo=Resolu%C3%A7%C3%A3o%20BCB&numero=520"
+      },
+      {
+       "nome": "Instrução Normativa BCB 704",
+       "url": "https://www.bcb.gov.br/estabilidadefinanceira/exibenormativo?tipo=Instru%C3%A7%C3%A3o%20Normativa%20BCB&numero=704"
+      },
+      {
+       "nome": "Resolução BCB 589/2026",
+       "url": "https://www.bcb.gov.br/estabilidadefinanceira/exibenormativo?tipo=Resolu%C3%A7%C3%A3o%20BCB&numero=589"
+      }
+     ]
+    },
+    {
+     "texto": "A corretora tem de mostrar no site e no app se tem autorização ou pedido em análise no Banco Central, avisar que cripto não tem garantia do FGC e separar o dinheiro e a cripto dos clientes dos dela, com prova de reservas.",
+     "fontes": [
       {
        "nome": "Resolução BCB 520/2025",
        "url": "https://www.bcb.gov.br/estabilidadefinanceira/exibenormativo?tipo=Resolu%C3%A7%C3%A3o%20BCB&numero=520"
@@ -8272,21 +8307,32 @@
      ]
     },
     {
-     "texto": "As corretoras de cripto que já operavam têm até 30/10/2026 para pedir a autorização do Banco Central, e toda prestadora tem de informar no site e no app se tem autorização ou pedido em análise.",
+     "texto": "Desde 02/02/2026, comprar ou vender stablecoin (cripto atrelada a moeda, como USDT e USDC) e mandar cripto de ou para carteira própria é operação de câmbio; a corretora identifica o dono da carteira, e transferências a partir de US$ 10 mil vão ao Coaf.",
      "fontes": [
       {
-       "nome": "Instrução Normativa BCB 704",
-       "url": "https://www.bcb.gov.br/estabilidadefinanceira/exibenormativo?tipo=Instru%C3%A7%C3%A3o%20Normativa%20BCB&numero=704"
+       "nome": "Resolução BCB 521/2025",
+       "url": "https://www.bcb.gov.br/estabilidadefinanceira/exibenormativo?tipo=Resolu%C3%A7%C3%A3o%20BCB&numero=521"
       },
       {
-       "nome": "Resolução BCB 520/2025",
-       "url": "https://www.bcb.gov.br/estabilidadefinanceira/exibenormativo?tipo=Resolu%C3%A7%C3%A3o%20BCB&numero=520"
+       "nome": "Resolução BCB 591/2026",
+       "url": "https://www.bcb.gov.br/estabilidadefinanceira/exibenormativo?tipo=Resolu%C3%A7%C3%A3o%20BCB&numero=591"
+      }
+     ]
+    },
+    {
+     "texto": "Em junho de 2026, as operações declaradas à Receita somaram R$ 57,5 bilhões: R$ 34 bilhões em USDT e R$ 2,4 bilhões em bitcoin.",
+     "fontes": [
+      {
+       "nome": "Receita Federal, dados abertos de criptoativos (relatório de 26/08/2026)",
+       "url": "https://www.gov.br/receitafederal/pt-br/assuntos/orientacao-tributaria/declaracoes-e-demonstrativos/criptoativos/arquivos/criptoativos_dados_abertos_20260826.pdf"
       }
      ]
     }
    ],
-   "resumo": "",
-   "limites": []
+   "resumo": "Bitcoin à vista, em regra, não é valor mobiliário: quem regula as corretoras é o Banco Central, não a CVM, e não há garantia do FGC. As corretoras têm até 30/10/2026 para pedir autorização, e a partir de 06/11/2026 banco e Pix não podem operar com corretora não autorizada.",
+   "limites": [
+    "Regras conferidas na fonte em 23/10/2026; as de 2025 e 2026 ainda estão entrando em vigor, e vale a norma do Banco Central na data da operação."
+   ]
   }
  },
  "historico": {
@@ -20065,5 +20111,816 @@
    "Os números do euro são da PTAX de venda do Banco Central. Na troca de verdade (banco, corretora, app de remessa), a cotação é outra e pode haver tarifa, spread e IOF."
   ]
  },
+ "cripto": {
+  "imposto": {
+   "titulo": "Imposto e formas de ter cripto no Brasil (regra conferida em 23/10/2026)",
+   "linhas": [
+    {
+     "texto": "Em corretora no Brasil, vender até R$ 35 mil por mês, somando todas as criptos, é isento. Passou disso, todo o ganho do mês paga imposto (15% até R$ 5 milhões de ganho), pelo DARF até o último dia útil do mês seguinte; trocar uma cripto por outra também conta.",
+     "fontes": [
+      {
+       "nome": "Lei 9.250/1995, art. 22",
+       "url": "https://www.planalto.gov.br/ccivil_03/leis/l9250.htm"
+      },
+      {
+       "nome": "Lei 8.981/1995, art. 21",
+       "url": "https://www.planalto.gov.br/ccivil_03/leis/l8981.htm"
+      },
+      {
+       "nome": "Receita Federal, Perguntas e Respostas IRPF 2026",
+       "url": "https://www.gov.br/receitafederal/pt-br/centrais-de-conteudo/publicacoes/perguntas-e-respostas/dirpf/p-r-irpf-2026-v1-00-2026-04-23.pdf"
+      }
+     ]
+    },
+    {
+     "texto": "A proposta de 17,5% sem isenção (Medida Provisória 1.303/2025) perdeu a validade em 08/10/2025, e nenhuma lei a substituiu até 23/10/2026.",
+     "fontes": [
+      {
+       "nome": "Medida Provisória 1.303/2025",
+       "url": "https://www.planalto.gov.br/ccivil_03/_ato2023-2026/2025/mpv/mpv1303.htm"
+      },
+      {
+       "nome": "Congresso, Ato Declaratório nº 67/2025 (fim da vigência da MP 1.303)",
+       "url": "https://www2.camara.leg.br/legin/fed/atodecpm/2025/atodeclaratoriodopresidentedamesa-67-14-outubro-2025-798130-publicacaooriginal-176721-cn.html"
+      }
+     ]
+    },
+    {
+     "texto": "Em corretora no exterior, o ganho paga 15% por ano, na declaração, sem isenção.",
+     "fontes": [
+      {
+       "nome": "Lei 14.754/2023 (aplicações no exterior)",
+       "url": "https://www.planalto.gov.br/ccivil_03/_ato2023-2026/2023/lei/l14754.htm"
+      },
+      {
+       "nome": "Receita Federal, Perguntas e Respostas IRPF 2026",
+       "url": "https://www.gov.br/receitafederal/pt-br/centrais-de-conteudo/publicacoes/perguntas-e-respostas/dirpf/p-r-irpf-2026-v1-00-2026-04-23.pdf"
+      }
+     ]
+    },
+    {
+     "texto": "Na declaração, a cripto vai em Bens e Direitos, grupo 08 (código 01 é bitcoin), pelo custo de compra, quando o custo de cada tipo é de R$ 5 mil ou mais. Desde 01/07/2026 a DeCripto substituiu a antiga IN 1.888.",
+     "fontes": [
+      {
+       "nome": "Receita Federal, Perguntas e Respostas IRPF 2026",
+       "url": "https://www.gov.br/receitafederal/pt-br/centrais-de-conteudo/publicacoes/perguntas-e-respostas/dirpf/p-r-irpf-2026-v1-00-2026-04-23.pdf"
+      },
+      {
+       "nome": "Receita Federal, DeCripto",
+       "url": "https://www.gov.br/receitafederal/pt-br/assuntos/orientacao-tributaria/declaracoes-e-demonstrativos/criptoativos/decripto"
+      }
+     ]
+    },
+    {
+     "texto": "Formas de ter bitcoin: comprar numa corretora autorizada pelo Banco Central; guardar em carteira própria (quem guarda a chave é você, e perder a chave é perder o ativo); ETF na B3, por corretora de valores; ou futuro de bitcoin na B3, com margem e ajuste diário.",
+     "fontes": [
+      {
+       "nome": "Resolução BCB 520/2025",
+       "url": "https://www.bcb.gov.br/estabilidadefinanceira/exibenormativo?tipo=Resolu%C3%A7%C3%A3o%20BCB&numero=520"
+      },
+      {
+       "nome": "Resolução BCB 521/2025",
+       "url": "https://www.bcb.gov.br/estabilidadefinanceira/exibenormativo?tipo=Resolu%C3%A7%C3%A3o%20BCB&numero=521"
+      },
+      {
+       "nome": "Lei 6.385/1976 (mercado de valores mobiliários)",
+       "url": "https://www.planalto.gov.br/ccivil_03/leis/l6385compilada.htm"
+      }
+     ]
+    },
+    {
+     "texto": "No cadastro da CVM há 29 fundos de índice (ETF) ligados a cripto em funcionamento, com cerca de R$ 6,9 bilhões.",
+     "fontes": [
+      {
+       "nome": "CVM, dados abertos: cadastro de classes de fundos (baixado em 23/10/2026)",
+       "url": "https://dados.cvm.gov.br/dados/FI/CAD/DADOS/registro_fundo_classe.zip"
+      }
+     ]
+    },
+    {
+     "texto": "O futuro de bitcoin da B3 é negociado desde 17/04/2024: cada contrato vale 0,1 bitcoin, cotado em reais, com liquidação só em dinheiro.",
+     "fontes": [
+      {
+       "nome": "B3, Ofício-Circular 044/2024-PRE (contrato futuro de bitcoin)",
+       "url": "https://www.b3.com.br/data/files/2E/40/4F/10/D868E810C54843E8DC0D8AA8/OC%20044-2024%20PRE%20Lancamento%20do%20Contrato%20Futuro%20de%20Bitcoin%20e%20da%20Op.%20Estruturada%20de%20Rolagem%20de%20Contrato%20Futuro%20de%20Bitcoin%20(PT).pdf"
+      },
+      {
+       "nome": "B3, início do futuro de bitcoin",
+       "url": "https://www.b3.com.br/pt_br/noticias/inicio-do-futuro-de-bitcoin.htm"
+      }
+     ]
+    }
+   ],
+   "resumo": "Imposto: em corretora no Brasil, vendas de até R$ 35 mil por mês são isentas e, acima disso, o ganho paga 15%; em corretora no exterior, 15% por ano sem isenção. Também dá para ter bitcoin por ETF ou futuro na B3, que são regulados pela CVM.",
+   "limites": [
+    "Regra de imposto muda por lei: confira na Receita antes de declarar."
+   ]
+  },
+  "riscos": {
+   "titulo": "Riscos da cripto, com caso e fonte (fato)",
+   "linhas": [
+    {
+     "texto": "Cripto não tem FGC. A proteção do cliente se a corretora quebrar ainda depende de lei: o PL 4.932/2023 foi aprovado na Câmara em 12/11/2024 e está no Senado.",
+     "fontes": [
+      {
+       "nome": "Resolução BCB 520/2025",
+       "url": "https://www.bcb.gov.br/estabilidadefinanceira/exibenormativo?tipo=Resolu%C3%A7%C3%A3o%20BCB&numero=520"
+      },
+      {
+       "nome": "Câmara dos Deputados, PL 4.932/2023 (dados abertos)",
+       "url": "https://dadosabertos.camara.leg.br/api/v2/proposicoes/2395230"
+      }
+     ]
+    },
+    {
+     "texto": "Corretora também quebra: a FTX pediu recuperação judicial nos EUA em 11/11/2022, e a SEC acusou o fundador de desviar dinheiro de clientes.",
+     "fontes": [
+      {
+       "nome": "SEC, acusação contra o fundador da FTX (13/12/2022)",
+       "url": "https://www.sec.gov/newsroom/press-releases/2022-219"
+      }
+     ]
+    },
+    {
+     "texto": "Fraude com ativo virtual é crime, com pena de 4 a 8 anos de prisão (Código Penal, art. 171-A, criado pela Lei 14.478/2022).",
+     "fontes": [
+      {
+       "nome": "Código Penal, art. 171-A",
+       "url": "https://www.planalto.gov.br/ccivil_03/decreto-lei/del2848compilado.htm"
+      },
+      {
+       "nome": "Lei 14.478/2022 (ativos virtuais)",
+       "url": "https://www.planalto.gov.br/ccivil_03/_ato2019-2022/2022/lei/l14478.htm"
+      }
+     ]
+    },
+    {
+     "texto": "No caso GAS (\"Faraó dos Bitcoins\"), o contrato prometia 10% ao mês. No julgamento da CVM de 29/08/2023, o voto do relator condenou os três acusados a multa de R$ 34 milhões cada.",
+     "fontes": [
+      {
+       "nome": "CVM, PAS 19957.002835/2022-47 (caso GAS), voto de 29/08/2023",
+       "url": "https://www.gov.br/cvm/pt-br/assuntos/noticias/anexos/2023/20230829_pas_cvm_19957_002835_2022_47_presidente_cvm_joao_pedro_nascimento_voto.pdf"
+      }
+     ]
+    }
+   ],
+   "resumo": "Riscos: cripto não tem FGC, corretora pode quebrar (FTX, 2022), e fraude com ativo virtual dá de 4 a 8 anos de prisão. No caso GAS, a promessa era de 10% ao mês, e o voto do relator na CVM multou os três acusados em R$ 34 milhões cada.",
+   "limites": [
+    "O repertório ainda não mostra o preço do bitcoin: nenhuma fonte gratuita permite uso comercial da cotação."
+   ]
+  },
+  "marcos": {
+   "": {
+    "titulo": "Linha do tempo da cripto desde 2016 (fato, sem preço)",
+    "linhas": [
+     {
+      "texto": "09/07/2016: Halving: a recompensa por bloco cai de 25 para 12,5 BTC.",
+      "fontes": [
+       {
+        "nome": "Fonte primária do evento de 09/07/2016",
+        "url": "https://mempool.space/api/block-height/420000"
+       }
+      ]
+     },
+     {
+      "texto": "11/05/2020: Halving: de 12,5 para 6,25 BTC.",
+      "fontes": [
+       {
+        "nome": "Fonte primária do evento de 11/05/2020",
+        "url": "https://mempool.space/api/block-height/630000"
+       }
+      ]
+     },
+     {
+      "texto": "08/02/2021: A Tesla revela compra de US$ 1,5 bilhão em bitcoin.",
+      "fontes": [
+       {
+        "nome": "Fonte primária do evento de 08/02/2021",
+        "url": "https://www.sec.gov/Archives/edgar/data/1318605/000156459021004599/tsla-10k_20201231.htm"
+       }
+      ]
+     },
+     {
+      "texto": "26/04/2021: HASH11, primeiro ETF de índice de cripto, começa a ser negociado na B3.",
+      "fontes": [
+       {
+        "nome": "Fonte primária do evento de 26/04/2021",
+        "url": "https://www.b3.com.br/pt_br/noticias/b3-inicia-negociacao-do-primeiro-etf-da-hashdex.htm"
+       }
+      ]
+     },
+     {
+      "texto": "24/09/2021: China declara ilegais as atividades de negócio com moeda virtual (Circular 237).",
+      "fontes": [
+       {
+        "nome": "Fonte primária do evento de 24/09/2021",
+        "url": "https://www.gov.cn/zhengce/zhengceku/2021-10/08/content_5641404.htm"
+       }
+      ]
+     },
+     {
+      "texto": "11/11/2022: FTX pede recuperação judicial nos EUA.",
+      "fontes": [
+       {
+        "nome": "Fonte primária do evento de 11/11/2022",
+        "url": "https://restructuring.ra.kroll.com/FTX/"
+       }
+      ]
+     },
+     {
+      "texto": "22/12/2022: Lei 14.478/2022, o marco legal dos ativos virtuais, é publicada.",
+      "fontes": [
+       {
+        "nome": "Fonte primária do evento de 22/12/2022",
+        "url": "https://www.planalto.gov.br/ccivil_03/_ato2019-2022/2022/lei/l14478.htm"
+       }
+      ]
+     },
+     {
+      "texto": "21/11/2023: Binance e o fundador fecham acordo com o governo dos EUA (US$ 4,3 bilhões).",
+      "fontes": [
+       {
+        "nome": "Fonte primária do evento de 21/11/2023",
+        "url": "https://home.treasury.gov/news/press-releases/jy1925"
+       }
+      ]
+     },
+     {
+      "texto": "10/01/2024: A SEC aprova os ETFs de bitcoin à vista nos EUA.",
+      "fontes": [
+       {
+        "nome": "Fonte primária do evento de 10/01/2024",
+        "url": "https://www.sec.gov/newsroom/speeches-statements/gensler-statement-spot-bitcoin-011023"
+       }
+      ]
+     },
+     {
+      "texto": "17/04/2024: A B3 começa a negociar o futuro de bitcoin.",
+      "fontes": [
+       {
+        "nome": "Fonte primária do evento de 17/04/2024",
+        "url": "https://www.b3.com.br/pt_br/noticias/inicio-do-futuro-de-bitcoin.htm"
+       }
+      ]
+     },
+     {
+      "texto": "20/04/2024: Halving: de 6,25 para 3,125 BTC.",
+      "fontes": [
+       {
+        "nome": "Fonte primária do evento de 20/04/2024",
+        "url": "https://mempool.space/api/block-height/840000"
+       }
+      ]
+     },
+     {
+      "texto": "05/11/2024: Eleição presidencial dos EUA (Trump vence).",
+      "fontes": [
+       {
+        "nome": "Fonte primária do evento de 05/11/2024",
+        "url": "https://www.archives.gov/electoral-college/2024"
+       }
+      ]
+     },
+     {
+      "texto": "17/01/2025: Lançamento da memecoin $TRUMP.",
+      "fontes": [
+       {
+        "nome": "Fonte primária do evento de 17/01/2025",
+        "url": "https://www.presidency.ucsb.edu/documents/truth-social-posts-january-17-2025"
+       }
+      ]
+     },
+     {
+      "texto": "06/03/2025: Trump cria a Reserva Estratégica de Bitcoin por ordem executiva.",
+      "fontes": [
+       {
+        "nome": "Fonte primária do evento de 06/03/2025",
+        "url": "https://www.federalregister.gov/documents/2025/03/11/2025-03992/establishment-of-the-strategic-bitcoin-reserve-and-united-states-digital-asset-stockpile"
+       }
+      ]
+     },
+     {
+      "texto": "18/07/2025: Lei das stablecoins (GENIUS Act) é sancionada nos EUA.",
+      "fontes": [
+       {
+        "nome": "Fonte primária do evento de 18/07/2025",
+        "url": "https://www.govinfo.gov/app/details/PLAW-119publ27"
+       }
+      ]
+     },
+     {
+      "texto": "08/10/2025: A MP 1.303/2025 (17,5% sobre cripto) perde a validade sem votação.",
+      "fontes": [
+       {
+        "nome": "Fonte primária do evento de 08/10/2025",
+        "url": "https://www2.camara.leg.br/legin/fed/atodecpm/2025/atodeclaratoriodopresidentedamesa-67-14-outubro-2025-798130-publicacaooriginal-176721-cn.html"
+       }
+      ]
+     },
+     {
+      "texto": "10/11/2025: O Banco Central publica as regras das corretoras de cripto (Resoluções 519, 520 e 521).",
+      "fontes": [
+       {
+        "nome": "Fonte primária do evento de 10/11/2025",
+        "url": "https://www.bcb.gov.br/estabilidadefinanceira/exibenormativo?tipo=Resolu%C3%A7%C3%A3o%20BCB&numero=519"
+       }
+      ]
+     },
+     {
+      "texto": "02/02/2026: As regras do Banco Central entram em vigor; stablecoin passa a ser câmbio.",
+      "fontes": [
+       {
+        "nome": "Fonte primária do evento de 02/02/2026",
+        "url": "https://www.bcb.gov.br/estabilidadefinanceira/exibenormativo?tipo=Resolu%C3%A7%C3%A3o%20BCB&numero=520"
+       }
+      ]
+     },
+     {
+      "texto": "23/09/2026: O Banco Central marca 06/11/2026 para bancos pararem de operar com corretora não autorizada.",
+      "fontes": [
+       {
+        "nome": "Fonte primária do evento de 23/09/2026",
+        "url": "https://www.bcb.gov.br/estabilidadefinanceira/exibenormativo?tipo=Resolu%C3%A7%C3%A3o%20BCB&numero=589"
+       }
+      ]
+     }
+    ],
+    "resumo": "",
+    "limites": [
+     "Sem a variação do preço em cada data: o repertório ainda não tem cotação licenciada do bitcoin."
+    ]
+   },
+   "halving": {
+    "titulo": "Linha do tempo da cripto desde 2016 (fato, sem preço)",
+    "linhas": [
+     {
+      "texto": "Halving é o corte pela metade da recompensa de quem minera bitcoin, a cada 210.000 blocos (cerca de 4 anos): 50 BTC no início, 3,125 BTC desde 20/04/2024. É essa regra que leva o total a cerca de 21 milhões de bitcoins.",
+      "fontes": [
+       {
+        "nome": "Bitcoin Core, regra da recompensa (validation.cpp, GetBlockSubsidy)",
+        "url": "https://raw.githubusercontent.com/bitcoin/bitcoin/master/src/validation.cpp"
+       }
+      ]
+     },
+     {
+      "texto": "09/07/2016: Halving: a recompensa por bloco cai de 25 para 12,5 BTC.",
+      "fontes": [
+       {
+        "nome": "Fonte primária do evento de 09/07/2016",
+        "url": "https://mempool.space/api/block-height/420000"
+       }
+      ]
+     },
+     {
+      "texto": "11/05/2020: Halving: de 12,5 para 6,25 BTC.",
+      "fontes": [
+       {
+        "nome": "Fonte primária do evento de 11/05/2020",
+        "url": "https://mempool.space/api/block-height/630000"
+       }
+      ]
+     },
+     {
+      "texto": "20/04/2024: Halving: de 6,25 para 3,125 BTC.",
+      "fontes": [
+       {
+        "nome": "Fonte primária do evento de 20/04/2024",
+        "url": "https://mempool.space/api/block-height/840000"
+       }
+      ]
+     }
+    ],
+    "resumo": "Na linha do tempo da cripto: 09/07/2016, halving: a recompensa por bloco cai de 25 para 12,5 BTC; 11/05/2020, halving: de 12,5 para 6,25 BTC; 20/04/2024, halving: de 6,25 para 3,125 BTC.",
+    "limites": [
+     "Sem a variação do preço em cada data: o repertório ainda não tem cotação licenciada do bitcoin."
+    ]
+   },
+   "etf": {
+    "titulo": "Linha do tempo da cripto desde 2016 (fato, sem preço)",
+    "linhas": [
+     {
+      "texto": "26/04/2021: HASH11, primeiro ETF de índice de cripto, começa a ser negociado na B3.",
+      "fontes": [
+       {
+        "nome": "Fonte primária do evento de 26/04/2021",
+        "url": "https://www.b3.com.br/pt_br/noticias/b3-inicia-negociacao-do-primeiro-etf-da-hashdex.htm"
+       }
+      ]
+     },
+     {
+      "texto": "10/01/2024: A SEC aprova os ETFs de bitcoin à vista nos EUA.",
+      "fontes": [
+       {
+        "nome": "Fonte primária do evento de 10/01/2024",
+        "url": "https://www.sec.gov/newsroom/speeches-statements/gensler-statement-spot-bitcoin-011023"
+       }
+      ]
+     }
+    ],
+    "resumo": "Na linha do tempo da cripto: 26/04/2021, HASH11, primeiro ETF de índice de cripto, começa a ser negociado na B3; 10/01/2024, A SEC aprova os ETFs de bitcoin à vista nos EUA.",
+    "limites": [
+     "Sem a variação do preço em cada data: o repertório ainda não tem cotação licenciada do bitcoin."
+    ]
+   },
+   "ftx": {
+    "titulo": "Linha do tempo da cripto desde 2016 (fato, sem preço)",
+    "linhas": [
+     {
+      "texto": "11/11/2022: FTX pede recuperação judicial nos EUA.",
+      "fontes": [
+       {
+        "nome": "Fonte primária do evento de 11/11/2022",
+        "url": "https://restructuring.ra.kroll.com/FTX/"
+       }
+      ]
+     }
+    ],
+    "resumo": "Na linha do tempo da cripto: 11/11/2022, FTX pede recuperação judicial nos EUA.",
+    "limites": [
+     "Sem a variação do preço em cada data: o repertório ainda não tem cotação licenciada do bitcoin."
+    ]
+   },
+   "trump": {
+    "titulo": "Linha do tempo da cripto desde 2016 (fato, sem preço)",
+    "linhas": [
+     {
+      "texto": "05/11/2024: Eleição presidencial dos EUA (Trump vence).",
+      "fontes": [
+       {
+        "nome": "Fonte primária do evento de 05/11/2024",
+        "url": "https://www.archives.gov/electoral-college/2024"
+       }
+      ]
+     },
+     {
+      "texto": "17/01/2025: Lançamento da memecoin $TRUMP.",
+      "fontes": [
+       {
+        "nome": "Fonte primária do evento de 17/01/2025",
+        "url": "https://www.presidency.ucsb.edu/documents/truth-social-posts-january-17-2025"
+       }
+      ]
+     },
+     {
+      "texto": "06/03/2025: Trump cria a Reserva Estratégica de Bitcoin por ordem executiva.",
+      "fontes": [
+       {
+        "nome": "Fonte primária do evento de 06/03/2025",
+        "url": "https://www.federalregister.gov/documents/2025/03/11/2025-03992/establishment-of-the-strategic-bitcoin-reserve-and-united-states-digital-asset-stockpile"
+       }
+      ]
+     }
+    ],
+    "resumo": "Na linha do tempo da cripto: 05/11/2024, eleição presidencial dos EUA (Trump vence); 17/01/2025, lançamento da memecoin $TRUMP; 06/03/2025, trump cria a Reserva Estratégica de Bitcoin por ordem executiva.",
+    "limites": [
+     "Sem a variação do preço em cada data: o repertório ainda não tem cotação licenciada do bitcoin."
+    ]
+   },
+   "china": {
+    "titulo": "Linha do tempo da cripto desde 2016 (fato, sem preço)",
+    "linhas": [
+     {
+      "texto": "24/09/2021: China declara ilegais as atividades de negócio com moeda virtual (Circular 237).",
+      "fontes": [
+       {
+        "nome": "Fonte primária do evento de 24/09/2021",
+        "url": "https://www.gov.cn/zhengce/zhengceku/2021-10/08/content_5641404.htm"
+       }
+      ]
+     }
+    ],
+    "resumo": "Na linha do tempo da cripto: 24/09/2021, china declara ilegais as atividades de negócio com moeda virtual (Circular 237).",
+    "limites": [
+     "Sem a variação do preço em cada data: o repertório ainda não tem cotação licenciada do bitcoin."
+    ]
+   },
+   "regulacao": {
+    "titulo": "Linha do tempo da cripto desde 2016 (fato, sem preço)",
+    "linhas": [
+     {
+      "texto": "22/12/2022: Lei 14.478/2022, o marco legal dos ativos virtuais, é publicada.",
+      "fontes": [
+       {
+        "nome": "Fonte primária do evento de 22/12/2022",
+        "url": "https://www.planalto.gov.br/ccivil_03/_ato2019-2022/2022/lei/l14478.htm"
+       }
+      ]
+     },
+     {
+      "texto": "08/10/2025: A MP 1.303/2025 (17,5% sobre cripto) perde a validade sem votação.",
+      "fontes": [
+       {
+        "nome": "Fonte primária do evento de 08/10/2025",
+        "url": "https://www2.camara.leg.br/legin/fed/atodecpm/2025/atodeclaratoriodopresidentedamesa-67-14-outubro-2025-798130-publicacaooriginal-176721-cn.html"
+       }
+      ]
+     },
+     {
+      "texto": "10/11/2025: O Banco Central publica as regras das corretoras de cripto (Resoluções 519, 520 e 521).",
+      "fontes": [
+       {
+        "nome": "Fonte primária do evento de 10/11/2025",
+        "url": "https://www.bcb.gov.br/estabilidadefinanceira/exibenormativo?tipo=Resolu%C3%A7%C3%A3o%20BCB&numero=519"
+       }
+      ]
+     },
+     {
+      "texto": "02/02/2026: As regras do Banco Central entram em vigor; stablecoin passa a ser câmbio.",
+      "fontes": [
+       {
+        "nome": "Fonte primária do evento de 02/02/2026",
+        "url": "https://www.bcb.gov.br/estabilidadefinanceira/exibenormativo?tipo=Resolu%C3%A7%C3%A3o%20BCB&numero=520"
+       }
+      ]
+     },
+     {
+      "texto": "23/09/2026: O Banco Central marca 06/11/2026 para bancos pararem de operar com corretora não autorizada.",
+      "fontes": [
+       {
+        "nome": "Fonte primária do evento de 23/09/2026",
+        "url": "https://www.bcb.gov.br/estabilidadefinanceira/exibenormativo?tipo=Resolu%C3%A7%C3%A3o%20BCB&numero=589"
+       }
+      ]
+     }
+    ],
+    "resumo": "Na linha do tempo da cripto: 22/12/2022, lei 14.478/2022, o marco legal dos ativos virtuais, é publicada; 08/10/2025, A MP 1.303/2025 (17,5% sobre cripto) perde a validade sem votação; 10/11/2025, O Banco Central publica as regras das corretoras de cripto (Resoluções 519, 520 e 521).",
+    "limites": [
+     "Sem a variação do preço em cada data: o repertório ainda não tem cotação licenciada do bitcoin."
+    ]
+   },
+   "stablecoin": {
+    "titulo": "Linha do tempo da cripto desde 2016 (fato, sem preço)",
+    "linhas": [
+     {
+      "texto": "18/07/2025: Lei das stablecoins (GENIUS Act) é sancionada nos EUA.",
+      "fontes": [
+       {
+        "nome": "Fonte primária do evento de 18/07/2025",
+        "url": "https://www.govinfo.gov/app/details/PLAW-119publ27"
+       }
+      ]
+     },
+     {
+      "texto": "02/02/2026: As regras do Banco Central entram em vigor; stablecoin passa a ser câmbio.",
+      "fontes": [
+       {
+        "nome": "Fonte primária do evento de 02/02/2026",
+        "url": "https://www.bcb.gov.br/estabilidadefinanceira/exibenormativo?tipo=Resolu%C3%A7%C3%A3o%20BCB&numero=520"
+       }
+      ]
+     }
+    ],
+    "resumo": "Na linha do tempo da cripto: 18/07/2025, lei das stablecoins (GENIUS Act) é sancionada nos EUA; 02/02/2026, as regras do Banco Central entram em vigor; stablecoin passa a ser câmbio.",
+    "limites": [
+     "Sem a variação do preço em cada data: o repertório ainda não tem cotação licenciada do bitcoin."
+    ]
+   },
+   "binance": {
+    "titulo": "Linha do tempo da cripto desde 2016 (fato, sem preço)",
+    "linhas": [
+     {
+      "texto": "21/11/2023: Binance e o fundador fecham acordo com o governo dos EUA (US$ 4,3 bilhões).",
+      "fontes": [
+       {
+        "nome": "Fonte primária do evento de 21/11/2023",
+        "url": "https://home.treasury.gov/news/press-releases/jy1925"
+       }
+      ]
+     }
+    ],
+    "resumo": "Na linha do tempo da cripto: 21/11/2023, binance e o fundador fecham acordo com o governo dos EUA (US$ 4,3 bilhões).",
+    "limites": [
+     "Sem a variação do preço em cada data: o repertório ainda não tem cotação licenciada do bitcoin."
+    ]
+   }
+  },
+  "temas": {
+   "halving": "\\bhalving\\b|\\bhalvings\\b|\\bcorte da recompensa\\b",
+   "etf": "\\betfs?\\b|\\bhash11\\b|\\bfundo de indice\\b",
+   "ftx": "\\bftx\\b|\\bquebr\\w* (de|da) (corretora|exchange)\\b|\\bfaliu\\b|\\bfalencia\\b",
+   "trump": "\\btrump\\b|\\breserva estrategica\\b",
+   "china": "\\bchina\\b|\\bchines\\w*\\b",
+   "regulacao": "\\bregul\\w*|\\blei\\b|\\bbanco central\\b|\\bautoriza\\w*|\\blegal\\b|\\bproibi\\w*",
+   "stablecoin": "\\bstablecoins?\\b|\\busdt\\b|\\busdc\\b|\\btether\\b",
+   "binance": "\\bbinance\\b"
+  },
+  "titulos": [
+   "Linha do tempo da cripto desde 2016 (fato, sem preço)",
+   "Como funciona a cripto no Brasil",
+   "Imposto e formas de ter cripto no Brasil (regra conferida em 23/10/2026)",
+   "Riscos da cripto, com caso e fonte (fato)"
+  ]
+ },
+ "dois_lados": {
+  "ibovespa": {
+   "titulo": "Os dois lados, no que já aconteceu (o Ibovespa, últimos 12 meses até 20/10/2026)",
+   "linhas": [
+    {
+     "texto": "Quando caiu: a maior queda em um dia foi de 4,31% (05/12/2025); em 21 pregões seguidos (cerca de um mês), a maior queda foi de 11,45% (de 16/04/2026 a 19/05/2026).",
+     "fontes": [
+      {
+       "nome": "Ipeadata, série GM366_IBVSP366 (fechamento do Ibovespa na B3)",
+       "url": "http://www.ipeadata.gov.br/api/odata4/ValoresSerie(SERCODIGO='GM366_IBVSP366')"
+      },
+      {
+       "nome": "Cálculo próprio: estudo de evento 2016–2026 sobre as séries oficiais (método no cofre, nota \"Estudo de evento 2016–2026\")",
+       "url": ""
+      }
+     ]
+    },
+    {
+     "texto": "Quando subiu: a maior alta em um dia foi de 7,70% (05/10/2026); em 21 pregões seguidos (cerca de um mês), a maior alta foi de 17,12% (de 13/01/2026 a 11/02/2026).",
+     "fontes": [
+      {
+       "nome": "Ipeadata, série GM366_IBVSP366 (fechamento do Ibovespa na B3)",
+       "url": "http://www.ipeadata.gov.br/api/odata4/ValoresSerie(SERCODIGO='GM366_IBVSP366')"
+      },
+      {
+       "nome": "Cálculo próprio: estudo de evento 2016–2026 sobre as séries oficiais (método no cofre, nota \"Estudo de evento 2016–2026\")",
+       "url": ""
+      }
+     ]
+    },
+    {
+     "texto": "Taxa-base do Ibovespa: nos 2.682 pregões de 05/01/2016 a 20/10/2026, ele subiu mais de 4% em 0,7% dos dias e caiu mais de 4% em 0,6%; a variação típica (mediana, em módulo) foi de 0,74%.",
+     "fontes": [
+      {
+       "nome": "Ipeadata, série GM366_IBVSP366 (fechamento do Ibovespa na B3)",
+       "url": "http://www.ipeadata.gov.br/api/odata4/ValoresSerie(SERCODIGO='GM366_IBVSP366')"
+      },
+      {
+       "nome": "Cálculo próprio: estudo de evento 2016–2026 sobre as séries oficiais (método no cofre, nota \"Estudo de evento 2016–2026\")",
+       "url": ""
+      }
+     ]
+    },
+    {
+     "texto": "O histórico mostra os dois lados, não o próximo movimento: a decisão é sua.",
+     "fontes": []
+    }
+   ],
+   "resumo": "Os dois lados nos últimos 12 meses: o Ibovespa teve dia de queda de até 4,31% e de alta de até 7,70%; em cerca de um mês, caiu até 11,45% e subiu até 17,12%. O histórico mostra os dois lados, não o próximo movimento: a decisão é sua.",
+   "limites": [
+    "Os dois lados são do passado e da mesma janela; o próximo movimento pode ser maior, menor ou de outro lado."
+   ]
+  },
+  "dolar": {
+   "titulo": "Os dois lados, no que já aconteceu (o dólar, últimos 12 meses até 22/10/2026)",
+   "linhas": [
+    {
+     "texto": "Quando caiu: a maior queda em um dia foi de 4,55% (05/10/2026); em 21 pregões seguidos (cerca de um mês), a maior queda foi de 7,00% (de 29/12/2025 a 28/01/2026).",
+     "fontes": [
+      {
+       "nome": "Banco Central, SGS 1 (dólar PTAX de venda)",
+       "url": "https://api.bcb.gov.br/dados/serie/bcdata.sgs.1/dados/ultimos/1?formato=json"
+      },
+      {
+       "nome": "Cálculo próprio: estudo de evento 2016–2026 sobre as séries oficiais (método no cofre, nota \"Estudo de evento 2016–2026\")",
+       "url": ""
+      }
+     ]
+    },
+    {
+     "texto": "Quando subiu: a maior alta em um dia foi de 1,92% (18/06/2026); em 21 pregões seguidos (cerca de um mês), a maior alta foi de 5,70% (de 11/05/2026 a 10/06/2026).",
+     "fontes": [
+      {
+       "nome": "Banco Central, SGS 1 (dólar PTAX de venda)",
+       "url": "https://api.bcb.gov.br/dados/serie/bcdata.sgs.1/dados/ultimos/1?formato=json"
+      },
+      {
+       "nome": "Cálculo próprio: estudo de evento 2016–2026 sobre as séries oficiais (método no cofre, nota \"Estudo de evento 2016–2026\")",
+       "url": ""
+      }
+     ]
+    },
+    {
+     "texto": "Taxa-base do dólar: nos 2.711 pregões de 05/01/2016 a 22/10/2026, ele subiu mais de 1% em 10,3% dos dias e caiu mais de 1% em 9,6%; a variação típica (mediana, em módulo) foi de 0,47%.",
+     "fontes": [
+      {
+       "nome": "Banco Central, SGS 1 (dólar PTAX de venda)",
+       "url": "https://api.bcb.gov.br/dados/serie/bcdata.sgs.1/dados/ultimos/1?formato=json"
+      },
+      {
+       "nome": "Cálculo próprio: estudo de evento 2016–2026 sobre as séries oficiais (método no cofre, nota \"Estudo de evento 2016–2026\")",
+       "url": ""
+      }
+     ]
+    },
+    {
+     "texto": "O histórico mostra os dois lados, não o próximo movimento: a decisão é sua.",
+     "fontes": []
+    }
+   ],
+   "resumo": "Os dois lados nos últimos 12 meses: o dólar teve dia de queda de até 4,55% e de alta de até 1,92%; em cerca de um mês, caiu até 7,00% e subiu até 5,70%. O histórico mostra os dois lados, não o próximo movimento: a decisão é sua.",
+   "limites": [
+    "Os dois lados são do passado e da mesma janela; o próximo movimento pode ser maior, menor ou de outro lado."
+   ]
+  },
+  "euro": {
+   "titulo": "Os dois lados, no que já aconteceu (o euro, últimos 12 meses até 22/10/2026)",
+   "linhas": [
+    {
+     "texto": "Quando caiu: a maior queda em um dia foi de 4,96% (05/10/2026); em 21 pregões seguidos (cerca de um mês), a maior queda foi de 6,11% (de 10/09/2026 a 09/10/2026).",
+     "fontes": [
+      {
+       "nome": "Banco Central, SGS 21619 (euro PTAX de venda)",
+       "url": "https://api.bcb.gov.br/dados/serie/bcdata.sgs.21619/dados/ultimos/1?formato=json"
+      },
+      {
+       "nome": "Cálculo próprio: estudo de evento 2016–2026 sobre as séries oficiais (método no cofre, nota \"Estudo de evento 2016–2026\")",
+       "url": ""
+      }
+     ]
+    },
+    {
+     "texto": "Quando subiu: a maior alta em um dia foi de 1,37% (08/12/2025); em 21 pregões seguidos (cerca de um mês), a maior alta foi de 5,76% (de 27/11/2025 a 29/12/2025).",
+     "fontes": [
+      {
+       "nome": "Banco Central, SGS 21619 (euro PTAX de venda)",
+       "url": "https://api.bcb.gov.br/dados/serie/bcdata.sgs.21619/dados/ultimos/1?formato=json"
+      },
+      {
+       "nome": "Cálculo próprio: estudo de evento 2016–2026 sobre as séries oficiais (método no cofre, nota \"Estudo de evento 2016–2026\")",
+       "url": ""
+      }
+     ]
+    },
+    {
+     "texto": "Taxa-base do euro: nos 2.709 pregões de 05/01/2016 a 22/10/2026, ele subiu mais de 1% em 10,1% dos dias e caiu mais de 1% em 9,3%; a variação típica (mediana, em módulo) foi de 0,48%.",
+     "fontes": [
+      {
+       "nome": "Banco Central, SGS 21619 (euro PTAX de venda)",
+       "url": "https://api.bcb.gov.br/dados/serie/bcdata.sgs.21619/dados/ultimos/1?formato=json"
+      },
+      {
+       "nome": "Cálculo próprio: estudo de evento 2016–2026 sobre as séries oficiais (método no cofre, nota \"Estudo de evento 2016–2026\")",
+       "url": ""
+      }
+     ]
+    },
+    {
+     "texto": "O histórico mostra os dois lados, não o próximo movimento: a decisão é sua.",
+     "fontes": []
+    }
+   ],
+   "resumo": "Os dois lados nos últimos 12 meses: o euro teve dia de queda de até 4,96% e de alta de até 1,37%; em cerca de um mês, caiu até 6,11% e subiu até 5,76%. O histórico mostra os dois lados, não o próximo movimento: a decisão é sua.",
+   "limites": [
+    "Os dois lados são do passado e da mesma janela; o próximo movimento pode ser maior, menor ou de outro lado."
+   ]
+  },
+  "juros": {
+   "titulo": "Os dois lados, no que já aconteceu (o juro prefixado de 5 anos, últimos 12 meses até 15/10/2026)",
+   "linhas": [
+    {
+     "texto": "Quando caiu: a maior queda em um dia foi de 120 pontos-base (05/10/2026); em 21 pregões seguidos (cerca de um mês), a maior queda foi de 174 pontos-base (de 10/09/2026 a 09/10/2026).",
+     "fontes": [
+      {
+       "nome": "Tesouro Direto, taxas dos títulos prefixados (Tesouro Transparente)",
+       "url": "https://www.tesourotransparente.gov.br/ckan/dataset/df56aa42-484a-4a59-8184-7676580c81e3/resource/796d2059-14e9-44e3-80c9-2d9e30b405c1/download/precotaxatesourodireto.csv"
+      },
+      {
+       "nome": "Cálculo próprio: estudo de evento 2016–2026 sobre as séries oficiais (método no cofre, nota \"Estudo de evento 2016–2026\")",
+       "url": ""
+      }
+     ]
+    },
+    {
+     "texto": "Quando subiu: a maior alta em um dia foi de 48 pontos-base (08/12/2025); em 21 pregões seguidos (cerca de um mês), a maior alta foi de 124 pontos-base (de 26/02/2026 a 27/03/2026).",
+     "fontes": [
+      {
+       "nome": "Tesouro Direto, taxas dos títulos prefixados (Tesouro Transparente)",
+       "url": "https://www.tesourotransparente.gov.br/ckan/dataset/df56aa42-484a-4a59-8184-7676580c81e3/resource/796d2059-14e9-44e3-80c9-2d9e30b405c1/download/precotaxatesourodireto.csv"
+      },
+      {
+       "nome": "Cálculo próprio: estudo de evento 2016–2026 sobre as séries oficiais (método no cofre, nota \"Estudo de evento 2016–2026\")",
+       "url": ""
+      }
+     ]
+    },
+    {
+     "texto": "Taxa-base do juro prefixado de 5 anos: nos 2.684 pregões de 05/01/2016 a 15/10/2026, ele subiu mais de 30 p.b. em 2,4% dos dias e caiu mais de 30 p.b. em 2,1%; a variação típica (mediana, em módulo) foi de 7 p.b..",
+     "fontes": [
+      {
+       "nome": "Tesouro Direto, taxas dos títulos prefixados (Tesouro Transparente)",
+       "url": "https://www.tesourotransparente.gov.br/ckan/dataset/df56aa42-484a-4a59-8184-7676580c81e3/resource/796d2059-14e9-44e3-80c9-2d9e30b405c1/download/precotaxatesourodireto.csv"
+      },
+      {
+       "nome": "Cálculo próprio: estudo de evento 2016–2026 sobre as séries oficiais (método no cofre, nota \"Estudo de evento 2016–2026\")",
+       "url": ""
+      }
+     ]
+    },
+    {
+     "texto": "O histórico mostra os dois lados, não o próximo movimento: a decisão é sua.",
+     "fontes": []
+    }
+   ],
+   "resumo": "Os dois lados nos últimos 12 meses: o juro prefixado de 5 anos teve dia de queda de até 120 pontos-base (100 pontos-base = 1 ponto percentual) e de alta de até 48 pontos-base; em cerca de um mês, caiu até 174 pontos-base e subiu até 124 pontos-base. O histórico mostra os dois lados, não o próximo movimento: a decisão é sua.",
+   "limites": [
+    "Os dois lados são do passado e da mesma janela; o próximo movimento pode ser maior, menor ou de outro lado."
+   ]
+  }
+ },
+ "titulo_dois_lados": "Os dois lados, no que já aconteceu",
  "resumo_hoje": "Hoje, pelo dado oficial:"
 }

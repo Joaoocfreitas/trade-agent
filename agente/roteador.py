@@ -52,7 +52,8 @@ MERCADOS = {
              r'|para fora|do exterior|de fora|para o exterior|pro exterior)\b',
     'euro': r'\beuros?\b|\beur\b',
     'juros': r'\bjuros\b|\bdi1?\b|\bdi futuro\b|\bselic\b|\brenda fixa\b|\btesouro\b|\bprefixad\w*',
-    'cripto': r'\bcripto\w*|\bbitcoin\b|\bbtc\b|\bethereum\b|\bexchanges?\b|\bstablecoins?\b|\bsolana\b',
+    'cripto': r'\bcripto\w*|\bbitcoin\b|\bbtc\b|\bethereum\b|\bexchanges?\b|\bstablecoins?\b|\bsolana\b'
+              r'|\bhalving\b|\bftx\b|\busdt\b|\busdc\b|\btether\b',
     'memecoin': r'\bmeme ?coins?\b|\bmemecoins?\b|\$trump\b|\$libra\b|\$melania\b|\btokens?\b|\bmoeda do candidato\b',
     'previsao': r'\bpolymarket\b|\bkalshi\b|\bmercados? de previs\w*',
 }

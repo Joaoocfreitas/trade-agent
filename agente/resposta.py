@@ -68,6 +68,10 @@ def escolher_blocos(p: Pedido, hoje: str) -> list[F.Bloco]:
                if m in F.HISTORICO]
     if not tem_evento and medidos:
         blocos += [F.historico(m) for m in medidos]
+        # Quem pede o que fazer ou para onde vai recebe os dois lados do que já aconteceu, não uma recomendação. Em contrato
+        # (WIN, WDO) não: o lado que importa é a taxa-base da FGV, que precisa caber nas 3 linhas.
+        if {'dica', 'direcao', 'momento'} & set(p.proibidos) and not {'mini_indice', 'mini_dolar'} & set(p.mercados):
+            blocos.append(F.dois_lados(medidos[0]))
         blocos += [F.expectativas(medidos[0]), F.calendario(medidos[0], hoje)]
     elif 'economia' in p.temas or 'copom' in p.temas:
         blocos.append(F.expectativas(medidos[0] if medidos else ''))
@@ -83,6 +87,16 @@ def escolher_blocos(p: Pedido, hoje: str) -> list[F.Bloco]:
         if m == 'ibovespa' and 'mini_indice' in p.mercados:
             continue  # pergunta de contrato: a regra de IR das ações à vista não vale para o WIN
         blocos.append(F.mercado(m))
+        if m == 'cripto':
+            # Regras, imposto, riscos e a linha do tempo. Se a pessoa citou um tema (halving, FTX, ETF...), a linha do
+            # tempo vem antes das regras.
+            tema = F.tema_cripto(normalizar(p.pergunta))
+            extra = [F.cripto_imposto(), F.cripto_riscos()]
+            if tema:
+                blocos[-1:-1] = [F.cripto_marcos(tema)]
+                blocos += extra
+            else:
+                blocos += extra + [F.cripto_marcos()]
     if pede_dinheiro or set(DERIVATIVOS[:2]) & set(p.mercados):
         blocos.append(F.fgv())
     # O estudo do Copom e da linha do tempo mede o dólar, não o euro: dizer isso, em vez de responder só com o dólar.
@@ -91,9 +105,21 @@ def escolher_blocos(p: Pedido, hoje: str) -> list[F.Bloco]:
     blocos = [b for b in blocos if b]
     if p.cambio:
         blocos = _cambio_primeiro(p, blocos)
+    if 'cripto' in p.mercados:
+        blocos = _cripto_primeiro(blocos)
     if not blocos:
         blocos.append(F.economia())
     return blocos
+
+
+CRIPTO_TITULOS = (F.TITULO_MARCOS, F.TITULO_CRIPTO, F.TITULO_CRIPTO_IMPOSTO, F.TITULO_CRIPTO_RISCOS)
+
+
+def _cripto_primeiro(blocos: list[F.Bloco]) -> list[F.Bloco]:
+    """Pergunta que cita cripto: os blocos de cripto na frente ("ETF de bitcoin na B3" fala de cripto, não do nível do
+    Ibovespa), na ordem em que já estavam."""
+    eh = lambda b: b.titulo in CRIPTO_TITULOS  # noqa: E731
+    return [b for b in blocos if eh(b)] + [b for b in blocos if not eh(b)]
 
 
 def _cambio_primeiro(p: Pedido, blocos: list[F.Bloco]) -> list[F.Bloco]:
@@ -219,6 +245,11 @@ def renderizar(r: Resposta) -> tuple[str, str]:
             if i < len(fs) and fs[i] not in das_linhas:
                 das_linhas.append(fs[i])
     curto = list(topo)
+    # A versão curta só leva as 3 linhas: se elas falam de cripto e nenhuma diz que não é valor mobiliário (D5), o aviso
+    # de cripto entra mesmo que o bloco dele esteja no texto inteiro.
+    if (T.RISCO_CRIPTO not in avisos and {'cripto', 'memecoin'} & set(r.pedido.mercados)
+            and not any('não é valor mobiliário' in x for x in r.curta)):
+        avisos = avisos + [T.RISCO_CRIPTO]
     curto += [''] + avisos if avisos else []
     if das_linhas:
         curto += ['', 'Fontes: ' + ' · '.join(f'{f.nome}: {f.url}' for f in das_linhas[:4])]

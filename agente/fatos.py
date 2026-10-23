@@ -304,6 +304,53 @@ LIMITE_PTAX_EURO = ('Os números do euro são da PTAX de venda do Banco Central.
                     'app de remessa), a cotação é outra e pode haver tarifa, spread e IOF.')
 
 
+# ---------- os dois lados: quando caiu e quando subiu (P2, sem manchete de direção) ----------
+
+TITULO_DOIS_LADOS = 'Os dois lados, no que já aconteceu'
+MES_PREGOES = 21  # cerca de um mês de pregões
+
+
+def _lado(v: float, casas: int, un: str, queda: bool) -> str:
+    """O maior movimento de um lado, em palavras; se esse lado não aconteceu na janela, diz isso."""
+    if (v < 0) == queda and v != 0:
+        return f'{num(abs(v), casas)}{un}'
+    return f'nenhuma {"queda" if queda else "alta"} (o mais perto foi {"alta" if queda else "queda"} de {num(abs(v), casas)}{un})'
+
+
+def dois_lados(mercado: str) -> Bloco:
+    """Para quem pergunta se compra ou para onde vai: o que já aconteceu dos dois lados nos últimos 12 meses, na mesma
+    ordem e com os mesmos espaços (quando caiu, quando subiu), mais a taxa-base. Nunca o próximo movimento."""
+    nome, serie_nome, fonte, _ = HISTORICO[mercado]
+    s = serie(serie_nome)
+    d_fim = s.index[-1]
+    juros = serie_nome.startswith('pre_')
+    if juros:
+        r, mes_, un, casas = s.diff() * 100, (s - s.shift(MES_PREGOES)) * 100, PONTOS_BASE, 0
+    else:
+        r, mes_, un, casas = s.pct_change() * 100, (s / s.shift(MES_PREGOES) - 1) * 100, '%', 2
+    na_janela = s.index > d_fim - pd.DateOffset(years=1)
+    r12, m12 = r[na_janela].dropna(), mes_[na_janela].dropna()
+    d_q, d_a, m_q, m_a = r12.idxmin(), r12.idxmax(), m12.idxmin(), m12.idxmax()
+    inicio = lambda d: s.index[s.index.get_loc(d) - MES_PREGOES]  # noqa: E731
+    fontes = (fonte, F_ESTUDO)
+    b = Bloco(f'{TITULO_DOIS_LADOS} ({nome}, últimos 12 meses até {dia(d_fim)})')
+    # As duas linhas com o mesmo molde, palavra por palavra, trocando só queda por alta (o tamanho igual é parte da regra).
+    for rotulo, palavra, d_dia, d_mes, queda in (('Quando caiu', 'queda', d_q, m_q, True), ('Quando subiu', 'alta', d_a, m_a, False)):
+        b.add(f'{rotulo}: a maior {palavra} em um dia foi de {_lado(r12[d_dia], casas, un, queda)} ({dia(d_dia)}); em '
+              f'{MES_PREGOES} pregões seguidos (cerca de um mês), a maior {palavra} foi de {_lado(m12[d_mes], casas, un, queda)} '
+              f'(de {dia(inicio(d_mes))} a {dia(d_mes)}).', *fontes)
+    b.linhas.append(taxa_base(mercado, nome.split(' ', 1)[1]))
+    b.add(DECISAO_SUA)
+    b.limites.append('Os dois lados são do passado e da mesma janela; o próximo movimento pode ser maior, menor ou de outro lado.')
+    b.resumo = (f'Os dois lados nos últimos 12 meses: {nome} teve dia de queda de até {_lado(r12[d_q], casas, un, True)}'
+                + (EXPLICA_PB if juros else '') + f' e de alta de até {_lado(r12[d_a], casas, un, False)}; em cerca de um mês, '
+                f'caiu até {_lado(m12[m_q], casas, un, True)} e subiu até {_lado(m12[m_a], casas, un, False)}. {DECISAO_SUA}')
+    return b
+
+
+DECISAO_SUA = 'O histórico mostra os dois lados, não o próximo movimento: a decisão é sua.'
+
+
 # ---------- o que o mercado espera (Focus) e as datas marcadas ----------
 
 DIAS_DA_SEMANA = ('segunda', 'terça', 'quarta', 'quinta', 'sexta', 'sábado', 'domingo')
@@ -727,11 +774,7 @@ def mercado(chave: str) -> Bloco | None:
               'para pessoa física; day trade não tem essa isenção.', F_LEI_11033, F_RECEITA_ISENCAO)
         return b
     elif chave == 'cripto':
-        b = Bloco(TITULO_CRIPTO)
-        b.add(f'{RISCO_CRIPTO_FATO}', F_LEI_14478, F_PARECER_40, F_BCB_520)
-        b.add('As corretoras de cripto que já operavam têm até 30/10/2026 para pedir a autorização do Banco Central, e '
-              'toda prestadora tem de informar no site e no app se tem autorização ou pedido em análise.', F_IN_704, F_BCB_520)
-        return b
+        return _bloco_json(_cripto()['regras'])
     else:
         return None
     b.add('A margem é só garantia: o ajuste diário debita ou credita a conta a cada pregão, e, se faltar saldo, a corretora '
@@ -907,6 +950,67 @@ def conta_cambio(valor: float, moeda: str, gasto: float | None = None, gasto_moe
     b.resumo = (f'Pela cotação oficial de {dia(c["data"])}, seus {_qtd(valor)} {plural} equivalem a R$ {_reais(hoje_r)}; na '
                 f'troca de verdade entram a tarifa e o spread do banco ou do app. Cada R$ 0,10 de diferença no {nome} muda '
                 f'isso em R$ {_reais(valor * 0.1)}{cobre}.')
+    return b
+
+
+# ---------- cripto: regras, imposto, riscos e a linha do tempo (sem preço: falta licença da cotação) ----------
+
+def _cripto() -> dict:
+    return _json('agente/cripto.json')
+
+
+def _fontes_json(fs: list[dict]) -> tuple[Fonte, ...]:
+    return tuple(Fonte(f['nome'], f['url']) for f in fs)
+
+
+def _bloco_json(d: dict) -> Bloco:
+    b = Bloco(d['titulo'])
+    for ln in d['linhas']:
+        b.add(ln['texto'], *_fontes_json(ln['fontes']))
+    b.resumo = d.get('resumo', '')
+    b.limites = list(d.get('limites', []))
+    return b
+
+
+TITULO_CRIPTO_IMPOSTO = 'Imposto e formas de ter cripto no Brasil (regra conferida em 23/10/2026)'
+TITULO_CRIPTO_RISCOS = 'Riscos da cripto, com caso e fonte (fato)'
+
+
+def cripto_imposto() -> Bloco:
+    b = _bloco_json(_cripto()['imposto'])
+    assert b.titulo == TITULO_CRIPTO_IMPOSTO
+    return b
+
+
+def cripto_riscos() -> Bloco:
+    b = _bloco_json(_cripto()['riscos'])
+    assert b.titulo == TITULO_CRIPTO_RISCOS
+    return b
+
+
+TITULO_MARCOS = 'Linha do tempo da cripto desde 2016 (fato, sem preço)'
+
+
+def tema_cripto(pergunta_normalizada: str) -> str:
+    """O 1º tema da linha do tempo que a pergunta cita ('halving', 'ftx'...), ou '' se nenhum."""
+    return next((k for k, t in _cripto()['temas'].items() if re.search(t['regex'], pergunta_normalizada)), '')
+
+
+def cripto_marcos(tema: str = '') -> Bloco:
+    """Os marcos do tema que a pessoa citou; sem tema, todos. Só o fato e a data: a reação do preço espera a licença."""
+    c = _cripto()
+    datas = set(c['temas'][tema]['datas']) if tema else None
+    marcos = [m for m in c['marcos'] if datas is None or m['data'] in datas]
+    b = Bloco(TITULO_MARCOS)
+    if tema == 'halving':
+        h = c['halving']
+        b.add(h['texto'], *_fontes_json(h['fontes']))
+    for m in marcos:
+        b.add(f'{dia(m["data"])}: {m["titulo"]}.', *_fontes_json(m['fontes']))
+    if tema:
+        minuscula = lambda t: t[0].lower() + t[1:] if t[1:2].islower() else t  # "HASH11" fica, "Halving" vira "halving"  # noqa: E731
+        b.resumo = 'Na linha do tempo da cripto: ' + '; '.join(f'{dia(m["data"])}, {minuscula(m["titulo"])}' for m in marcos[:3]) + '.'
+    b.limites.append('Sem a variação do preço em cada data: o repertório ainda não tem cotação licenciada do bitcoin.')
     return b
 
 
