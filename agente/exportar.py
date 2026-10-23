@@ -54,6 +54,7 @@ def base() -> dict:
         'gerado_em': datetime.now(FUSO).isoformat(timespec='seconds'),
         'textos': {
             'AVISO': T.AVISO, 'RECUSA': T.RECUSA, 'FECHO': T.FECHO, 'RISCO_DERIVATIVO': T.RISCO_DERIVATIVO,
+            'RISCO_DERIVATIVO_CRIPTO': T.RISCO_DERIVATIVO_CRIPTO, 'SEM_PRECO_CRIPTO': T.SEM_PRECO_CRIPTO,
             'RISCO_CRIPTO': T.RISCO_CRIPTO, 'POR_PEDIDO': T.POR_PEDIDO, 'PEDEM_RECUSA': sorted(T.PEDEM_RECUSA),
             'VOTO_INFORMADO': T.VOTO_INFORMADO, 'SEM_REPERTORIO': T.SEM_REPERTORIO, 'NORMAS': T.NORMAS, 'SEGURA': SEGURA,
             'LIMITE_CRIPTO_ELEICAO': LIMITE_CRIPTO_ELEICAO, 'INSTRUCOES_IA': INSTRUCOES,
@@ -150,6 +151,16 @@ EXTRAS = [
     'ETF de bitcoin na B3', 'stablecoin é câmbio?', 'Binance é segura?', 'bitcoin vai subir?',
     'como funciona o imposto do bitcoin?', 'o dólar vai cair?', 'compro ibovespa?', 'euro sobe?', 'China e bitcoin',
     'regulação de cripto no Brasil', 'USDT é seguro?', 'devo vender meus prefixados?',
+    # 23/10/2026, achados da revisão da cripto e dos dois lados.
+    'o trump vai fazer o bitcoin explodir?', 'bitcoin to the moon?', 'eth vai pumpar?', 'doge ou shiba, qual explode?',
+    'usdt ou dolar, qual o melhor?', 'tiro meu btc da exchange e boto na carteira fria?', 'ibovespa vai a 250 mil?',
+    'bitcoin chega a 100 mil?', 'o que é pump and dump em cripto?', 'a Binance é confiável?', 'essa corretora é segura?',
+    'Binance e o governo dos EUA', 'o que é HASH11?', 'a lei das stablecoins nos EUA', 'que legal, quando surgiu o bitcoin?',
+    'o que é halving?', 'o que é stablecoin?', 'o que é ETF de bitcoin?', 'quanto tá o bitcoin hoje?', 'bitcoin caiu hoje?',
+    'o que aconteceu com o bitcoin quando o Trump ganhou?', 'preciso declarar bitcoin?', 'ETF de bitcoin na B3 paga imposto?',
+    'futuro de bitcoin na B3 vale a pena?', 'devo comprar bitcoin?', 'should I exchange my euros now?',
+    'tenho 10 mil dólares em USDT, quanto dá em reais?', 'o dólar vai cair? e o ibovespa?', 'dá pra ficar rico com bitcoin?',
+    'a china proibiu bitcoin?', 'e se a exchange quebrar?',
 ]
 
 

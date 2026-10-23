@@ -31,7 +31,7 @@
     ]
    },
    {
-    "texto": "As corretoras de cripto que já operavam têm até 30/10/2026 para pedir autorização ao Banco Central. A partir de 06/11/2026, bancos e instituições de pagamento, inclusive no Pix, não podem operar com corretora de cripto não autorizada.",
+    "texto": "As corretoras de cripto que já operavam têm até 30/10/2026 para pedir autorização ao Banco Central, e quem pede a tempo pode seguir operando até a decisão. A Resolução BCB 589 proíbe bancos e instituições de pagamento, inclusive no Pix, de operar a partir de 06/11/2026 com corretora não autorizada; o texto novo tirou a ressalva de quem está \"em processo de autorização\", e até 23/10/2026 o Banco Central não esclareceu se quem pediu a tempo fica fora desse corte.",
     "fontes": [
      {
       "nome": "Resolução BCB 520/2025",
@@ -57,12 +57,17 @@
     ]
    },
    {
-    "texto": "Desde 02/02/2026, comprar ou vender stablecoin (cripto atrelada a moeda, como USDT e USDC) e mandar cripto de ou para carteira própria é operação de câmbio; a corretora identifica o dono da carteira, e transferências a partir de US$ 10 mil vão ao Coaf.",
+    "texto": "Desde 02/02/2026, comprar ou vender stablecoin (cripto atrelada a moeda, como USDT e USDC) e mandar cripto de ou para carteira própria é operação de câmbio, e a corretora tem de identificar o dono da carteira própria.",
     "fontes": [
      {
       "nome": "Resolução BCB 521/2025",
       "url": "https://www.bcb.gov.br/estabilidadefinanceira/exibenormativo?tipo=Resolu%C3%A7%C3%A3o%20BCB&numero=521"
-     },
+     }
+    ]
+   },
+   {
+    "texto": "Desde 01/10/2026, a corretora comunica ao Coaf (o órgão que fiscaliza lavagem de dinheiro) as transferências de cripto de ou para carteira própria a partir do equivalente a US$ 10 mil.",
+    "fontes": [
      {
       "nome": "Resolução BCB 591/2026",
       "url": "https://www.bcb.gov.br/estabilidadefinanceira/exibenormativo?tipo=Resolu%C3%A7%C3%A3o%20BCB&numero=591"
@@ -79,9 +84,10 @@
     ]
    }
   ],
-  "resumo": "Bitcoin à vista, em regra, não é valor mobiliário: quem regula as corretoras é o Banco Central, não a CVM, e não há garantia do FGC. As corretoras têm até 30/10/2026 para pedir autorização, e a partir de 06/11/2026 banco e Pix não podem operar com corretora não autorizada.",
+  "resumo": "Bitcoin à vista, em regra, não é valor mobiliário: quem regula as corretoras é o Banco Central, não a CVM, e não há garantia do FGC (o fundo que protege depósito em banco). As corretoras têm até 30/10/2026 para pedir autorização ao Banco Central; se o corte de banco e Pix de 06/11/2026 alcança quem pediu a tempo, o Banco Central ainda não esclareceu.",
   "limites": [
-   "Regras conferidas na fonte em 23/10/2026; as de 2025 e 2026 ainda estão entrando em vigor, e vale a norma do Banco Central na data da operação."
+   "Regras conferidas na fonte em 23/10/2026; as de 2025 e 2026 ainda estão entrando em vigor, e vale a norma do Banco Central na data da operação.",
+   "Em aberto: a Resolução BCB 589 tirou a ressalva de quem está \"em processo de autorização\", o que conflita com a regra de que quem pediu a tempo segue operando (Resolução BCB 520, art. 88); até 23/10/2026 o Banco Central não esclareceu."
   ]
  },
  "imposto": {
@@ -101,6 +107,19 @@
      {
       "nome": "Receita Federal, Perguntas e Respostas IRPF 2026",
       "url": "https://www.gov.br/receitafederal/pt-br/centrais-de-conteudo/publicacoes/perguntas-e-respostas/dirpf/p-r-irpf-2026-v1-00-2026-04-23.pdf"
+     }
+    ]
+   },
+   {
+    "texto": "A isenção de R$ 35 mil é da venda da própria cripto. Cota de ETF e contrato futuro são negociados na bolsa: a isenção de R$ 20 mil da bolsa vale só para ações e ouro à vista, e a Receita diz que ela não vale para cota de fundo de índice (ETF) nem para day trade.",
+    "fontes": [
+     {
+      "nome": "Receita Federal, Perguntas e Respostas IRPF 2026",
+      "url": "https://www.gov.br/receitafederal/pt-br/centrais-de-conteudo/publicacoes/perguntas-e-respostas/dirpf/p-r-irpf-2026-v1-00-2026-04-23.pdf"
+     },
+     {
+      "nome": "Receita Federal, isenções na bolsa",
+      "url": "https://www.gov.br/receitafederal/pt-br/assuntos/meu-imposto-de-renda/pagamento/renda-variavel/bolsa-de-valores-1/isencoes"
      }
     ]
    },
@@ -144,7 +163,7 @@
     ]
    },
    {
-    "texto": "Formas de ter bitcoin: comprar numa corretora autorizada pelo Banco Central; guardar em carteira própria (quem guarda a chave é você, e perder a chave é perder o ativo); ETF na B3, por corretora de valores; ou futuro de bitcoin na B3, com margem e ajuste diário.",
+    "texto": "Formas de ter exposição ao bitcoin: comprar numa corretora de cripto no Brasil, regulada pelo Banco Central (a autorização ainda está em processo, e a corretora tem de informar no site e no app se tem autorização ou pedido em análise); guardar em carteira própria (quem guarda a chave é você, e perder a chave é perder o ativo); cota de ETF na B3, por corretora de valores; ou futuro de bitcoin na B3, que não entrega bitcoin (liquidação só em dinheiro), com margem e ajuste diário: a posição é alavancada, e a perda pode passar do que você depositou.",
     "fontes": [
      {
       "nome": "Resolução BCB 520/2025",
@@ -157,6 +176,10 @@
      {
       "nome": "Lei 6.385/1976 (mercado de valores mobiliários)",
       "url": "https://www.planalto.gov.br/ccivil_03/leis/l6385compilada.htm"
+     },
+     {
+      "nome": "B3 (Bora Investir), glossário: margem de garantia",
+      "url": "https://borainvestir.b3.com.br/glossario/margem-de-garantia/"
      }
     ]
    },
@@ -183,9 +206,10 @@
     ]
    }
   ],
-  "resumo": "Imposto: em corretora no Brasil, vendas de até R$ 35 mil por mês são isentas e, acima disso, o ganho paga 15%; em corretora no exterior, 15% por ano sem isenção. Também dá para ter bitcoin por ETF ou futuro na B3, que são regulados pela CVM.",
+  "resumo": "Imposto da cripto comprada direto: em corretora de cripto no Brasil, vendas de até R$ 35 mil por mês são isentas e, acima disso, o ganho paga 15%; em corretora no exterior, 15% por ano sem isenção. Pela B3, há exposição ao preço por cota de ETF ou por futuro, que são valores mobiliários; o futuro não entrega bitcoin, e a perda pode passar do que foi depositado.",
   "limites": [
-   "Regra de imposto muda por lei: confira na Receita antes de declarar."
+   "Regra de imposto muda por lei: confira na Receita antes de declarar.",
+   "A regra de imposto do ETF e do futuro de cripto ainda não foi conferida na fonte: confira na Receita antes de vender."
   ]
  },
  "riscos": {
@@ -208,6 +232,10 @@
     "texto": "Corretora também quebra: a FTX pediu recuperação judicial nos EUA em 11/11/2022, e a SEC acusou o fundador de desviar dinheiro de clientes.",
     "fontes": [
      {
+      "nome": "Kroll, administradora oficial do caso FTX (processo 22-11068, Tribunal de Falências de Delaware)",
+      "url": "https://restructuring.ra.kroll.com/FTX/"
+     },
+     {
       "nome": "SEC, acusação contra o fundador da FTX (13/12/2022)",
       "url": "https://www.sec.gov/newsroom/press-releases/2022-219"
      }
@@ -227,27 +255,22 @@
     ]
    },
    {
-    "texto": "No caso GAS (\"Faraó dos Bitcoins\"), o contrato prometia 10% ao mês. No julgamento da CVM de 29/08/2023, o voto do relator condenou os três acusados a multa de R$ 34 milhões cada.",
+    "texto": "No caso GAS (\"Faraó dos Bitcoins\"), o contrato prometia 10% ao mês. Em 29/08/2023, o Colegiado da CVM, por unanimidade e seguindo o voto do relator, multou os três acusados em R$ 34 milhões cada.",
     "fontes": [
      {
       "nome": "CVM, PAS 19957.002835/2022-47 (caso GAS), voto de 29/08/2023",
       "url": "https://www.gov.br/cvm/pt-br/assuntos/noticias/anexos/2023/20230829_pas_cvm_19957_002835_2022_47_presidente_cvm_joao_pedro_nascimento_voto.pdf"
+     },
+     {
+      "nome": "CVM, notícia do julgamento do caso GAS (29/08/2023)",
+      "url": "https://www.gov.br/cvm/pt-br/assuntos/noticias/2023/cvm-multa-em-r-102-milhoes-acusados-de-esquema-fraudulento-do-201cfarao-das-bitcoins201d"
      }
     ]
    }
   ],
-  "resumo": "Riscos: cripto não tem FGC, corretora pode quebrar (FTX, 2022), e fraude com ativo virtual dá de 4 a 8 anos de prisão. No caso GAS, a promessa era de 10% ao mês, e o voto do relator na CVM multou os três acusados em R$ 34 milhões cada.",
+  "resumo": "Riscos: cripto não tem FGC, corretora pode quebrar (FTX, 2022), e fraude com ativo virtual dá de 4 a 8 anos de prisão. No caso GAS, a promessa era de 10% ao mês, e a CVM multou os três acusados em R$ 34 milhões cada.",
   "limites": [
    "O repertório ainda não mostra o preço do bitcoin: nenhuma fonte gratuita permite uso comercial da cotação."
-  ]
- },
- "halving": {
-  "texto": "Halving é o corte pela metade da recompensa de quem minera bitcoin, a cada 210.000 blocos (cerca de 4 anos): 50 BTC no início, 3,125 BTC desde 20/04/2024. É essa regra que leva o total a cerca de 21 milhões de bitcoins.",
-  "fontes": [
-   {
-    "nome": "Bitcoin Core, regra da recompensa (validation.cpp, GetBlockSubsidy)",
-    "url": "https://raw.githubusercontent.com/bitcoin/bitcoin/master/src/validation.cpp"
-   }
   ]
  },
  "marcos": [
@@ -297,7 +320,7 @@
   },
   {
    "data": "2021-09-24",
-   "titulo": "China declara ilegais as atividades de negócio com moeda virtual (Circular 237)",
+   "titulo": "China declara ilegais as atividades de negócio com moeda virtual (Circular 237, revogada em 06/02/2026)",
    "categoria": "regulacao_fora",
    "fontes": [
     {
@@ -330,9 +353,13 @@
   },
   {
    "data": "2023-11-21",
-   "titulo": "Binance e o fundador fecham acordo com o governo dos EUA (US$ 4,3 bilhões)",
+   "titulo": "Binance e o fundador fecham acordo com o governo dos EUA (mais de US$ 4,3 bilhões no total)",
    "categoria": "regulacao_fora",
    "fontes": [
+    {
+     "nome": "CFTC, comunicado 8825-23 (21/11/2023): Binance e Changpeng Zhao aceitam acordo",
+     "url": "https://www.cftc.gov/PressRoom/PressReleases/8825-23"
+    },
     {
      "nome": "Fonte primária do evento de 21/11/2023",
      "url": "https://home.treasury.gov/news/press-releases/jy1925"
@@ -362,8 +389,8 @@
    ]
   },
   {
-   "data": "2024-04-20",
-   "titulo": "Halving: de 6,25 para 3,125 BTC",
+   "data": "2024-04-19",
+   "titulo": "Halving: de 6,25 para 3,125 BTC (às 21h09 em Brasília; já era 20/04 em UTC)",
    "categoria": "halving",
    "fontes": [
     {
@@ -450,6 +477,17 @@
    ]
   },
   {
+   "data": "2026-02-06",
+   "titulo": "China: oito órgãos revogam a Circular 237 e reforçam a proibição das atividades de negócio com moeda virtual (Circular 42)",
+   "categoria": "regulacao_fora",
+   "fontes": [
+    {
+     "nome": "CSRC, Yinfa [2026] 42, de 06/02/2026",
+     "url": "https://www.csrc.gov.cn/c100028/c7614318/content.shtml"
+    }
+   ]
+  },
+  {
    "data": "2026-09-23",
    "titulo": "O Banco Central marca 06/11/2026 para bancos pararem de operar com corretora não autorizada",
    "categoria": "regulacao_brasil",
@@ -467,7 +505,7 @@
    "datas": [
     "2016-07-09",
     "2020-05-11",
-    "2024-04-20"
+    "2024-04-19"
    ]
   },
   "etf": {
@@ -483,30 +521,6 @@
     "2022-11-11"
    ]
   },
-  "trump": {
-   "regex": "\\btrump\\b|\\breserva estrategica\\b",
-   "datas": [
-    "2024-11-05",
-    "2025-01-17",
-    "2025-03-06"
-   ]
-  },
-  "china": {
-   "regex": "\\bchina\\b|\\bchines\\w*\\b",
-   "datas": [
-    "2021-09-24"
-   ]
-  },
-  "regulacao": {
-   "regex": "\\bregul\\w*|\\blei\\b|\\bbanco central\\b|\\bautoriza\\w*|\\blegal\\b|\\bproibi\\w*",
-   "datas": [
-    "2022-12-22",
-    "2025-10-08",
-    "2025-11-10",
-    "2026-02-02",
-    "2026-09-23"
-   ]
-  },
   "stablecoin": {
    "regex": "\\bstablecoins?\\b|\\busdt\\b|\\busdc\\b|\\btether\\b",
    "datas": [
@@ -518,6 +532,81 @@
    "regex": "\\bbinance\\b",
    "datas": [
     "2023-11-21"
+   ]
+  },
+  "trump": {
+   "regex": "\\btrump\\b|\\breserva estrategica\\b",
+   "datas": [
+    "2024-11-05",
+    "2025-01-17",
+    "2025-03-06"
+   ]
+  },
+  "china": {
+   "regex": "\\bchina\\b|\\bchines\\w*\\b",
+   "datas": [
+    "2021-09-24",
+    "2026-02-06"
+   ]
+  },
+  "regulacao": {
+   "regex": "\\bregul\\w*|\\blei\\b|\\bbanco central\\b|\\bautoriza\\w*|\\b(e|eh|seja|sao|esta|ser) legal\\b|\\blegaliz\\w*|\\bilegal\\w*|\\blegalidade\\b|\\bproibi\\w*",
+   "datas": [
+    "2022-12-22",
+    "2025-10-08",
+    "2025-11-10",
+    "2026-02-02",
+    "2026-09-23"
+   ]
+  }
+ },
+ "definicoes": {
+  "halving": {
+   "texto": "Halving é o corte pela metade da recompensa de quem minera bitcoin, a cada 210.000 blocos (cerca de 4 anos): de 25 para 12,5 bitcoins em 09/07/2016, de 12,5 para 6,25 em 11/05/2020 e de 6,25 para 3,125 em 19/04/2024 (20/04 em UTC). É essa regra que leva o total a cerca de 21 milhões de bitcoins.",
+   "fontes": [
+    {
+     "nome": "Bitcoin Core, regra da recompensa (validation.cpp, GetBlockSubsidy)",
+     "url": "https://raw.githubusercontent.com/bitcoin/bitcoin/master/src/validation.cpp"
+    }
+   ]
+  },
+  "stablecoin": {
+   "texto": "Stablecoin é cripto atrelada a uma moeda, como USDT e USDC; desde 02/02/2026, comprar ou vender stablecoin no Brasil é operação de câmbio.",
+   "fontes": [
+    {
+     "nome": "Resolução BCB 521/2025",
+     "url": "https://www.bcb.gov.br/estabilidadefinanceira/exibenormativo?tipo=Resolu%C3%A7%C3%A3o%20BCB&numero=521"
+    }
+   ]
+  },
+  "etf": {
+   "texto": "ETF de cripto é um fundo de índice regulado pela CVM e negociado na B3, comprado por corretora de valores; no cadastro da CVM há 29 ligados a cripto em funcionamento, com cerca de R$ 6,9 bilhões.",
+   "fontes": [
+    {
+     "nome": "Lei 6.385/1976 (mercado de valores mobiliários)",
+     "url": "https://www.planalto.gov.br/ccivil_03/leis/l6385compilada.htm"
+    },
+    {
+     "nome": "Parecer de Orientação CVM 40/2022",
+     "url": "https://conteudo.cvm.gov.br/export/sites/cvm/legislacao/pareceres-orientacao/anexos/Pare040.pdf"
+    },
+    {
+     "nome": "CVM, dados abertos: cadastro de classes de fundos (baixado em 23/10/2026)",
+     "url": "https://dados.cvm.gov.br/dados/FI/CAD/DADOS/registro_fundo_classe.zip"
+    }
+   ]
+  },
+  "ftx": {
+   "texto": "Corretora também quebra: a FTX pediu recuperação judicial nos EUA em 11/11/2022, e a SEC (a CVM dos EUA) acusou o fundador de desviar dinheiro de clientes.",
+   "fontes": [
+    {
+     "nome": "Kroll, administradora oficial do caso FTX (processo 22-11068, Tribunal de Falências de Delaware)",
+     "url": "https://restructuring.ra.kroll.com/FTX/"
+    },
+    {
+     "nome": "SEC, acusação contra o fundador da FTX (13/12/2022)",
+     "url": "https://www.sec.gov/newsroom/press-releases/2022-219"
+    }
    ]
   }
  }

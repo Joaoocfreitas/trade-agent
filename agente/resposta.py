@@ -66,12 +66,16 @@ def escolher_blocos(p: Pedido, hoje: str) -> list[F.Bloco]:
     tem_evento = p.eleicao or 'copom' in p.temas or any(t in p.temas for t in F.TIPOS)
     medidos = [m for m in dict.fromkeys({'mini_indice': 'ibovespa', 'mini_dolar': 'dolar'}.get(m, m) for m in p.mercados)
                if m in F.HISTORICO]
+    # "ETF de bitcoin na B3": a B3 é o lugar da cripto, não o Ibovespa. Sem caminho nem dois lados do índice.
+    b3_so_lugar = 'cripto' in p.mercados and not re.search(IBOV_DITO, normalizar(p.pergunta))
+    if b3_so_lugar:
+        medidos = [m for m in medidos if m != 'ibovespa']
     if not tem_evento and medidos:
         blocos += [F.historico(m) for m in medidos]
         # Quem pede o que fazer ou para onde vai recebe os dois lados do que já aconteceu, não uma recomendação. Em contrato
         # (WIN, WDO) não: o lado que importa é a taxa-base da FGV, que precisa caber nas 3 linhas.
         if {'dica', 'direcao', 'momento'} & set(p.proibidos) and not {'mini_indice', 'mini_dolar'} & set(p.mercados):
-            blocos.append(F.dois_lados(medidos[0]))
+            blocos += [F.dois_lados(m) for m in medidos]  # de cada mercado citado, não só do primeiro
         blocos += [F.expectativas(medidos[0]), F.calendario(medidos[0], hoje)]
     elif 'economia' in p.temas or 'copom' in p.temas:
         blocos.append(F.expectativas(medidos[0] if medidos else ''))
@@ -84,19 +88,25 @@ def escolher_blocos(p: Pedido, hoje: str) -> list[F.Bloco]:
     if p.conta:
         blocos.append(F.conta(p.pontos, p.contratos, 'mini_indice' if 'mini_indice' in p.mercados else 'mini_dolar'))
     for m in p.mercados:
-        if m == 'ibovespa' and 'mini_indice' in p.mercados:
-            continue  # pergunta de contrato: a regra de IR das ações à vista não vale para o WIN
+        if m == 'ibovespa' and ('mini_indice' in p.mercados or b3_so_lugar):
+            continue  # contrato (WIN) ou cripto na B3: a regra de IR das ações à vista não vale
         blocos.append(F.mercado(m))
         if m == 'cripto':
-            # Regras, imposto, riscos e a linha do tempo. Se a pessoa citou um tema (halving, FTX, ETF...), a linha do
-            # tempo vem antes das regras.
-            tema = F.tema_cripto(normalizar(p.pergunta))
-            extra = [F.cripto_imposto(), F.cripto_riscos()]
-            if tema:
-                blocos[-1:-1] = [F.cripto_marcos(tema)]
-                blocos += extra
+            # Regras, imposto, riscos e a linha do tempo. Tema citado (halving, FTX, ETF...): a linha do tempo antes das
+            # regras, com a definição primeiro se a pessoa perguntou "o que é". Pergunta de imposto: o imposto primeiro.
+            t = normalizar(p.pergunta)
+            tema = F.tema_cripto(t)
+            imposto, riscos = F.cripto_imposto(), F.cripto_riscos()
+            if re.search(IMPOSTO_DITO, t):
+                blocos[-1:-1] = [imposto]
+                blocos.append(riscos)
             else:
-                blocos += extra + [F.cripto_marcos()]
+                blocos += [imposto, riscos]
+            if tema:
+                i = next(i for i, b in enumerate(blocos) if b and b.titulo in (F.TITULO_CRIPTO, F.TITULO_CRIPTO_IMPOSTO))
+                blocos.insert(i, F.cripto_marcos(tema, conceito='conceito' in p.temas))
+            else:
+                blocos.append(F.cripto_marcos())
     if pede_dinheiro or set(DERIVATIVOS[:2]) & set(p.mercados):
         blocos.append(F.fgv())
     # O estudo do Copom e da linha do tempo mede o dólar, não o euro: dizer isso, em vez de responder só com o dólar.
@@ -105,7 +115,7 @@ def escolher_blocos(p: Pedido, hoje: str) -> list[F.Bloco]:
     blocos = [b for b in blocos if b]
     if p.cambio:
         blocos = _cambio_primeiro(p, blocos)
-    if 'cripto' in p.mercados:
+    elif 'cripto' in p.mercados:  # em pergunta de câmbio ("exchange my euros"), o câmbio continua na frente
         blocos = _cripto_primeiro(blocos)
     if not blocos:
         blocos.append(F.economia())
@@ -113,13 +123,21 @@ def escolher_blocos(p: Pedido, hoje: str) -> list[F.Bloco]:
 
 
 CRIPTO_TITULOS = (F.TITULO_MARCOS, F.TITULO_CRIPTO, F.TITULO_CRIPTO_IMPOSTO, F.TITULO_CRIPTO_RISCOS)
+# A pessoa falou do índice mesmo, e não só da B3 como lugar.
+IBOV_DITO = r'\bibov\w*|\bbovespa\b|\bacoes\b|\bacao\b|\bbova11\b'
+IMPOSTO_DITO = r'\bimpost\w*|\bdeclar\w*|\birpf?\b|\bdarf\b|\bleao\b|\btribut\w*|\bisen\w*'
+# Pergunta de preço ou de movimento de cripto: o repertório não tem a cotação.
+PRECO_CRIPTO = (r'\b(quanto (ta|esta|vale|custa)|preco|cotacao|caiu|subiu|cai|sobe|reagiu|valoriz\w*|desvaloriz\w*)\b'
+                r'|\bo que aconteceu com o (bitcoin|btc|cripto)')
 
 
 def _cripto_primeiro(blocos: list[F.Bloco]) -> list[F.Bloco]:
     """Pergunta que cita cripto: os blocos de cripto na frente ("ETF de bitcoin na B3" fala de cripto, não do nível do
-    Ibovespa), na ordem em que já estavam."""
+    Ibovespa), na ordem em que já estavam. A taxa-base da FGV, quando há ("dá pra ficar rico?"), logo depois do 1º."""
     eh = lambda b: b.titulo in CRIPTO_TITULOS  # noqa: E731
-    return [b for b in blocos if eh(b)] + [b for b in blocos if not eh(b)]
+    fgv = [b for b in blocos if b.titulo == F.TITULO_FGV]
+    cripto = [b for b in blocos if eh(b)]
+    return cripto[:1] + fgv + cripto[1:] + [b for b in blocos if not eh(b) and b.titulo != F.TITULO_FGV]
 
 
 def _cambio_primeiro(p: Pedido, blocos: list[F.Bloco]) -> list[F.Bloco]:
@@ -152,6 +170,8 @@ def _abertura(p: Pedido, achou_repertorio: bool) -> list[str]:
             linhas.append(T.POR_PEDIDO[codigo])
     if 'memecoin' in p.mercados and T.PEDEM_RECUSA & set(p.proibidos) and 'plataforma' not in p.proibidos:
         linhas.append(T.POR_PEDIDO['plataforma'])
+    if 'cripto' in p.mercados and re.search(PRECO_CRIPTO, normalizar(p.pergunta)):
+        linhas.append(T.SEM_PRECO_CRIPTO)
     if p.voto_informado:
         linhas.append(T.VOTO_INFORMADO)
     if not achou_repertorio:
@@ -178,9 +198,10 @@ def _contrato_de_juros(pergunta: str) -> bool:
 
 def _avisos(r: Resposta) -> list[str]:
     avisos = []
-    derivativo = set(DERIVATIVOS[:2]) & set(r.pedido.mercados) or ('juros' in r.pedido.mercados and _contrato_de_juros(r.pergunta))
+    derivativo = (set(DERIVATIVOS[:2]) & set(r.pedido.mercados) or ('juros' in r.pedido.mercados and _contrato_de_juros(r.pergunta))
+                  or any(b.titulo == F.TITULO_CRIPTO_IMPOSTO for b in r.blocos))  # ele cita o futuro de bitcoin
     if derivativo or any(b.titulo.startswith('A taxa-base de quem faz day') for b in r.blocos):
-        avisos.append(T.RISCO_DERIVATIVO)
+        avisos.append(T.RISCO_DERIVATIVO_CRIPTO if 'cripto' in r.pedido.mercados else T.RISCO_DERIVATIVO)
     if {'cripto', 'memecoin'} & set(r.pedido.mercados) and not any(b.titulo == F.TITULO_CRIPTO for b in r.blocos):
         avisos.append(T.RISCO_CRIPTO)  # o bloco da cripto já traz o D5: não repete
     return avisos
@@ -225,7 +246,7 @@ def renderizar(r: Resposta) -> tuple[str, str]:
     # ordem das linhas, para nenhuma ficar sem fonte; dentro de cada uma, primeiro as séries oficiais e as pesquisas
     # (o arquivo do TSE é grande demais para o celular).
     def oficial(f: F.Fonte) -> bool:
-        return f.nome.startswith(('Banco Central', 'Ipeadata', 'Tesouro', 'Pesquisa', 'B3', 'Chague'))
+        return f.nome.startswith(('Banco Central', 'Ipeadata', 'Tesouro', 'Pesquisa', 'Chague'))
 
     por_linha = []
     for resumo in r.curta:
@@ -265,6 +286,7 @@ def fatos_texto(r: Resposta) -> str:
         if b.limites:
             partes.append('Limitações: ' + ' '.join(b.limites))
     fixos = [T.AVISO, T.RECUSA, T.FECHO, T.RISCO_DERIVATIVO, T.RISCO_CRIPTO, T.SEM_REPERTORIO, T.NORMAS, T.VOTO_INFORMADO,
+             T.SEM_PRECO_CRIPTO, T.RISCO_DERIVATIVO_CRIPTO,
              *T.POR_PEDIDO.values()]
     return '\n'.join(partes + ['## Textos fixos'] + fixos)
 

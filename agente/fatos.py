@@ -310,41 +310,61 @@ TITULO_DOIS_LADOS = 'Os dois lados, no que já aconteceu'
 MES_PREGOES = 21  # cerca de um mês de pregões
 
 
-def _lado(v: float, casas: int, un: str, queda: bool) -> str:
-    """O maior movimento de um lado, em palavras; se esse lado não aconteceu na janela, diz isso."""
+def _lado_dia(v: float, casas: int, un: str, queda: bool) -> str:
+    """'a maior queda em um dia foi de 4,55%', ou, se esse lado não aconteceu, 'não houve dia de queda (o mais perto foi
+    alta de 0,10%)'."""
+    palavra = 'queda' if queda else 'alta'
     if (v < 0) == queda and v != 0:
-        return f'{num(abs(v), casas)}{un}'
-    return f'nenhuma {"queda" if queda else "alta"} (o mais perto foi {"alta" if queda else "queda"} de {num(abs(v), casas)}{un})'
+        return f'a maior {palavra} em um dia foi de {num(abs(v), casas)}{un}'
+    return f'não houve dia de {palavra} (o mais perto foi {"alta" if queda else "queda"} de {num(abs(v), casas)}{un})'
+
+
+def _lado_mes(v: float, casas: int, un: str, queda: bool) -> str:
+    palavra = 'queda' if queda else 'alta'
+    if (v < 0) == queda and v != 0:
+        return f'a maior {palavra} foi de {num(abs(v), casas)}{un}'
+    return f'não houve {palavra} (o mais perto foi {"alta" if queda else "queda"} de {num(abs(v), casas)}{un})'
+
+
+def _resumo_lado(v: float, casas: int, un: str, queda: bool, dia_: bool) -> str:
+    """Para o resumo: 'o maior dia de queda foi de 4,55%' / 'a maior alta, de 5,70%', ou 'não houve...'."""
+    palavra = 'queda' if queda else 'alta'
+    if not ((v < 0) == queda and v != 0):
+        return f'não houve {"dia de " if dia_ else ""}{palavra}'
+    if dia_:
+        return f'o maior dia de {palavra} foi de {num(abs(v), casas)}{un}' if queda else f'o maior dia de alta foi de {num(abs(v), casas)}{un}'
+    return f'a maior {palavra} foi de {num(abs(v), casas)}{un}'
 
 
 def dois_lados(mercado: str) -> Bloco:
     """Para quem pergunta se compra ou para onde vai: o que já aconteceu dos dois lados nos últimos 12 meses, na mesma
-    ordem e com os mesmos espaços (quando caiu, quando subiu), mais a taxa-base. Nunca o próximo movimento."""
+    ordem e com os mesmos espaços (quando caiu, quando subiu), mais a taxa-base. Nunca o próximo movimento. Todo número
+    sai de preços de dentro dos 12 meses (a mesma faixa do "foi de X a Y" do caminho)."""
     nome, serie_nome, fonte, _ = HISTORICO[mercado]
     s = serie(serie_nome)
     d_fim = s.index[-1]
+    s12 = s[s.index > d_fim - pd.DateOffset(years=1)]
     juros = serie_nome.startswith('pre_')
     if juros:
-        r, mes_, un, casas = s.diff() * 100, (s - s.shift(MES_PREGOES)) * 100, PONTOS_BASE, 0
+        r12, m12, un, casas = (s12.diff() * 100).dropna(), ((s12 - s12.shift(MES_PREGOES)) * 100).dropna(), PONTOS_BASE, 0
     else:
-        r, mes_, un, casas = s.pct_change() * 100, (s / s.shift(MES_PREGOES) - 1) * 100, '%', 2
-    na_janela = s.index > d_fim - pd.DateOffset(years=1)
-    r12, m12 = r[na_janela].dropna(), mes_[na_janela].dropna()
+        r12, m12 = (s12.pct_change() * 100).dropna(), ((s12 / s12.shift(MES_PREGOES) - 1) * 100).dropna()
+        un, casas = '%', 2
     d_q, d_a, m_q, m_a = r12.idxmin(), r12.idxmax(), m12.idxmin(), m12.idxmax()
-    inicio = lambda d: s.index[s.index.get_loc(d) - MES_PREGOES]  # noqa: E731
+    inicio = lambda d: s12.index[s12.index.get_loc(d) - MES_PREGOES]  # noqa: E731
     fontes = (fonte, F_ESTUDO)
     b = Bloco(f'{TITULO_DOIS_LADOS} ({nome}, últimos 12 meses até {dia(d_fim)})')
     # As duas linhas com o mesmo molde, palavra por palavra, trocando só queda por alta (o tamanho igual é parte da regra).
-    for rotulo, palavra, d_dia, d_mes, queda in (('Quando caiu', 'queda', d_q, m_q, True), ('Quando subiu', 'alta', d_a, m_a, False)):
-        b.add(f'{rotulo}: a maior {palavra} em um dia foi de {_lado(r12[d_dia], casas, un, queda)} ({dia(d_dia)}); em '
-              f'{MES_PREGOES} pregões seguidos (cerca de um mês), a maior {palavra} foi de {_lado(m12[d_mes], casas, un, queda)} '
-              f'(de {dia(inicio(d_mes))} a {dia(d_mes)}).', *fontes)
+    for rotulo, d_dia, d_mes, queda in (('Quando caiu', d_q, m_q, True), ('Quando subiu', d_a, m_a, False)):
+        b.add(f'{rotulo}: {_lado_dia(r12[d_dia], casas, un, queda)} ({dia(d_dia)}); em {MES_PREGOES} pregões seguidos (cerca de '
+              f'um mês), {_lado_mes(m12[d_mes], casas, un, queda)} (de {dia(inicio(d_mes))} a {dia(d_mes)}).', *fontes)
     b.linhas.append(taxa_base(mercado, nome.split(' ', 1)[1]))
     b.add(DECISAO_SUA)
     b.limites.append('Os dois lados são do passado e da mesma janela; o próximo movimento pode ser maior, menor ou de outro lado.')
-    b.resumo = (f'Os dois lados nos últimos 12 meses: {nome} teve dia de queda de até {_lado(r12[d_q], casas, un, True)}'
-                + (EXPLICA_PB if juros else '') + f' e de alta de até {_lado(r12[d_a], casas, un, False)}; em cerca de um mês, '
-                f'caiu até {_lado(m12[m_q], casas, un, True)} e subiu até {_lado(m12[m_a], casas, un, False)}. {DECISAO_SUA}')
+    b.resumo = (f'Os dois lados nos últimos 12 meses ({nome}): {_resumo_lado(r12[d_q], casas, un, True, True)}'
+                + (EXPLICA_PB if juros else '') + f' e {_resumo_lado(r12[d_a], casas, un, False, True)}; em cerca de um mês, '
+                f'{_resumo_lado(m12[m_q], casas, un, True, False)} e {_resumo_lado(m12[m_a], casas, un, False, False)}. '
+                f'{DECISAO_SUA}')
     return b
 
 
@@ -996,26 +1016,32 @@ def tema_cripto(pergunta_normalizada: str) -> str:
     return next((k for k, t in _cripto()['temas'].items() if re.search(t['regex'], pergunta_normalizada)), '')
 
 
-def cripto_marcos(tema: str = '') -> Bloco:
-    """Os marcos do tema que a pessoa citou; sem tema, todos. Só o fato e a data: a reação do preço espera a licença."""
+def cripto_marcos(tema: str = '', conceito: bool = False) -> Bloco:
+    """Os marcos do tema que a pessoa citou; sem tema, todos. Só o fato e a data: a reação do preço espera a licença.
+    `conceito`: a pessoa perguntou "o que é...": a definição do tema (quando há) vira a 1ª linha e o resumo."""
     c = _cripto()
     datas = set(c['temas'][tema]['datas']) if tema else None
     marcos = [m for m in c['marcos'] if datas is None or m['data'] in datas]
     b = Bloco(TITULO_MARCOS)
-    if tema == 'halving':
-        h = c['halving']
-        b.add(h['texto'], *_fontes_json(h['fontes']))
+    definicao = c['definicoes'].get(tema) if tema else None
+    if definicao:
+        b.add(definicao['texto'], *_fontes_json(definicao['fontes']))
     for m in marcos:
         b.add(f'{dia(m["data"])}: {m["titulo"]}.', *_fontes_json(m['fontes']))
-    if tema:
-        minuscula = lambda t: t[0].lower() + t[1:] if t[1:2].islower() else t  # "HASH11" fica, "Halving" vira "halving"  # noqa: E731
-        b.resumo = 'Na linha do tempo da cripto: ' + '; '.join(f'{dia(m["data"])}, {minuscula(m["titulo"])}' for m in marcos[:3]) + '.'
+    if conceito and definicao:
+        b.resumo = definicao['texto']
+    elif tema:
+        # data e dois-pontos, como no bloco: o título fica como está (sem adivinhar maiúscula de nome próprio)
+        b.resumo = 'Na linha do tempo da cripto: ' + '; '.join(f'{dia(m["data"])}: {m["titulo"]}' for m in marcos[:3]) + '.'
     b.limites.append('Sem a variação do preço em cada data: o repertório ainda não tem cotação licenciada do bitcoin.')
     return b
 
 
+TITULO_FGV = 'A taxa-base de quem faz day trade (fato)'
+
+
 def fgv() -> Bloco:
-    b = Bloco('A taxa-base de quem faz day trade (fato)')
+    b = Bloco(TITULO_FGV)
     b.add('Entre as 19.646 pessoas físicas que começaram a fazer day trade de mini-índice de 2013 a 2015, 1.551 persistiram '
           'mais de 300 dias; dessas, 97% perderam dinheiro e só 47 (3,0%) lucraram.', F_FGV)
     b.resumo = 'No estudo da FGV, 97% de quem insistiu mais de 300 dias no day trade de mini-índice perdeu dinheiro.'

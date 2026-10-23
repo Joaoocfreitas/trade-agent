@@ -13,6 +13,8 @@ from dataclasses import dataclass, field
 
 # Símbolo de moeda que o simples() apagaria: vira palavra antes ("€150.000" → "euros 150.000").
 SIMBOLOS = {'€': ' euros '}
+# Corretoras de cripto pelo nome (a mesma lista do filtro de saída).
+EXCH = r'(binance|coinbase|mercado bitcoin|foxbit|bybit|okx|kraken|novadax|bitso|bitget|kucoin)'
 EMOJI = {'📈': ' sobe ', '📉': ' cai ', '🚀': ' dispara ', '🔥': ' dispara ', '💰': ' lucro ', '🤑': ' lucro ',
          '⬆️': ' sobe ', '⬇️': ' cai ', '⬆': ' sobe ', '⬇': ' cai '}
 # Abreviações e erros de digitação comuns do público (internetês).
@@ -52,8 +54,8 @@ MERCADOS = {
              r'|para fora|do exterior|de fora|para o exterior|pro exterior)\b',
     'euro': r'\beuros?\b|\beur\b',
     'juros': r'\bjuros\b|\bdi1?\b|\bdi futuro\b|\bselic\b|\brenda fixa\b|\btesouro\b|\bprefixad\w*',
-    'cripto': r'\bcripto\w*|\bbitcoin\b|\bbtc\b|\bethereum\b|\bexchanges?\b|\bstablecoins?\b|\bsolana\b'
-              r'|\bhalving\b|\bftx\b|\busdt\b|\busdc\b|\btether\b',
+    'cripto': r'\bcripto\w*|\bbitcoins?\b|\bbtc\b|\bethereum\b|\bethers?\b|\beth\b|\bxrp\b|\bexchanges?\b|\bstablecoins?\b'
+              r'|\bsolana\b|\bhalving\b|\bftx\b|\busdt\b|\busdc\b|\btether\b|\bhash11\b|\bdoge\w*|\bshiba\b|' + rf'\b{EXCH}\b',
     'memecoin': r'\bmeme ?coins?\b|\bmemecoins?\b|\$trump\b|\$libra\b|\$melania\b|\btokens?\b|\bmoeda do candidato\b',
     'previsao': r'\bpolymarket\b|\bkalshi\b|\bmercados? de previs\w*',
 }
@@ -91,6 +93,7 @@ PROIBIDOS = {
             r'|\bexposicao\b|\baplicar\b|\binvestir\b|\bbuy\b|\bsell\b|\bshould i\b|\bwould you\b'
             # mover o dinheiro, na 1ª pessoa ("trago o dinheiro?", "troco?"), menos "como mando dinheiro pra fora?" (P5)
             r'|(?<!como )(?<!como eu )\b(troco|trago|mando|envio|converto|transfiro|remeto)\b|\bdeixo (la|aqui|parado|onde esta)\b'
+            r'|\b(tiro|boto)\b[^.?!]{0,40}\b(exchange|corretora|carteira)\b'
             r'|(?<=.{10})\be ai(\?|\W*$)|\bconviene\b|\b(debo|deberia) (cambiar|traer|mandar|enviar)\b',
     'direcao': r'\bvai (subir|cair|disparar|despencar|bombar|valorizar|explodir|fechar|abrir)\b|\bvao (subir|cair)\b|\bchances?\b'
                r'|\bprobabilidad\w*|\bde 0 a 100\b|\bum numero\b|\btendencia\b|\bpode (subir|cair|disparar)\b'
@@ -106,7 +109,7 @@ PROIBIDOS = {
     'perfil': r'\barrojad\w*|\bconservador\w*|\bmoderad[oa]\b|\btolerancia (a|ao) risco\b|\bperfil\b|\baposentadoria\b'
               r'|\breserva de emergencia\b|\bserve (pra|para) mim\b|\be (pra|para) mim\b|\bminha idade\b|\btenho \d+ anos\b'
               r'|\bmeu objetivo\b|\bmeu prazo\b',
-    'comparar': r'\bmelhor\b.{0,40}\bou\b|\bvale mais\b|\b(dolar|bolsa|cripto|bitcoin|renda fixa|tesouro|acoes|ouro|poupanca|cdb)\b'
+    'comparar': r'\bmelhor\b.{0,40}\bou\b|\bou\b.{0,40}\b(qual )?(o |a )?melhor\b|\bvale mais\b|\b(dolar|bolsa|cripto|bitcoin|renda fixa|tesouro|acoes|ouro|poupanca|cdb)\b'
                 r'.{0,25}\bou\b.{0,25}\b(dolar|bolsa|cripto|bitcoin|renda fixa|tesouro|acoes|ouro|poupanca|cdb)\b',
     'ranking': r'\branking\b|\bmelhores (acoes|ativos|moedas|criptos)\b|\btop ?\d+\b|\bmonta (uma )?carteira\b'
                r'|\bcarteira (recomendada|sugerida|ideal)\b|\bquais (acoes|ativos)\b|\bqual (acao|ativo|papel|moeda|cripto)\b'
@@ -114,7 +117,10 @@ PROIBIDOS = {
     'seletivo': r'\bso (os|as) (casos|vezes|anos|eleicoes|reunioes|dias|turnos)\b|\bso (as )?altas\b|\bso os positivos\b'
                 r'|\bmostra so\b|\bmostra apenas\b|\bapenas (os|as) (casos|turnos|vezes)\b|\b(so|apenas) (a|as) (mediana|media|altas|quedas)\b',
     'plataforma': r'\bqual (a )?(melhor )?(exchange|corretora|plataforma|app)\b|\bonde (eu )?(compro|opero|abro conta)\b'
-                  r'|\bque (exchange|corretora)\b',
+                  r'|\bque (exchange|corretora)\b'
+                  # avaliar uma corretora citada pelo nome ou apontada ("a Binance é segura?") também é indicar (N7)
+                  rf'|\b{EXCH}\b[^.?!]{{0,30}}\b(segur[ao]s?|confiave(l|is)|golpe)\b'
+                  r'|\b(essa|esta) (corretora|exchange|plataforma|app)\b[^.?!]{0,20}\b(segur[ao]|confiavel|golpe)\b',
     'aposta': r'\bapost\w*|\baposto\b|\bbets?\b|\bpolymarket\b|\bkalshi\b|\bvpn\b',
     'voto': r'\bem quem\b|\bquem e (o )?melhor\b|\bmelhor candidato\b|\bdevo votar\b|\bquem (voce|vc) (apoia|prefere)\b'
             r'|\bmelhor (pra|para) (a |o )?(economia|bolsa|mercado|pais|brasil|investidor)\b|\bmercado prefere\b'
@@ -145,8 +151,10 @@ PROIBIDOS = {
 FUTURO = (r'\b(sobe|sobem|subir|suba|subira|subiria|desce|descer|cai|caem|cair|caia|caira|cairia|despenc\w*|dispar\w*|derret\w*'
           r'|valoriz\w*|desvaloriz\w*|aprecia\w*|recua\w*|fecha|fechar|abre|abrir|pra cima|para cima|pra baixo|para baixo|topo'
           r'|fundo|barat[oa]|caro|vies|palpite|visao|acha|acham|opiniao|tendencia|provavel|esperado|retorno|potencial'
-          r'|vai bem|vai mal|reage bem|reage mal|vai a \d|chega a \d|pra onde|para onde|go up|go down|rise|fall|rally'
-          r'|bajar|probabilidad\w*|chances?)\b')
+          r'|vai bem|vai mal|reage bem|reage mal|vai a \d+|chega a \d+|pra onde|para onde|go up|go down|rise|fall|rally'
+          r'|bajar|probabilidad\w*|chances?'
+          # gíria de cripto, em formas fechadas: "bombardeio" e "pump and dump" (conceito) não entram
+          r'|explod\w*|decol\w*|bombar|bombando|bombou|pumpa\w*|pumpar|pra lua|para a lua|to the moon)\b')
 CONDICIONAL = (r'\bse (o |a )?(\w+ ){0,2}(ganhar|vencer|perder|for eleito|for reeleito|cortar|cortarem|subir|aumentar|baixar|'
                r'reduzir|mantiver|wins?)\b|\b(ganhando|vencendo|perdendo)\b|\bcom (o |a )?\w+ eleit[oa]\b|\bif \w+ wins?\b')
 # Pergunta sobre o que já aconteceu: não pede direção.
@@ -413,8 +421,9 @@ def analisar(pergunta: str) -> Pedido:
     # lado da reação nos turnos, o valor dela viraria indicação de momento. Pergunta de contrato (mini-dólar) também não.
     valor, moeda, gasto, gasto_moeda = cambio(t)
     contrato_futuro = bool({'mini_indice', 'mini_dolar'} & set(p.mercados) or re.search(CONTRATO, t))
+    cripto = bool({'cripto', 'memecoin'} & set(p.mercados))  # "10 mil dólares em USDT" é cripto da pessoa, não câmbio
     if valor is not None and not contrato_futuro:
-        if quanto or momento_troca:
+        if quanto or momento_troca or cripto:
             if 'capital' not in p.proibidos:
                 p.proibidos.append('capital')  # a pessoa contou o valor e ele não é usado: a linha do capital diz por quê
         else:
