@@ -3,6 +3,7 @@
  "ibov": false,
  "ptax": true,
  "euro": true,
+ "brent": true,
  "selic_meta": true,
  "ipca_12m": true,
  "divida_bruta": true,

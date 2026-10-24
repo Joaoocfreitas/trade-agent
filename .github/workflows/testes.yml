@@ -10,7 +10,7 @@ permissions:
 jobs:
   testes:
     runs-on: ubuntu-24.04
-    timeout-minutes: 15
+    timeout-minutes: 40  # exportar (~5 min) + pytest (~8) + deno (~2) passam de 15 desde a rodada 4
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5

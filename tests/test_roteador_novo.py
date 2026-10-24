@@ -137,7 +137,7 @@ def test_sem_contrato_nao_ha_ao_vivo(pergunta):
     ('compro agora?', ['dica', 'momento']),
     ('Vendo meus títulos prefixados agora?', ['dica', 'momento']),
     ('o Focus diz que o dólar vai a 5,13, então compro agora?', ['dica', 'direcao', 'momento']),
-    ('opero agora?', ['momento']),
+    ('opero agora?', ['dica', 'momento']),  # "opero?" na 1ª pessoa é a ordem, como "compro" (rodada 4)
     ('a bolsa está caindo agora, por quê?', ['direcao']),
 ])
 def test_sem_contrato_agora_continua_pedindo_recusa(pergunta, deve):
