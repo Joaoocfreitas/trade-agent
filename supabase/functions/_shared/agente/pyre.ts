@@ -68,12 +68,14 @@ export function converter(p: string): string {
 
 const COMPILADOS = new Map<string, RegExp>()
 
-/** `inteiro`: para o fullmatch, o fim estrito do texto (o $ do JavaScript, que não aceita o \n final). */
+/** `inteiro`: para o fullmatch, o fim estrito do texto (o $ do JavaScript, que não aceita o \n final). Com grupo de nome,
+ * a flag d, para o start(nome) do Python. */
 function compilar(p: string, flags: '' | 'g' | 'y', inteiro = false): RegExp {
   const chave = flags + (inteiro ? '$' : '') + '\u0000' + p
   let r = COMPILADOS.get(chave)
   if (!r) {
-    r = new RegExp(inteiro ? `(?:${converter(p)})$` : converter(p), flags)
+    const fonte = converter(p)
+    r = new RegExp(inteiro ? `(?:${fonte})$` : fonte, flags + (p.includes('(?P<') ? 'd' : ''))
     COMPILADOS.set(chave, r)
   }
   return r
@@ -83,19 +85,36 @@ function compilar(p: string, flags: '' | 'g' | 'y', inteiro = false): RegExp {
 export type Casamento = {
   start: number
   end: number
-  /** group(0) é o trecho inteiro. */
-  group: (n?: number) => string | undefined
+  /** group(0) é o trecho inteiro; o grupo pode ser o número ou o nome. */
+  group: (n?: number | string) => string | undefined
+  /** start(n) e start(nome) do Python (o início do grupo; -1 se ele não participou). */
+  inicio: (n: number | string) => number
   /** os grupos 1..n */
   groups: (string | undefined)[]
+  /** o lastindex do Python: o grupo de número mais alto que participou (o mesmo de lá quando os grupos não se aninham) */
+  lastindex: number | null
   string: string
 }
 
 function casamento(m: RegExpExecArray, s: string): Casamento {
+  let lastindex: number | null = null
+  for (let i = m.length - 1; i > 0; i--) {
+    if (m[i] !== undefined) {
+      lastindex = i
+      break
+    }
+  }
   return {
     start: m.index,
     end: m.index + m[0].length,
-    group: (n = 0) => m[n],
+    group: (n = 0) => typeof n === 'string' ? m.groups?.[n] : m[n],
+    inicio: (n) => {
+      if (!m.indices) throw new Error('start(grupo) pede grupo de nome no padrão (a flag d)')
+      const par = typeof n === 'string' ? m.indices.groups?.[n] : m.indices[n]
+      return par ? par[0] : -1
+    },
     groups: m.slice(1),
+    lastindex,
     string: s,
   }
 }
@@ -123,19 +142,27 @@ export function fullmatch(p: string, s: string): Casamento | null {
   return m ? casamento(m, s) : null
 }
 
-/** Quantos casamentos vazios o finditer já viu: o Python e o JavaScript só discordam neles (teste em pyre_test.ts). */
+/** Quantos casamentos vazios o finditer já viu: o Python e o JavaScript só discordam neles (teste em desempenho_test.ts). */
 export const vazios = { n: 0 }
 
-/** re.finditer. Num casamento vazio, o JavaScript anda uma posição e o Python ainda aceita um casamento não vazio no
- * mesmo lugar; os padrões do agente não casam vazio no sub, no split nem no finditer, e `vazios` conta se casarem. */
-export function finditer(p: string, s: string): Casamento[] {
+/** Os casamentos um a um, como o finditer do Python. Num casamento vazio, o JavaScript anda uma posição e o Python ainda
+ * aceita um casamento não vazio no mesmo lugar; os padrões do agente não casam vazio no sub, no split nem no finditer, e
+ * `vazios` conta se casarem. */
+function* iterar(p: string, s: string): Generator<Casamento> {
   const r = compilar(p, 'g')
-  const saida: Casamento[] = []
-  for (const m of s.matchAll(r)) {
-    if (m[0] === '') vazios.n++
-    saida.push(casamento(m as RegExpExecArray, s))
+  r.lastIndex = 0
+  for (let m = r.exec(s); m; m = r.exec(s)) {
+    if (m[0] === '') {
+      vazios.n++
+      r.lastIndex++
+    }
+    yield casamento(m, s)
   }
-  return saida
+}
+
+/** re.finditer */
+export function finditer(p: string, s: string): Casamento[] {
+  return [...iterar(p, s)]
 }
 
 /** A troca de re.sub com texto: \1, \g<1> e \\ como no Python. */
@@ -147,29 +174,45 @@ function expandir(modelo: string, m: Casamento): string {
   })
 }
 
-/** re.sub */
-export function sub(p: string, troca: string | ((m: Casamento) => string), s: string): string {
+/** re.sub; `count` como lá: só as `count` primeiras trocas (0, todas). */
+export function sub(p: string, troca: string | ((m: Casamento) => string), s: string, count = 0): string {
   let saida = ''
-  let ultimo = 0
-  for (const m of finditer(p, s)) {
-    saida += s.slice(ultimo, m.start) + (typeof troca === 'string' ? expandir(troca, m) : troca(m))
-    ultimo = m.end
+  let ultimoFim = 0
+  let n = 0
+  for (const m of iterar(p, s)) {
+    saida += s.slice(ultimoFim, m.start) + (typeof troca === 'string' ? expandir(troca, m) : troca(m))
+    ultimoFim = m.end
+    if (count && ++n >= count) break
   }
-  return saida + s.slice(ultimo)
+  return saida + s.slice(ultimoFim)
 }
 
 /** re.split: os pedaços e, entre eles, os grupos do separador (undefined no que não participou). */
 export function split(p: string, s: string): (string | undefined)[] {
   const saida: (string | undefined)[] = []
-  let ultimo = 0
-  for (const m of finditer(p, s)) {
-    saida.push(s.slice(ultimo, m.start), ...m.groups)
-    ultimo = m.end
+  let ultimoFim = 0
+  for (const m of iterar(p, s)) {
+    saida.push(s.slice(ultimoFim, m.start), ...m.groups)
+    ultimoFim = m.end
   }
-  saida.push(s.slice(ultimo))
+  saida.push(s.slice(ultimoFim))
   return saida
 }
 
-/** re.split(...)[-1] e [0]: o primeiro e o último pedaço são sempre texto. */
-export const ultimo = (p: string, s: string): string => split(p, s).at(-1) as string
-export const primeiro = (p: string, s: string): string => split(p, s)[0] as string
+/** re.split(...)[-1]: o que vem depois do último separador. */
+export function ultimo(p: string, s: string): string {
+  let fim = 0
+  for (const m of iterar(p, s)) fim = m.end
+  return s.slice(fim)
+}
+
+/** re.split(..., maxsplit=1)[0] (e o [0] de qualquer split): o que vem antes do primeiro separador. */
+export function primeiro(p: string, s: string): string {
+  const m = search(p, s)
+  return m ? s.slice(0, m.start) : s
+}
+
+/** re.escape do Python (os caracteres que ele escapa). */
+export function escape(s: string): string {
+  return s.replace(/[()[\]{}?*+\-|^$\\.&~# \t\n\r\v\f]/g, (c) => '\\' + c)
+}

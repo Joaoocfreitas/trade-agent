@@ -10,8 +10,8 @@ import { montar } from './resposta.ts'
 import { analisar } from './roteador.ts'
 
 const BASES = ['1', ', ', 'e ', '1.', '1,', 'us$ 1 ', '10 dolares ', 'barril a ',
-  // os piores casos medidos no Python
-  ', , ,', 'e e e ', '1.1.1.', 'us$ 1 us$ 1 ']
+  // os piores casos medidos no Python, e os símbolos repetidos da rodada 4 (o "€" vira palavra e crescia 4 vezes)
+  ', , ,', 'e e e ', '1.1.1.', 'us$ 1 us$ 1 ', '€1', '📉📈']
 
 Deno.test('pergunta de 2.000 caracteres: o roteador e a resposta inteira em menos de 500 ms', () => {
   montar('o dólar vai subir?', undefined, '2026-10-23') // compila os padrões
