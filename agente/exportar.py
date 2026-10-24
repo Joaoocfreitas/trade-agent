@@ -190,6 +190,8 @@ EXTRAS = [
     'o petróleo vai subir com a guerra?', 'quais ações de petróleo comprar?', 'compro PETR4 amanhã?',
     'o imposto do diesel mudou?', 'como está o petróleo?', 'Brent e dólar', 'troca de presidente da Petrobras',
     'a covid derrubou o petróleo?', 'Tarifas dos EUA e o Ibovespa', 'A guerra no Irã derrubou a bolsa?',
+    # 23/10/2026, noite: as regressões graves da conferência da rodada 4.
+    'quanto vai ficar 3 mil dolares em reais com a vitoria do bolsonaro?', 'quanto vai ficar 2 mil euros em reais em 2027?', 'Quanto vai sair 1000 dólares em reais na eleição?', 'Quanto vai sair a viagem com o dólar subindo?', 'o copom vai ser de aumento?', 'o copom de dezembro sera de aumento?', 'dezembro vai ser manutencao ou aumento?', 'O que é o stop loss ideal pro bitcoin?', 'Minha viagem vai custar 3 mil euros, quanto vai dar em reais em dezembro?', 'Qual a melhor data da compra do dólar pra viagem?', 'Melhor hora pra compra e venda de dólar?', 'Comprar ações com baixa liquidez?', 'Como compro PETR4 no suporte?', 'a selic tera aumento?', 'o que sera de aumento de imposto?',
     # 23/10/2026, achados da revisão do petróleo.
     'vale a pena PETR4?', 'PETR4 é boa pagadora de dividendos?', 'PETR4 ou PRIO3, qual é melhor?', 'petrobras ou vale?',
     'qual petroleira paga mais dividendo?', 'mantenho PETR4?', 'faço preço médio em petr4?', 'petróleo: long ou short?',

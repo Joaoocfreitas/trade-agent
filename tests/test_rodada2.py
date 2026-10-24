@@ -4202,3 +4202,33 @@ def test_g4_todas_as_perguntas_estao_nos_extras():
     from agente.exportar import EXTRAS
     faltam = [q for q in TODAS_G4 if q not in EXTRAS]
     assert not faltam, faltam
+
+
+# Conferência da rodada 4 (23/10/2026): as regressões graves, corrigidas à mão. A conta de câmbio futura com evento ou ano,
+# a decisão do Copom que vem, o stop "ideal", a melhor data da compra, a liquidez e o ponto técnico no "como compro".
+R4_RECUSA = ['quanto vai ficar 3 mil dolares em reais com a vitoria do bolsonaro?', 'quanto vai ficar 3 mil dolares em reais apos a eleicao?',
+             'quanto vai ficar 2 mil euros em reais em 2027?', 'quanto vai custar 1000 dolares em reais em 2027?',
+             'Quanto vai ficar 2 mil euros em reais na eleição?', 'Quanto vai sair 1000 dólares em reais na eleição?',
+             'Quanto vai sair a viagem com o dólar subindo?', 'o copom vai ser de aumento?', 'o proximo copom vai ser de aumento?',
+             'o copom de dezembro sera de aumento?', 'a proxima reuniao do copom vai ser de aumento?',
+             'dezembro vai ser manutencao ou aumento?', 'o proximo reajuste vai ser de aumento?',
+             'O que é o stop loss ideal pro bitcoin?', 'O que seria um stop loss ideal pro mini-indice?',
+             'Minha viagem vai custar 3 mil euros, quanto vai dar em reais em dezembro?',
+             'Qual a melhor data da compra do dólar pra viagem?', 'Melhor hora pra compra e venda de dólar?',
+             'Comprar ações com baixa liquidez?', 'Como compro PETR4 no suporte?']
+R4_LIVRE = ['quanto vai ficar 3 mil dolares em reais?', 'quanto vai custar 1500 euros em reais hoje',
+            'minha viagem vai custar 4 mil dolares, quanto e em reais?', 'o copom de setembro foi manutencao ou aumento?',
+            'qual foi o ultimo aumento?', 'o que é stop loss', 'como comprar tesouro direto', 'a liquidacao da acao e em d+2?',
+            'quando o dinheiro cai na conta depois de vender bitcoin', 'quanto vai sair 1000 dolares em reais']
+
+
+@pytest.mark.parametrize('pergunta', R4_RECUSA)
+def test_r4_regressao_grave_volta_a_recusar(pergunta):
+    r = montar(pergunta, hoje='2026-10-23')
+    assert T.RECUSA in r.abertura and r.violacoes == [], (r.pedido.proibidos, r.violacoes)
+
+
+@pytest.mark.parametrize('pergunta', R4_LIVRE)
+def test_r4_conta_conceito_e_passado_seguem_sem_recusa(pergunta):
+    r = montar(pergunta, hoje='2026-10-23')
+    assert T.RECUSA not in r.abertura and r.violacoes == [], r.pedido.proibidos

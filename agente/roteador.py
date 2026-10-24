@@ -486,6 +486,9 @@ PROIBIDOS = {
             r'| pelo que\b| (na|em) lei\b)',
     'direcao': COMO_VE
                + r'|\bvai (subir|cair|disparar|despencar|bombar|valorizar|explodir|fechar|abrir)\b|\bvao (subir|cair)\b|\bchances?\b'
+               # a decisão que ainda vem ("o Copom vai ser de aumento?", "dezembro vai ser manutenção ou aumento?")
+               r'|\b((vai|vao|deve|devem) (ser|ter|vir)|sera|serao|tera|terao|vira|virao)( de| um| uma)?( \w+ ou)? (aumento|corte|manutencao|reducao'
+               r'|alta|queda)\W*$'
                r'|\bprobabilidad\w*|\bde 0 a 100\b|\bum numero\b|\btendencia\b|\bpode (subir|cair|disparar)\b'
                r'|\bsobe ou (cai|desce|nao)\b|\balavanc(ar|a)\b|\bpotencial\b|\bprevisao\b|\bprever\b|\bdisparar\b'
                # "a Selic chegou no pico?": se o topo já passou é pergunta sobre o que vem; com data ou "quando" é passado
@@ -521,6 +524,9 @@ PROIBIDOS = {
                r'|baixa ou (em |na )?alta)(?=\W*$| (amanha|essa semana|esse mes|esse ano|depois d\w+|no fim d\w+|ate o fim d\w+'
                r'|na semana que vem|em 202[6-9])\b)',
     'momento': r'\bstop\b|\balvo\b|\bponto de (entrada|saida)\b|\bquando (entrar|sair|comprar|vender)\b'
+               # "qual a melhor data da compra?", "melhor hora pra compra e venda de dólar?": o quando (N4)
+               r'|\b(melhor|pior|ideal) (data|hora|horario|epoca)\b'
+               r'|\b(melhor|pior|ideal) (dia|mes|semana) (pra|para|de) (comprar|vender|compra|venda|trocar|troca|entrar|sair|operar)\b'
                r'|\b(hora|quando)\b.{0,15}\b(entrar|sair|comprar|vender|operar)\b|\balertas?\b|\bme avis(a|e)\b|\bsinal de\b'
                r'|\bamanha\b|\bna abertura\b|\bsegunda(-feira)?\b.{0,30}\b(fazer|compr\w*|vend\w*|entr\w*)'
                # "o dólar caiu, espero?", "a petr4 caiu, espero mais um pouco?", "espero ele baixar?": esperar é o quando
@@ -1507,13 +1513,18 @@ QUAL_TAXA = r'\bqual( e)?( o| a)? (dolar|cotacao|cambio|taxa( de cambio)?|ptax) 
 NA_FATURA = r'( na| no| pra| para)( a| o)? (fatura|cartao)\b'
 DATA_DA_CONTA = (rf'\b(em|no|na|pro|pra|ate) ({MESES[1:-1]}|natal|carnaval|fim|final|volta)\b'
                  r'|\b(amanha|depois|quando|daqui|futuro|proxim\w*)\b|\b(semana|mes|ano) que vem\b')
+# O câmbio de um evento ou de um ano ("na eleição", "com a vitória do X", "em 2027") é previsão em qualquer lugar da frase;
+# a data, só na oração do verbo ou depois dele ("quanto vai dar em reais em dezembro?"), não a da viagem ("vou em janeiro").
+EVENTO_DA_CONTA = r'\b(20\d\d|eleic\w*|turnos?|copom|vitoria|derrota|guerra|crise|posse|black friday|pico|topo|fundo)\b'
 
 
 def _sem_a_conta(t: str) -> str:
     """Tira o "vai ficar/custar/valer" da conta de câmbio com a quantia da pessoa e da regra do cartão."""
     def troca(m: re.Match) -> str:
         frase, oracao = _trecho(t, m, r'[?!]|\.(?!\d)'), _trecho(t, m, ORACAO)
-        if re.search(PRAZO, frase) or re.search(DATA_DA_CONTA, oracao):
+        depois = re.split(r'[?!]|\.(?!\d)', t[m.end():], maxsplit=1)[0]
+        if (re.search(PRAZO, frase) or re.search(EVENTO_DA_CONTA, frase) or re.search(DATA_DA_CONTA, oracao)
+                or re.search(DATA_DA_CONTA, depois)):
             return m.group()
         if re.search(QUAL_TAXA, t[:m.start()]) and re.match(NA_FATURA, t[m.end():]):
             return ' '
@@ -1702,7 +1713,7 @@ REGRA_DA_COMPRA = (rf'{REGRA_IMPOSTO}|\b(impostos?|iof|darf|come[- ]cotas)\b|\b(
                    r'|\bviage(m|ns)\b(?=[^.?!]*(\bquanto (custa\w*|da|dao|fica\w*|sai\w*|e|sao|pago)\b|\bem reais\b'
                    r'|\bquantos reais\b))'
                    # a liquidação ("quando o dinheiro cai na conta depois de vender bitcoin?", "a venda liquida em D+2?")
-                   r'|\b(cai|cair|caem|caiu) na conta\b|\bliquid\w*|\bd ?\+ ?\d\b')
+                   r'|\b(cai|cair|caem|caiu) na conta\b|\bliquid(acao|acoes|a|am|ar|ado|ada)\b|\bd ?\+ ?\d\b')
 VERBO_DA_REGRA = (r'\b((se|quando|caso)( eu)? (compro|vendo|compre|venda|comprar|vender)|quem (compra|vende))\b|\b(comprar|vender)\b'
                   r'|\b(na|da|pela|a|uma|cada|toda|nas|das|pelas|as) compras?\b')
 PEDIDO_NA_REGRA = (r'\b(ou|agora|ja|antes(?! d[ao] datas? (com|ex)\b)|melhor|pior|compens\w*|hora|momento|porque|devido)\b'
@@ -1752,7 +1763,8 @@ TERMO_DEFINIDO = (r'\b(o que (e|sao|seria|significa|quer dizer)|como funcionam?|
                   + r'( (e|ou) (o |a |um |uma )?' + _TERMO_DE_ORDEM + ')*')
 # O que, no resto, volta a pedir o stop ou a ordem ("o que é stop? qual eu uso?", "e me diz onde colocar").
 PEDIDO_JUNTO = (r'\b(eu|vou|meu|minha|meus|minhas|mim|consigo|me|qual|quais|quanto|quantos|onde|uso|usar|usaria'
-                r'|coloco|colocar|ponho|por|boto|botar|faco|usa|poe|bota|coloca)\b|\d')
+                r'|coloco|colocar|ponho|por|boto|botar|faco|usa|poe|bota|coloca|ideal|certo|certa|bom|boa|melhor'
+                r'|recomendad\w*|indicad\w*)\b|\d')
 
 
 # "Como compro Tesouro?", "como vender ações no home broker?", "como faço pra comprar dólar pra viagem?" pedem o passo a
@@ -1768,6 +1780,7 @@ COMO_NEGOCIA_PEDIDO = (r'\b(agora|hoje|amanha|logo|hora|horas|momento|quando|ant
                        r'|boa(?! (tarde|noite))|bons|boas|certa|certo|ideal|qual|quais|ou|voce|vc|tu|seguro|segura|seguranca'
                        r'|que (paga|pagam)'
                        r'|prazo|dinheiro|grana|pouco|muito|meme\w*'
+                       r'|suporte|resistencia|minima|maxima|pullback|correcao|desconto|vespera'
                        r'|quant(o|a|os|as)(?! (custa|custam|cobra\w*|e o (iof|imposto|ir|custo)|de (iof|imposto|ir|taxa\w*))\b))\b'
                        r'|\bja\W*$')
 
@@ -1798,7 +1811,8 @@ _PUBLICADO = (r'(ipca|inpc|igp\w*|pib|caged|payroll|focus|boletim|resultados?|de
 _JUIZO_SAIR = (r'(alt[oa]s?|baix[oa]s?|forte|fraco|bo[ma]|ruim|dur[oa]|acima|abaixo|melhor|pior|maior|menor|positiv\w*'
                r'|negativ\w*|favor|contra|surpreend\w*|decepcion\w*)')
 _DATA_QUE_VEM = (r'(fim do ano|final do ano|ano que vem|mes que vem|semana que vem|proxim\w*|amanha|depois d\w*'
-                 r'|dezembro|janeiro|(em|no|para|pra) 20\d\d)')
+                 r'|dezembro|janeiro|(em|no|para|pra) 20\d\d|eleic\w*|turnos?|copom|vitoria|guerra|subindo|caindo'
+                 r'|disparando|despencando|em alta|em baixa)')
 SAIR_PUBLICADO = (
     rf'\bsair (o|a|os|as) ((proxim|nov|primeir|segund|ultim)[oa]s? )?{_PUBLICADO}\b(?![^.?!]*\b{_JUIZO_SAIR}\b)'
     rf'|\bquanto (vai|vao|ia|iria) (me |nos )?sair\b(?= (\d|r\$|us\$|mil\b|cem\b|em reais\b|(o|a|os|as) (iof|viagem'
