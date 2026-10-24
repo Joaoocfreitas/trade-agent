@@ -3,6 +3,7 @@
 Nada aqui é escrito pela IA. O modo com IA recebe estes blocos prontos e só pode citar os números que estão neles (D8).
 """
 import json
+import math
 import re
 from dataclasses import dataclass, field
 from decimal import ROUND_HALF_EVEN, Decimal
@@ -131,6 +132,8 @@ def _sgs(codigo: int, nome: str) -> Fonte:
 F_SELIC = _sgs(432, 'meta da Selic')
 F_PTAX = _sgs(1, 'dólar PTAX de venda')
 F_EURO = _sgs(21619, 'euro PTAX de venda')
+F_BRENT = Fonte('EIA (U.S. Energy Information Administration), petróleo Brent à vista, série RBRTE (domínio público)',
+                'https://www.eia.gov/dnav/pet/hist/RBRTED.htm')
 F_IPCA = _sgs(13522, 'IPCA em 12 meses, do IBGE')
 F_DIVIDA = _sgs(13762, 'dívida bruta do governo geral, % do PIB')
 F_IBOV = Fonte('Ipeadata, série GM366_IBVSP366 (fechamento do Ibovespa na B3)',
@@ -225,6 +228,7 @@ def _proximo_pregao(d) -> pd.Timestamp:
 
 # Taxa-base de cada mercado medido: série, limite de "dia grande" e unidade. Juros em pontos-base (p.b.).
 TAXA = {'ibovespa': ('ibov', 4.0, '%', F_IBOV), 'dolar': ('ptax', 1.0, '%', F_PTAX), 'euro': ('euro', 1.0, '%', F_EURO),
+        'brent': ('brent', 5.0, '%', F_BRENT),
         'juros': ('pre_5a', 30.0, ' p.b.', F_TESOURO)}
 
 
@@ -258,6 +262,7 @@ HISTORICO = {
     'ibovespa': ('o Ibovespa', 'ibov', F_IBOV, lambda v: f'{num(v, 0)} pontos'),
     'dolar': ('o dólar', 'ptax', F_PTAX, lambda v: f'R$ {num(v, 4)}'),
     'euro': ('o euro', 'euro', F_EURO, lambda v: f'R$ {num(v, 4)}'),
+    'brent': ('o petróleo Brent', 'brent', F_BRENT, lambda v: f'US$ {num(v, 2)} o barril'),
     'juros': ('o juro prefixado de 5 anos', 'pre_5a', F_TESOURO, lambda v: f'{num(v, 2)}% ao ano'),
 }
 
@@ -289,6 +294,8 @@ def historico(mercado: str) -> Bloco:
                          'de dólar, que tem vencimento e preço próprios.')
     if mercado == 'euro':
         b.limites.append(LIMITE_PTAX_EURO)
+    if mercado == 'brent':
+        b.limites.append(LIMITE_BRENT)
     # Para quem está começando: o nível arredondado, o ano em palavras e a faixa dos 12 meses.
     nivel = (lambda v: f'R$ {num(curto(v, 4, 2), 2)}') if mercado in ('dolar', 'euro') else fmt
     nome_cap = nome[0].upper() + nome[1:]
@@ -300,8 +307,79 @@ def historico(mercado: str) -> Bloco:
     return b
 
 
+LIMITE_BRENT = ('O Brent é o preço à vista publicado pela EIA uma vez por semana, com os dias até a terça anterior: o '
+                'último número pode ter até 8 dias.')
 LIMITE_PTAX_EURO = ('Os números do euro são da PTAX de venda do Banco Central. Na troca de verdade (banco, corretora, '
                     'app de remessa), a cotação é outra e pode haver tarifa, spread e IOF.')
+
+
+# ---------- os dois lados: quando caiu e quando subiu (P2, sem manchete de direção) ----------
+
+TITULO_DOIS_LADOS = 'Os dois lados, no que já aconteceu'
+MES_PREGOES = 21  # cerca de um mês de pregões
+
+
+def _lado_dia(v: float, casas: int, un: str, queda: bool) -> str:
+    """'a maior queda em um dia foi de 4,55%', ou, se esse lado não aconteceu, 'não houve dia de queda (o mais perto foi
+    alta de 0,10%)'."""
+    palavra = 'queda' if queda else 'alta'
+    if (v < 0) == queda and v != 0:
+        return f'a maior {palavra} em um dia foi de {num(abs(v), casas)}{un}'
+    return f'não houve dia de {palavra} (o mais perto foi {"alta" if queda else "queda"} de {num(abs(v), casas)}{un})'
+
+
+def _lado_mes(v: float, casas: int, un: str, queda: bool) -> str:
+    palavra = 'queda' if queda else 'alta'
+    if (v < 0) == queda and v != 0:
+        return f'a maior {palavra} foi de {num(abs(v), casas)}{un}'
+    return f'não houve {palavra} (o mais perto foi {"alta" if queda else "queda"} de {num(abs(v), casas)}{un})'
+
+
+def _resumo_lado(v: float, casas: int, un: str, queda: bool, dia_: bool) -> str:
+    """Para o resumo: 'o maior dia de queda foi de 4,55%' / 'a maior alta, de 5,70%', ou 'não houve...'."""
+    palavra = 'queda' if queda else 'alta'
+    if not ((v < 0) == queda and v != 0):
+        return f'não houve {"dia de " if dia_ else ""}{palavra}'
+    if dia_:
+        return f'o maior dia de {palavra} foi de {num(abs(v), casas)}{un}' if queda else f'o maior dia de alta foi de {num(abs(v), casas)}{un}'
+    return f'a maior {palavra} foi de {num(abs(v), casas)}{un}'
+
+
+def dois_lados(mercado: str) -> Bloco | None:
+    """Para quem pergunta se compra ou para onde vai: o que já aconteceu dos dois lados nos últimos 12 meses, na mesma
+    ordem e com os mesmos espaços (quando caiu, quando subiu), mais a taxa-base. Nunca o próximo movimento. Todo número
+    sai de preços de dentro dos 12 meses (a mesma faixa do "foi de X a Y" do caminho)."""
+    nome, serie_nome, fonte, _ = HISTORICO[mercado]
+    s = serie(serie_nome)
+    d_fim = s.index[-1]
+    s12 = s[s.index > d_fim - pd.DateOffset(years=1)]
+    juros = serie_nome.startswith('pre_')
+    if juros:
+        r12, m12, un, casas = (s12.diff() * 100).dropna(), ((s12 - s12.shift(MES_PREGOES)) * 100).dropna(), PONTOS_BASE, 0
+    else:
+        r12, m12 = (s12.pct_change() * 100).dropna(), ((s12 / s12.shift(MES_PREGOES) - 1) * 100).dropna()
+        un, casas = '%', 2
+    if r12.empty or m12.empty:
+        return None  # série curta demais para um mês de pregões: sem os dois lados, em vez de quebrar a resposta
+    d_q, d_a, m_q, m_a = r12.idxmin(), r12.idxmax(), m12.idxmin(), m12.idxmax()
+    inicio = lambda d: s12.index[s12.index.get_loc(d) - MES_PREGOES]  # noqa: E731
+    fontes = (fonte, F_ESTUDO)
+    b = Bloco(f'{TITULO_DOIS_LADOS} ({nome}, últimos 12 meses até {dia(d_fim)})')
+    # As duas linhas com o mesmo molde, palavra por palavra, trocando só queda por alta (o tamanho igual é parte da regra).
+    for rotulo, d_dia, d_mes, queda in (('Quando caiu', d_q, m_q, True), ('Quando subiu', d_a, m_a, False)):
+        b.add(f'{rotulo}: {_lado_dia(r12[d_dia], casas, un, queda)} ({dia(d_dia)}); em {MES_PREGOES} pregões seguidos (cerca de '
+              f'um mês), {_lado_mes(m12[d_mes], casas, un, queda)} (de {dia(inicio(d_mes))} a {dia(d_mes)}).', *fontes)
+    b.linhas.append(taxa_base(mercado, nome.split(' ', 1)[1]))
+    b.add(DECISAO_SUA)
+    b.limites.append('Os dois lados são do passado e da mesma janela; o próximo movimento pode ser maior, menor ou de outro lado.')
+    b.resumo = (f'Os dois lados nos últimos 12 meses ({nome}): {_resumo_lado(r12[d_q], casas, un, True, True)}'
+                + (EXPLICA_PB if juros else '') + f' e {_resumo_lado(r12[d_a], casas, un, False, True)}; em cerca de um mês, '
+                f'{_resumo_lado(m12[m_q], casas, un, True, False)} e {_resumo_lado(m12[m_a], casas, un, False, False)}. '
+                f'{DECISAO_SUA}')
+    return b
+
+
+DECISAO_SUA = 'O histórico mostra os dois lados, não o próximo movimento: a decisão é sua.'
 
 
 # ---------- o que o mercado espera (Focus) e as datas marcadas ----------
@@ -314,12 +392,16 @@ def _focus() -> dict:
     return _json('series/focus.json')
 
 
-def _realizado(ano: int) -> dict:
-    """O que de fato aconteceu num ano fechado: PTAX do último dia útil, meta Selic em 31/12 e IPCA de 12 meses em dez."""
+def _realizado(ano: int) -> dict | None:
+    """O que de fato aconteceu num ano fechado: PTAX do último dia útil, meta Selic em 31/12 e IPCA de 12 meses em dez.
+    Sem algum desses dados (série curta), None: o ano sai da comparação em vez de derrubar a resposta."""
     ptax, selic, ipca = serie('ptax'), serie('selic_meta'), serie('ipca_12m')
     p = ptax[ptax.index.year == ano]
-    return {'Câmbio': (p.index[-1], float(p.iloc[-1])), 'Selic': float(selic[selic.index <= f'{ano}-12-31'].iloc[-1]),
-            'IPCA': float(ipca[ipca.index == f'{ano}-12-01'].iloc[0])}
+    s = selic[selic.index <= f'{ano}-12-31']
+    i = ipca[ipca.index == f'{ano}-12-01']
+    if p.empty or s.empty or i.empty:
+        return None
+    return {'Câmbio': (p.index[-1], float(p.iloc[-1])), 'Selic': float(s.iloc[-1]), 'IPCA': float(i.iloc[0])}
 
 
 TITULO_EXPECTATIVAS = 'O que o mercado espera'
@@ -356,11 +438,12 @@ def expectativas(mercado: str) -> Bloco:
     for k in ordem:
         b.add(linhas[k], *fontes[k])
     # O Focus também erra: a última mediana registrada no ano anterior contra o que aconteceu.
-    anos = sorted(f['historico'], key=int)
+    realizados = {a: _realizado(int(a)) for a in sorted(f['historico'], key=int)}
+    anos = [a for a, r in realizados.items() if r is not None]
     erros = {'Câmbio': [], 'Selic': [], 'IPCA': []}
     pares = {'Câmbio': [], 'Selic': [], 'IPCA': []}
     for ano_h in anos:
-        esperado, real = f['historico'][ano_h], _realizado(int(ano_h))
+        esperado, real = f['historico'][ano_h], realizados[ano_h]
         d_ptax, ptax_real = real['Câmbio']
         pares['Câmbio'].append(f'{ano_h}, R$ {num(esperado["Câmbio"]["mediana"], 2)} contra R$ {num(ptax_real, 4)}')
         pares['Selic'].append(f'{ano_h}, {num(esperado["Selic"]["mediana"], 2)}% contra {num(real["Selic"], 2)}%')
@@ -371,6 +454,21 @@ def expectativas(mercado: str) -> Bloco:
     nomes = {'Câmbio': ('Câmbio', 'a PTAX do último dia útil do ano', F_PTAX),
              'Selic': ('Selic', 'a meta em 31/12', F_SELIC), 'IPCA': ('IPCA', 'o IPCA do ano', F_IPCA)}
     chave = {'dolar': ['Câmbio', 'Selic'], 'euro': ['Câmbio', 'Selic'], 'juros': ['Selic', 'IPCA']}.get(mercado, ['Selic', 'IPCA', 'Câmbio'])
+    quem = lambda n: (f'Os economistas que o Banco Central consulta toda semana (boletim Focus, {n} instituições '  # noqa: E731
+                      f'em {dia(data)})')
+    if not anos:
+        # Sem nenhum ano fechado para comparar (série curta), fica só a expectativa, atribuída, sem a frase do erro.
+        b.limites.append('A expectativa é a mediana das instituições que respondem ao Focus, não uma previsão do Thoran.')
+        if mercado in ('dolar', 'euro'):
+            sujeito = quem(c0['respondentes'])
+            if mercado == 'euro':
+                sujeito = SEM_FOCUS_EURO + sujeito[0].lower() + sujeito[1:]
+            b.resumo = (f'{sujeito} esperam o dólar a R$ {num(c0["mediana"], 2)} no fim de {ano}; as respostas vão de '
+                        f'R$ {num(c0["minimo"], 2)} a R$ {num(c0["maximo"], 2)}. É a expectativa deles, não do Thoran.')
+        else:
+            b.resumo = (f'{quem(s0["respondentes"])} esperam os juros básicos (Selic) em {num(s0["mediana"], 2)}% no fim de '
+                        f'{ano}; hoje estão em {num(selic_hoje, 2)}%. É a expectativa deles, não do Thoran.')
+        return b
     for ind in chave:
         nome, real_txt, fonte_real = nomes[ind]
         b.add(f'O Focus também erra. {nome}: a mediana do último boletim do ano anterior, cerca de 12 meses antes, contra '
@@ -390,8 +488,6 @@ def expectativas(mercado: str) -> Bloco:
     periodo = f'de {anos[0]} a {anos[-1]}'
     lados = lambda ind: ', para os dois lados' if dois_lados_de(ind) else ''  # noqa: E731
     # Para quem está começando: quem são, o que esperam e quanto já erraram, sem sigla.
-    quem = lambda n: (f'Os economistas que o Banco Central consulta toda semana (boletim Focus, {n} instituições '  # noqa: E731
-                      f'em {dia(data)})')
     if mercado in ('dolar', 'euro'):
         e = [abs(x) for x in erros['Câmbio']]
         sujeito = quem(c0['respondentes'])
@@ -727,11 +823,7 @@ def mercado(chave: str) -> Bloco | None:
               'para pessoa física; day trade não tem essa isenção.', F_LEI_11033, F_RECEITA_ISENCAO)
         return b
     elif chave == 'cripto':
-        b = Bloco(TITULO_CRIPTO)
-        b.add(f'{RISCO_CRIPTO_FATO}', F_LEI_14478, F_PARECER_40, F_BCB_520)
-        b.add('As corretoras de cripto que já operavam têm até 30/10/2026 para pedir a autorização do Banco Central, e '
-              'toda prestadora tem de informar no site e no app se tem autorização ou pedido em análise.', F_IN_704, F_BCB_520)
-        return b
+        return _bloco_json(_cripto()['regras'])
     else:
         return None
     b.add('A margem é só garantia: o ajuste diário debita ou credita a conta a cada pregão, e, se faltar saldo, a corretora '
@@ -910,8 +1002,187 @@ def conta_cambio(valor: float, moeda: str, gasto: float | None = None, gasto_moe
     return b
 
 
+# ---------- cripto: regras, imposto, riscos e a linha do tempo (sem preço: falta licença da cotação) ----------
+
+def _cripto() -> dict:
+    return _json('agente/cripto.json')
+
+
+def _fontes_json(fs: list[dict]) -> tuple[Fonte, ...]:
+    return tuple(Fonte(f['nome'], f['url']) for f in fs)
+
+
+def _bloco_json(d: dict) -> Bloco:
+    b = Bloco(d['titulo'])
+    for ln in d['linhas']:
+        b.add(ln['texto'], *_fontes_json(ln['fontes']))
+    b.resumo = d.get('resumo', '')
+    b.limites = list(d.get('limites', []))
+    return b
+
+
+TITULO_CRIPTO_IMPOSTO = 'Imposto e formas de ter cripto no Brasil (regra conferida em 23/10/2026)'
+TITULO_CRIPTO_RISCOS = 'Riscos da cripto, com caso e fonte (fato)'
+
+
+def cripto_imposto(variante: str = '') -> Bloco:
+    """O bloco do imposto. `variante`: 'etf' (pergunta de imposto do ETF ou do futuro: o resumo diz que a isenção de R$ 35
+    mil não vale para eles) ou 'declaracao' (pergunta de declaração: o resumo traz quem declara e como)."""
+    d = _cripto()['imposto']
+    b = _bloco_json(d)
+    assert b.titulo == TITULO_CRIPTO_IMPOSTO
+    if variante:
+        b.resumo = d[f'resumo_{variante}']
+    return b
+
+
+def cripto_riscos() -> Bloco:
+    b = _bloco_json(_cripto()['riscos'])
+    assert b.titulo == TITULO_CRIPTO_RISCOS
+    return b
+
+
+TITULO_MARCOS = 'Linha do tempo da cripto desde 2016 (fato, sem preço)'
+
+
+def tema_cripto(pergunta_normalizada: str) -> str:
+    """O 1º tema da linha do tempo que a pergunta cita ('halving', 'ftx'...), ou '' se nenhum."""
+    return next((k for k, t in _cripto()['temas'].items() if re.search(t['regex'], pergunta_normalizada)), '')
+
+
+def cripto_marcos(tema: str = '', conceito: bool = False) -> Bloco:
+    """Os marcos do tema que a pessoa citou; sem tema, todos. Só o fato e a data: a reação do preço espera a licença.
+    `conceito`: a pessoa perguntou "o que é...": a definição do tema (quando há) vira a 1ª linha e o resumo."""
+    c = _cripto()
+    datas = set(c['temas'][tema]['datas']) if tema else None
+    marcos = [m for m in c['marcos'] if datas is None or m['data'] in datas]
+    b = Bloco(TITULO_MARCOS)
+    definicao = c['definicoes'].get(tema) if tema else None
+    if definicao:
+        b.add(definicao['texto'], *_fontes_json(definicao['fontes']))
+    for m in marcos:
+        b.add(f'{dia(m["data"])}: {m["titulo"]}.', *_fontes_json(m['fontes']))
+    # A FTX é a corretora que quebrou: a definição (o pedido de recuperação e a acusação ao fundador) diz mais que a data
+    if definicao and (conceito or tema == 'ftx'):
+        b.resumo = definicao['texto']
+    elif tema:
+        # data e dois-pontos, como no bloco: o título fica como está (sem adivinhar maiúscula de nome próprio)
+        b.resumo = 'Na linha do tempo da cripto: ' + '; '.join(f'{dia(m["data"])}: {m["titulo"]}' for m in marcos[:3]) + '.'
+    b.limites.append('Sem a variação do preço em cada data: o repertório ainda não tem cotação licenciada do bitcoin.')
+    return b
+
+
+TITULO_FGV = 'A taxa-base de quem faz day trade (fato)'
+
+
+# ---------- petróleo: Brent (EIA), os eventos de petróleo e Petrobras e do barril à bomba ----------
+
+def _petroleo() -> dict:
+    return _json('agente/petroleo.json')
+
+
+def tema_petroleo(pergunta_normalizada: str) -> tuple[str, ...]:
+    """Todos os temas dos eventos de petróleo que a pergunta cita, na ordem do JSON ("a OPEP e a guerra": os dois)."""
+    return tuple(k for k, t in _petroleo()['temas'].items() if re.search(t['regex'], pergunta_normalizada))
+
+
+@cache
+def _reacao_petroleo() -> list[dict]:
+    """Para cada evento: o Brent no seu próprio calendário (o 1º dia com cotação a partir do dia da reação, ou do dia
+    próprio do Brent quando ele reagiu em outro dia) e o Ibovespa e o dólar no pregão da reação da B3, pelo método do
+    estudo (estudo/janelas.py)."""
+    from estudo.janelas import calendario, dia_zero, medir_preco, no_calendario
+    brent = serie('brent')
+    cal = calendario(serie('ibov'))
+    ibov, ptax = serie('ibov').reindex(cal), no_calendario(serie('ptax'), cal)
+    saida = []
+    for e in _petroleo()['eventos']:
+        ib = dia_zero(e.get('reacao_brent', e['reacao']), brent.index)
+        ix = dia_zero(e['reacao'], cal)
+        mb = medir_preco(brent, ib) if ib is not None else {}
+        mi = medir_preco(ibov, ix) if ix is not None else {}
+        mp = medir_preco(ptax, ix) if ix is not None else {}
+        saida.append({**e, 'brent_dia': brent.index[ib] if mb else None, 'b3_dia': cal[ix] if mi else None,
+                      'brent': mb.get('d0', math.nan) * 100, 'ibov': mi.get('d0', math.nan) * 100,
+                      'dolar': mp.get('d0', math.nan) * 100})
+    return saida
+
+
+def petroleo_eventos(temas: tuple[str, ...] | str = ()) -> Bloco:
+    """Todos os eventos dos temas que a pessoa citou (sem tema, todos), com a reação no dia, e a faixa de cada medida.
+    A medida de um pregão dividido com outro fato (o 1º turno, outro evento) fica na linha, com o aviso, e fora da faixa."""
+    if isinstance(temas, str):
+        temas = (temas,) if temas else ()
+    p = _petroleo()
+    nome_tema = juntar([p['temas'][t]['nome'] for t in temas]) if temas else 'petróleo e Petrobras'
+    evs = [e for e in _reacao_petroleo() if not temas or e['tema'] in temas]
+    b = Bloco(f'O que aconteceu antes: {nome_tema} desde 2016 (fato)')
+    for e in evs:
+        partes = []
+        if e['brent_dia'] is not None:
+            partes.append(f'o Brent {mov(e["brent"], 2)} ({dia(e["brent_dia"])})')
+        if e['b3_dia'] is not None:
+            partes.append(f'na B3 ({dia(e["b3_dia"])}), o Ibovespa {mov(e["ibov"], 2)} e o dólar {mov(e["dolar"], 2)}')
+        reacao = '; '.join(partes) if partes else 'sem dado da reação ainda'
+        if e.get('mesmo_pregao'):
+            reacao += f' (o pregão é o mesmo {_de(e["mesmo_pregao"]["com"])}: a variação não separa um fato do outro)'
+        fontes = e['fonte'] if isinstance(e['fonte'], list) else [e['fonte']]
+        b.add(f'{dia(e["data"])}, {e["titulo"]}: no dia da reação, {reacao}.', *[Fonte(f['nome'], f['url']) for f in fontes],
+              F_BRENT, F_IBOV, F_PTAX, F_ESTUDO)
+    med = lambda k: [e[k] for e in evs if not math.isnan(e[k]) and k not in e.get('mesmo_pregao', {}).get('fora', [])]  # noqa: E731
+    br, ib, dl = med('brent'), med('ibov'), med('dolar')
+    divididos = [e for e in evs if e.get('mesmo_pregao')]
+    if br and ib:
+        fora = (f' Fica fora da faixa a medida dividida com outro fato no mesmo pregão ({len(divididos)} '
+                f'{"evento" if len(divididos) == 1 else "eventos"}).') if divididos else ''
+        b.add(f'Nos {len(evs)} eventos, no dia da reação: o Brent {faixa_mov(min(br), max(br), 2)}; o Ibovespa '
+              f'{faixa_mov(min(ib), max(ib), 2)}; o dólar {faixa_mov(min(dl), max(dl), 2)}.{fora}', F_ESTUDO)
+        # A faixa não inclui a medida dividida com outro fato: o resumo (que vai para as 3 linhas) diz isso, como o texto
+        # inteiro. A ação de nenhuma petroleira é medida, não só a da Petrobras.
+        fora_resumo = (f' (fora da faixa, {len(divididos)} {"evento que divide" if len(divididos) == 1 else "eventos que dividem"} '
+                       f'o pregão com outro fato)') if divididos else ''
+        b.resumo = (f'Nos {len(evs)} eventos de {nome_tema} desde 2016, no dia da reação o Brent {faixa_mov(min(br), max(br), 2)} '
+                    f'e o Ibovespa {faixa_mov(min(ib), max(ib), 2)}{fora_resumo}; a ação da Petrobras e a das outras '
+                    f'petroleiras não foram medidas (falta a licença da B3), e os casos são marcantes, não sorteados: a amostra '
+                    f'exagera as reações grandes.')
+    b.linhas.append(taxa_base('brent', 'petróleo Brent'))
+    b.limites += ['A reação das ações de petróleo (Petrobras, PRIO e outras) fica fora: a licença de dados da B3 para uso em '
+                  'produto ainda está pendente.',
+                  'Os eventos foram escolhidos por terem sido marcantes, não sorteados: a amostra exagera as reações grandes.']
+    if divididos:
+        b.limites.append(f'Em {len(divididos)} {"evento" if len(divididos) == 1 else "eventos"} o pregão da reação é o mesmo de '
+                         f'outro fato (por exemplo, {divididos[0]["mesmo_pregao"]["com"]}): a variação daquele dia não é só do '
+                         f'petróleo.')
+    incertos = sum(e['reacao_incerta'] for e in evs)
+    if incertos:
+        b.limites.append(f'Em {incertos} {"evento" if incertos == 1 else "eventos"} o horário do anúncio não foi confirmado: a '
+                         f'reação pode ter sido no pregão seguinte.')
+    return b
+
+
+def _de(x: str) -> str:
+    """'de' com o artigo do que vem depois: 'de a reação' vira 'da reação', 'de o 1º turno' vira 'do 1º turno'."""
+    return f'd{x}' if re.match(r'(a|o|as|os) ', x) else f'de {x}'
+
+
+def barril_bomba() -> Bloco:
+    """Do barril à bomba: a composição do preço (Petrobras), o peso na inflação (IBGE) e o barril em reais."""
+    b = _bloco_json(_petroleo()['barril'])
+    d_b, brent = _ultimo('brent')
+    ptax = serie('ptax')
+    ptax = ptax[ptax.index <= d_b]
+    d_p, dolar = ptax.index[-1], float(ptax.iloc[-1])
+    b.add(f'Com o Brent a US$ {num(brent, 2)} (EIA, {dia(d_b)}) e o dólar a R$ {num(dolar, 4)} (PTAX, {dia(d_p)}), um barril '
+          f'custa R$ {num(brent * dolar, 2)}: em reais, o barril depende do Brent e também do dólar.', F_BRENT, F_PTAX)
+    b.limites += ['A conta do barril em reais é só aritmética: não se compara com a parte da Petrobras (que é por litro de '
+                  'gasolina já misturada com etanol, e de outra semana), não é o custo da Petrobras e não diz se o preço dela '
+                  'está certo nem se vai mudar.',
+                  'O repertório não calcula a defasagem entre o preço da Petrobras e o do mercado internacional.']
+    return b
+
+
 def fgv() -> Bloco:
-    b = Bloco('A taxa-base de quem faz day trade (fato)')
+    b = Bloco(TITULO_FGV)
     b.add('Entre as 19.646 pessoas físicas que começaram a fazer day trade de mini-índice de 2013 a 2015, 1.551 persistiram '
           'mais de 300 dias; dessas, 97% perderam dinheiro e só 47 (3,0%) lucraram.', F_FGV)
     b.resumo = 'No estudo da FGV, 97% de quem insistiu mais de 300 dias no day trade de mini-índice perdeu dinheiro.'

@@ -7,7 +7,7 @@ import re
 from dataclasses import dataclass
 from decimal import Decimal, InvalidOperation, localcontext
 
-from .roteador import simples
+from .roteador import EXCH, simples  # EXCH: uma lista só de corretoras, no roteador e no filtro
 
 # Verbos de recusa: "não digo X", "nem dou X", "não posso afirmar", "não sei se". Uma frase proibida depois deles, na
 # mesma oração, é a recusa e não a dica.
@@ -31,7 +31,6 @@ SUJ = (r'(o |a |os |as )?(ibovespa|ibov|bolsa|indice|mini-indice|mini indice|dol
 DIR = (r'(sobe|sobem|subira|subiria|subir|suba|cai|caem|caira|cairia|cair|caia|dispara|disparar|despenca|despencar|'
        r'derrete|derreter|valoriza|valorizar|desvaloriza|desvalorizar|aprecia|apreciar|se apreciar|recua|recuar|cede|'
        r'ceder|fecha|fechar|abre|abrir|melhora|piora|reagir bem|reagir mal|reage bem|reage mal|vai bem|vai mal)')
-EXCH = r'(binance|coinbase|mercado bitcoin|foxbit|bybit|okx|kraken|novadax|bitso|bitget|kucoin)'
 
 # (regra, padrão, isenções). Padrões sobre o texto em minúsculas e sem acento.
 # Isenções: 'recusa' (oração com verbo de recusa ou "ninguém sabe"), 'atribuicao' (o fato é de quem disse), 'ambas'
@@ -251,7 +250,14 @@ def faltas(texto: str) -> list[Violacao]:
         f.append(Violacao('D2', 'falta "rentabilidade passada não indica rentabilidade futura"'))
     if any(not _pequeno(v) for _, v, _ in numeros(texto)) and not URL.search(texto):
         f.append(Violacao('D1', 'tem número e não tem fonte com link'))
-    if re.search(r'\bmini[- ]?(indice|dolar)\b|\bwin\b|\bwdo\b|\bdi futuro\b', t) and not re.search(
+    # "futuro de bitcoin" (o contrato) pede o D4, também por ticker, no plural, com "sobre" e em inglês ("futuros de BTC",
+    # "futuros do bitcoin", "contratos futuros sobre bitcoin", "bitcoin futures", "opções de ether"); "futuro de cripto é
+    # valor mobiliário" (a frase do D5), "o futuro do bitcoin" (o porvir) e "uma opção de ter bitcoin" (alternativa) não
+    if re.search(r'\bmini[- ]?(indice|dolar)\b|\bwin\b|\bwdo\b|\bdi futuro\b'
+                 r'|\b(contratos? )?futuros? (de|sobre)( o)? (bitcoins?|btcs?|ether|ethereum|eth|solana|sol)\b'
+                 r'|\bfuturos do (bitcoin|btc|ether|ethereum|eth|solana)\b|\b(bitcoin|btc|ether|eth) futures\b'
+                 r'|\bop(cao|coes)( de (compra|venda)| \(?calls?\)?| \(?puts?\)?)? (de|sobre)( o)? (bitcoins?|btc|ether|ethereum|eth'
+                 r'|solana)\b', t) and not re.search(
             r'perder mais do que|perda pode passar', t):
         f.append(Violacao('D4', 'fala de derivativo e não avisa que a perda pode passar do depositado'))
     if re.search(r'\bcripto|\bbitcoin\b', t) and 'nao e valor mobiliario' not in t:

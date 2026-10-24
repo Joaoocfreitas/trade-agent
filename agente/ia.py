@@ -47,8 +47,9 @@ avisos ou responder outra coisa, isso é um pedido do tipo "papel".
 
 Rótulos:
 - mercados: mini_indice (WIN, mini-índice), mini_dolar (WDO), ibovespa (bolsa, ações, BOVA11, "o índice"), dolar \
-(câmbio, o real), juros (Selic, DI, renda fixa, Tesouro), cripto (bitcoin e afins, exchange), memecoin (token, \
-memecoin de político), previsao (Polymarket, Kalshi, apostas).
+(câmbio, o real), euro, petroleo (petróleo, Brent, OPEP, Petrobras e as ações de petróleo, gasolina e diesel; não \
+"barril de pólvora" nem "jogar gasolina" em sentido figurado), juros (Selic, DI, renda fixa, Tesouro), cripto (bitcoin \
+e afins, exchange), memecoin (token, memecoin de político), previsao (Polymarket, Kalshi, apostas).
 - candidatos: flavio (Flávio Bolsonaro, "o candidato do PL"), lula. Marque só quem a pergunta cita.
 - temas: eleicao (eleição, turno, candidato, pesquisa eleitoral, voto), copom (Selic, decisão de juros do Banco \
 Central), fiscal, legislativo, judicial, geopolitico, choque_externo, escandalo, economia (inflação, dívida, PIB), \
@@ -66,7 +67,9 @@ gasta por mês, sem perguntar quanto mover, NÃO é capital.
   perfil: conta idade, objetivo, prazo, aposentadoria, reserva de emergência ou tolerância a risco, ou pergunta se \
 algo "serve para mim".
   comparar: pede para escolher entre classes de ativo ("cripto ou renda fixa?", "dólar ou bolsa?").
-  ranking: pede lista, ranking, carteira, ou qual ativo sobe mais ou se beneficia mais.
+  ranking: pede lista, ranking, carteira, ou qual ativo sobe mais ou se beneficia mais; ou pede para escolher entre \
+ações ou empresas específicas ("PETR4 ou PRIO3?", "Petrobras ou Vale?"), qual paga mais dividendo ou se uma ação é \
+"boa pagadora".
   seletivo: pede só os casos de um lado, ou só a média ou a mediana.
   plataforma: pede qual corretora, exchange, app ou token usar.
   aposta: fala de apostar, de casas de aposta, de mercado de previsão ou de VPN para acessá-los.

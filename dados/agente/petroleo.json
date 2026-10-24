@@ -1,0 +1,748 @@
+{
+ "_leia": "Eventos de petróleo e Petrobras de 2016 a 2026, com a fonte de cada um (a primária quando houver), conferidos em 23/10/2026 (nota do cofre \"Petróleo e Petrobras 2016–2026\"). A reação é calculada no código: Brent pela EIA, Ibovespa e dólar no pregão da B3. A cotação das ações fica fora até a licença de dados da B3. O tema \"petrobras\" só aceita como dividendo que já saiu os anos fechados (hoje 2016–2025, no regex): suba o limite na virada do ano, porque ano que ainda vem não é fato (Mapa legal, seção 8, item 10).",
+ "temas": {
+  "opep": {
+   "regex": "\\bopep\\b|\\bopec\\b",
+   "nome": "decisões da OPEP e da OPEP+"
+  },
+  "guerra": {
+   "regex": "\\bguerra\\b(?! ((de|do|dos) )?precos?\\b| comercial)|\\biran\\b|\\b(do|no|ao|pro|pelo|com o|contra o) ira\\b|(?<!\\bquem )(?<!\\bque )(?<!\\bninguem )(?<!\\balguem )(?<!\\bnao )(?<!\\bele )(?<!\\bela )(?<!\\bvoce )\\bo ira\\b|\\bo ira\\b(?! \\w{3,}(ar|er|ir)\\b)|\\bormuz\\b|\\brussia\\b|\\bruss[oa]s?\\b|\\bucrania\\b|\\bisrael\\b|\\bataques?\\b|\\bconflito\\b|\\bcessar[- ]fogo\\b",
+   "nome": "guerras e ataques"
+  },
+  "governo": {
+   "regex": "\\bimpost\\w*|\\btribut\\w*|\\bicms\\b|\\bsubvenc\\w*|\\bmedida provisoria\\b|\\bgoverno\\b|\\bpre-sal\\b|\\boperador\\w*|\\bexportac\\w*",
+   "nome": "medidas do governo sobre combustível"
+  },
+  "choque": {
+   "regex": "\\bcovid\\b|\\bpandemia\\b|\\bguerra (de |do |dos )?precos?\\b|\\babaixo de zero\\b|\\b(wti|petroleo|barril|preco)\\b[^.?!]{0,25}\\bnegativ\\w*(?=[^.?!]{0,30}\\b(2020|abril|historia|historic\\w*|primeira vez)\\b)|\\b(2020|abril)\\b[^.?!]{0,40}\\b(wti|petroleo|barril|preco)\\b[^.?!]{0,25}\\bnegativ\\w*|^\\W*(o |a )?(wti|petroleo|barril|preco do petroleo|preco do barril)( ja)? (ficou |chegou a |fechou |foi )?negativo\\W*$|^(?!.*\\b(hoje|ontem|semanas?|mes|meses|anos?|acumulado|trimestre|semestre|pregao|sessao|periodo|janeiro|fevereiro|marco|maio|junho|julho|agosto|setembro|outubro|novembro|dezembro)\\b).*?\\b(wti|petroleo|barril)\\b( americano| de petroleo)?\\W{0,3}((ja )?(fica|ficou|ficaram|chegou a ficar|chegou a|foi a|esteve) )?negativo\\b",
+   "nome": "choques de demanda"
+  },
+  "petrobras": {
+   "regex": "(?=.*\\b(petrobras|petr[34])\\b)(?=.*\\b(presidentes?|presidencia|presidir|ceos?|comando|conselho( de administracao)?( da petrobras)? (nao )?(eleg\\w*|aprov\\w*|propo\\w*|propos|decid\\w*|vot\\w*)|indicad[oa] (para|pra|a) (presidir|presidencia|petrobras|o comando)|governo indica|deix(a|ou) (a petrobras|o cargo|a presidencia|o comando)|deixou de ser operadora|saida d[eoa] (presidente|ceo|presidencia|comando|\\w+ (da|na) petrobras)|renuncia\\w*|demissao|nome(a\\w*|ou|ia\\w*)|elegeu|elegeram|foi eleit[oa]|demitiu|demitiram|demitid[oa]|pedro parente|(o|do|ao|pelo|com o) parente\\b(?! d[oa] (meu|minha|seu|sua|um|uma)\\b| (meu|minha)\\b)|jean paul|prates|magda|chambriard|castell?o branco|castello|silva e luna|jose mauro|caio paes|paes de andrade|adriano pires|(aumentou|aumentaram|subiu|baixou|baixaram|reduziu|reduziram|cortou) (o |os )?precos?|(ultimo |o )?aumento d[aoe] (preco|precos|gasolina|diesel|combustive(l|is)|petrobras)|reajust\\w*|gasolina|diesel|politica de (preco|precos|dividendo|dividendos)|paridade|estrategia comercial|greve|caminhoneir\\w*|dividendos? extraordinari\\w*|interferencia)\\b)|(?=.*\\b(petrobras|petr[34])\\b)(?=.*\\bdividendo\\w*)(?=.*\\b(reagiu|reagiram|aconteceu|aconteceram|foi|foram|pagou|aprov\\w*|20(1[6-9]|2[0-5]))\\b)|(?=.*\\b(petrobras|petr[34])\\b)(?=.*\\b(o que aconteceu|aconteceu com|linha do tempo|eventos?|historia|historico)\\b)",
+   "nome": "Petrobras (presidente, preço e dividendo)"
+  }
+ },
+ "eventos": [
+  {
+   "data": "2016-05-19",
+   "reacao": "2016-05-20",
+   "reacao_incerta": false,
+   "titulo": "Pedro Parente é indicado para presidir a Petrobras",
+   "tema": "petrobras",
+   "confianca": "alta",
+   "fonte": {
+    "nome": "Petrobras, documento na CVM (evento de 19/05/2016)",
+    "url": "https://www.rad.cvm.gov.br/ENET/frmDownloadDocumento.aspx?Tela=ext&descTipo=IPE&CodigoInstituicao=1&numProtocolo=518030&numSequencia=60778&numVersao=1"
+   }
+  },
+  {
+   "data": "2016-10-14",
+   "reacao": "2016-10-14",
+   "reacao_incerta": true,
+   "titulo": "Petrobras passa a seguir a paridade de importação, com avaliação dos preços ao menos uma vez por mês",
+   "tema": "petrobras",
+   "confianca": "alta",
+   "fonte": {
+    "nome": "Petrobras, documento na CVM (evento de 14/10/2016)",
+    "url": "https://www.rad.cvm.gov.br/ENET/frmDownloadDocumento.aspx?Tela=ext&descTipo=IPE&CodigoInstituicao=1&numProtocolo=534336&numSequencia=77084&numVersao=1"
+   }
+  },
+  {
+   "data": "2016-11-29",
+   "reacao": "2016-11-30",
+   "reacao_incerta": false,
+   "titulo": "Lei 13.365: a Petrobras deixa de ser operadora obrigatória do pré-sal",
+   "tema": "governo",
+   "confianca": "alta",
+   "fonte": {
+    "nome": "Planalto, texto da Lei 13.365",
+    "url": "https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2016/lei/l13365.htm"
+   },
+   "mesmo_pregao": {
+    "com": "o corte da OPEP de 30/11/2016",
+    "fora": [
+     "brent",
+     "ibov",
+     "dolar"
+    ]
+   }
+  },
+  {
+   "data": "2016-11-30",
+   "reacao": "2016-11-30",
+   "reacao_incerta": false,
+   "titulo": "OPEP fecha o primeiro corte de produção desde 2008",
+   "tema": "opep",
+   "confianca": "media",
+   "fonte": {
+    "nome": "OPEP, comunicado de 30/11/2016",
+    "url": "https://www.opec.org/pr-detail/458-30-nov-2016.html"
+   },
+   "mesmo_pregao": {
+    "com": "a Lei 13.365 (pré-sal)",
+    "fora": [
+     "ibov",
+     "dolar"
+    ]
+   }
+  },
+  {
+   "data": "2016-12-10",
+   "reacao": "2016-12-12",
+   "reacao_incerta": false,
+   "titulo": "OPEP e países de fora dela fecham acordo de cooperação (nasce a OPEP+)",
+   "tema": "opep",
+   "confianca": "media",
+   "fonte": {
+    "nome": "OPEP, comunicado de 10/12/2016",
+    "url": "https://www.opec.org/pr-detail/457-10-dec-2016.html"
+   }
+  },
+  {
+   "data": "2017-06-29",
+   "reacao": "2017-06-30",
+   "reacao_incerta": false,
+   "titulo": "Petrobras passa a reajustar diesel e gasolina com mais frequência",
+   "tema": "petrobras",
+   "confianca": "alta",
+   "fonte": {
+    "nome": "Petrobras, documento na CVM (evento de 29/06/2017)",
+    "url": "https://www.rad.cvm.gov.br/ENET/frmDownloadDocumento.aspx?Tela=ext&descTipo=IPE&CodigoInstituicao=1&numProtocolo=569655&numSequencia=112450&numVersao=1"
+   }
+  },
+  {
+   "data": "2018-05-23",
+   "reacao": "2018-05-23",
+   "reacao_incerta": true,
+   "titulo": "Greve dos caminhoneiros: Petrobras corta o diesel em 10% por 15 dias",
+   "tema": "petrobras",
+   "confianca": "alta",
+   "fonte": [
+    {
+     "nome": "Petrobras, documento na CVM (evento de 23/05/2018)",
+     "url": "https://www.rad.cvm.gov.br/ENET/frmDownloadDocumento.aspx?Tela=ext&descTipo=IPE&CodigoInstituicao=1&numProtocolo=625302&numSequencia=160473&numVersao=3"
+    },
+    {
+     "nome": "Petrobras, Programa Temporário de Subvenção do Preço do Diesel (28/05/2018), que cita o anúncio de 23/05",
+     "url": "https://www.rad.cvm.gov.br/ENET/frmDownloadDocumento.aspx?Tela=ext&descTipo=IPE&CodigoInstituicao=1&numProtocolo=625769&numSequencia=160807&numVersao=1"
+    }
+   ]
+  },
+  {
+   "data": "2018-05-27",
+   "reacao": "2018-05-28",
+   "reacao_incerta": false,
+   "titulo": "Governo anuncia redução do diesel com subvenção (depois a Medida Provisória 838, de 30/05)",
+   "tema": "governo",
+   "confianca": "alta",
+   "fonte": [
+    {
+     "nome": "Petrobras, Programa Temporário de Subvenção do Preço do Diesel (28/05/2018)",
+     "url": "https://www.rad.cvm.gov.br/ENET/frmDownloadDocumento.aspx?Tela=ext&descTipo=IPE&CodigoInstituicao=1&numProtocolo=625769&numSequencia=160807&numVersao=1"
+    },
+    {
+     "nome": "Planalto, texto da Medida Provisória 838",
+     "url": "https://www.planalto.gov.br/ccivil_03/_ato2015-2018/2018/mpv/mpv838.htm"
+    }
+   ]
+  },
+  {
+   "data": "2018-06-01",
+   "reacao": "2018-06-01",
+   "reacao_incerta": false,
+   "titulo": "Pedro Parente deixa a Petrobras",
+   "tema": "petrobras",
+   "confianca": "alta",
+   "fonte": {
+    "nome": "Petrobras, Mudança na Administração (01/06/2018)",
+    "url": "https://www.rad.cvm.gov.br/ENET/frmDownloadDocumento.aspx?Tela=ext&descTipo=IPE&CodigoInstituicao=1&numProtocolo=626515&numSequencia=161377&numVersao=2"
+   }
+  },
+  {
+   "data": "2018-11-19",
+   "reacao": "2018-11-19",
+   "reacao_incerta": false,
+   "titulo": "Roberto Castello Branco é anunciado para presidir a Petrobras",
+   "tema": "petrobras",
+   "confianca": "alta",
+   "fonte": {
+    "nome": "Petrobras, esclarecimento sobre notícias (Ofício CVM 442/2018), 19/11/2018",
+    "url": "https://www.rad.cvm.gov.br/ENET/frmDownloadDocumento.aspx?Tela=ext&descTipo=IPE&CodigoInstituicao=1&numProtocolo=652277&numSequencia=183786&numVersao=1"
+   }
+  },
+  {
+   "data": "2019-04-11",
+   "reacao": "2019-04-12",
+   "reacao_incerta": false,
+   "titulo": "Petrobras adia reajuste do diesel",
+   "tema": "petrobras",
+   "confianca": "alta",
+   "fonte": {
+    "nome": "Petrobras, documento na CVM (evento de 11/04/2019)",
+    "url": "https://www.rad.cvm.gov.br/ENET/frmDownloadDocumento.aspx?Tela=ext&descTipo=IPE&CodigoInstituicao=1&numProtocolo=679240&numSequencia=207293&numVersao=1"
+   }
+  },
+  {
+   "data": "2019-09-14",
+   "reacao": "2019-09-16",
+   "reacao_incerta": false,
+   "titulo": "Ataque a instalações de petróleo da Arábia Saudita (Abqaiq e Khurais)",
+   "tema": "guerra",
+   "confianca": "alta",
+   "fonte": [
+    {
+     "nome": "Imprensa (Estado de Minas/AFP, 14/09/2019)",
+     "url": "https://www.em.com.br/app/noticia/internacional/2019/09/14/interna_internacional,1085243/rebeldes-do-iemen-atacam-instalacoes-petroleiras-na-arabia-saudita.shtml"
+    },
+    {
+     "nome": "Petrobras, comunicado sobre os eventos na Arábia Saudita (16/09/2019)",
+     "url": "https://www.rad.cvm.gov.br/ENET/frmDownloadDocumento.aspx?Tela=ext&descTipo=IPE&CodigoInstituicao=1&numProtocolo=711254&numSequencia=236568&numVersao=1"
+    }
+   ]
+  },
+  {
+   "data": "2020-03-06",
+   "reacao": "2020-03-06",
+   "reacao_incerta": false,
+   "titulo": "OPEP+ termina reunião sem acordo",
+   "tema": "opep",
+   "confianca": "media",
+   "fonte": {
+    "nome": "Imprensa (Azernews); o comunicado oficial da OPEP não foi localizado",
+    "url": "https://www.azernews.az/oil_and_gas/163221.html"
+   }
+  },
+  {
+   "data": "2020-03-08",
+   "reacao": "2020-03-09",
+   "reacao_incerta": false,
+   "titulo": "Guerra de preços da Arábia Saudita somada à covid",
+   "tema": "choque",
+   "confianca": "alta",
+   "fonte": {
+    "nome": "Imprensa (g1, 09/03/2020)",
+    "url": "https://g1.globo.com/economia/noticia/2020/03/09/bovespa.ghtml"
+   }
+  },
+  {
+   "data": "2020-04-12",
+   "reacao": "2020-04-13",
+   "reacao_incerta": false,
+   "titulo": "OPEP+ corta 9,7 milhões de barris por dia",
+   "tema": "opep",
+   "confianca": "media",
+   "fonte": {
+    "nome": "OPEP, comunicado de 12/04/2020",
+    "url": "https://www.opec.org/pr-detail/310-12-apr-2020.html"
+   }
+  },
+  {
+   "data": "2020-04-20",
+   "reacao": "2020-04-20",
+   "reacao_incerta": false,
+   "titulo": "Petróleo americano (WTI) fica negativo, e o Brent vai à mínima da década no dia seguinte",
+   "tema": "choque",
+   "confianca": "alta",
+   "fonte": {
+    "nome": "EIA, preço diário do petróleo WTI (o próprio fato: o WTI abaixo de zero)",
+    "url": "https://www.eia.gov/dnav/pet/hist/RWTCD.htm"
+   },
+   "reacao_brent": "2020-04-21"
+  },
+  {
+   "data": "2021-02-19",
+   "reacao": "2021-02-22",
+   "reacao_incerta": false,
+   "titulo": "Governo indica Joaquim Silva e Luna para a Petrobras, no lugar de Roberto Castello Branco",
+   "tema": "petrobras",
+   "confianca": "alta",
+   "fonte": {
+    "nome": "Petrobras, documento na CVM (evento de 19/02/2021)",
+    "url": "https://www.rad.cvm.gov.br/ENET/frmDownloadDocumento.aspx?Tela=ext&descTipo=IPE&CodigoInstituicao=1&numProtocolo=833750&numSequencia=358488&numVersao=1"
+   }
+  },
+  {
+   "data": "2022-02-24",
+   "reacao": "2022-02-24",
+   "reacao_incerta": false,
+   "titulo": "Rússia invade a Ucrânia",
+   "tema": "guerra",
+   "confianca": "alta",
+   "fonte": {
+    "nome": "Imprensa (g1, 24/02/2022)",
+    "url": "https://g1.globo.com/economia/noticia/2022/02/24/bovespa.ghtml"
+   }
+  },
+  {
+   "data": "2022-03-08",
+   "reacao": "2022-03-08",
+   "reacao_incerta": false,
+   "titulo": "EUA proíbem a compra de petróleo russo",
+   "tema": "guerra",
+   "confianca": "alta",
+   "fonte": {
+    "nome": "Federal Register (EUA), ordem executiva de 08/03/2022, publicada em 10/03/2022",
+    "url": "https://www.govinfo.gov/content/pkg/FR-2022-03-10/pdf/2022-05232.pdf"
+   }
+  },
+  {
+   "data": "2022-03-10",
+   "reacao": "2022-03-10",
+   "reacao_incerta": false,
+   "titulo": "Petrobras sobe gasolina e diesel",
+   "tema": "petrobras",
+   "confianca": "media",
+   "fonte": {
+    "nome": "Imprensa (Diário do Transporte, 10/03/2022); o comunicado da Petrobras não foi localizado",
+    "url": "https://diariodotransporte.com.br/2022/03/10/petrobras-anuncia-novo-aumento-nos-precos-do-glp-diesel-e-gasolina/"
+   }
+  },
+  {
+   "data": "2022-03-28",
+   "reacao": "2022-03-29",
+   "reacao_incerta": false,
+   "titulo": "Governo indica Adriano Pires para presidir a Petrobras",
+   "tema": "petrobras",
+   "confianca": "alta",
+   "fonte": {
+    "nome": "Petrobras, documento na CVM (evento de 28/03/2022)",
+    "url": "https://www.rad.cvm.gov.br/ENET/frmDownloadDocumento.aspx?Tela=ext&descTipo=IPE&CodigoInstituicao=1&numProtocolo=959642&numSequencia=484376&numVersao=1"
+   }
+  },
+  {
+   "data": "2022-04-06",
+   "reacao": "2022-04-07",
+   "reacao_incerta": false,
+   "titulo": "Governo indica José Mauro Coelho para a Petrobras, depois que Pires desistiu",
+   "tema": "petrobras",
+   "confianca": "media",
+   "fonte": {
+    "nome": "Petrobras, documento na CVM (evento de 06/04/2022)",
+    "url": "https://www.rad.cvm.gov.br/ENET/frmDownloadDocumento.aspx?Tela=ext&descTipo=IPE&CodigoInstituicao=1&numProtocolo=964705&numSequencia=489439&numVersao=1"
+   }
+  },
+  {
+   "data": "2022-05-23",
+   "reacao": "2022-05-24",
+   "reacao_incerta": false,
+   "titulo": "Governo indica Caio Paes de Andrade para a Petrobras, no lugar de José Mauro Coelho",
+   "tema": "petrobras",
+   "confianca": "alta",
+   "fonte": [
+    {
+     "nome": "Petrobras, documento na CVM (evento de 23/05/2022)",
+     "url": "https://www.rad.cvm.gov.br/ENET/frmDownloadDocumento.aspx?Tela=ext&descTipo=IPE&CodigoInstituicao=1&numProtocolo=984397&numSequencia=509131&numVersao=1"
+    },
+    {
+     "nome": "Imprensa (CNN Brasil, 23/05/2022, à noite)",
+     "url": "https://www.cnnbrasil.com.br/economia/macroeconomia/governo-anuncia-nova-troca-na-presidencia-da-petrobras/"
+    }
+   ]
+  },
+  {
+   "data": "2022-06-20",
+   "reacao": "2022-06-20",
+   "reacao_incerta": false,
+   "titulo": "José Mauro Coelho deixa a presidência da Petrobras",
+   "tema": "petrobras",
+   "confianca": "media",
+   "fonte": {
+    "nome": "Petrobras, documento na CVM (evento de 20/06/2022)",
+    "url": "https://www.rad.cvm.gov.br/ENET/frmDownloadDocumento.aspx?Tela=ext&descTipo=IPE&CodigoInstituicao=1&numProtocolo=991774&numSequencia=516508&numVersao=1"
+   }
+  },
+  {
+   "data": "2022-06-23",
+   "reacao": "2022-06-23",
+   "reacao_incerta": false,
+   "titulo": "Lei Complementar 194: combustível vira bem essencial, com teto do ICMS",
+   "tema": "governo",
+   "confianca": "alta",
+   "fonte": {
+    "nome": "Planalto, texto da Lei Complementar 194",
+    "url": "https://www.planalto.gov.br/ccivil_03/leis/lcp/lcp194.htm"
+   }
+  },
+  {
+   "data": "2022-07-14",
+   "reacao": "2022-07-14",
+   "reacao_incerta": false,
+   "titulo": "Emenda Constitucional 123: estado de emergência pelo preço dos combustíveis",
+   "tema": "governo",
+   "confianca": "alta",
+   "fonte": {
+    "nome": "Planalto, texto da Emenda Constitucional 123",
+    "url": "https://www.planalto.gov.br/ccivil_03/constituicao/emendas/emc/emc123.htm"
+   }
+  },
+  {
+   "data": "2022-07-28",
+   "reacao": "2022-07-28",
+   "reacao_incerta": true,
+   "titulo": "Petrobras aprova pagamento de dividendos",
+   "tema": "petrobras",
+   "confianca": "alta",
+   "fonte": {
+    "nome": "Petrobras, documento na CVM (evento de 28/07/2022)",
+    "url": "https://www.rad.cvm.gov.br/ENET/frmDownloadDocumento.aspx?Tela=ext&descTipo=IPE&CodigoInstituicao=1&numProtocolo=1001174&numSequencia=525908&numVersao=1"
+   }
+  },
+  {
+   "data": "2022-10-05",
+   "reacao": "2022-10-05",
+   "reacao_incerta": false,
+   "titulo": "OPEP+ corta 2 milhões de barris por dia",
+   "tema": "opep",
+   "confianca": "media",
+   "fonte": {
+    "nome": "OPEP, comunicado de 05/10/2022",
+    "url": "https://www.opec.org/pr-detail/73-05-oct-2022.html"
+   }
+  },
+  {
+   "data": "2023-01-26",
+   "reacao": "2023-01-26",
+   "reacao_incerta": true,
+   "titulo": "Conselho da Petrobras elege Jean Paul Prates presidente",
+   "tema": "petrobras",
+   "confianca": "alta",
+   "fonte": {
+    "nome": "Petrobras aprova eleição de Presidente (26/01/2023)",
+    "url": "https://www.rad.cvm.gov.br/ENET/frmDownloadDocumento.aspx?Tela=ext&descTipo=IPE&CodigoInstituicao=1&numProtocolo=1052401&numSequencia=577131&numVersao=1"
+   }
+  },
+  {
+   "data": "2023-02-28",
+   "reacao": "2023-02-28",
+   "reacao_incerta": true,
+   "titulo": "Medida Provisória 1.163: imposto de 9,2% na exportação de petróleo e volta parcial do PIS/Cofins da gasolina",
+   "tema": "governo",
+   "confianca": "alta",
+   "fonte": {
+    "nome": "Planalto, texto da Medida Provisória 1.163",
+    "url": "https://www.planalto.gov.br/ccivil_03/_ato2023-2026/2023/mpv/mpv1163.htm"
+   }
+  },
+  {
+   "data": "2023-04-02",
+   "reacao": "2023-04-03",
+   "reacao_incerta": false,
+   "titulo": "OPEP+ anuncia cortes voluntários de surpresa",
+   "tema": "opep",
+   "confianca": "media",
+   "fonte": {
+    "nome": "OPEP, comunicado de 03/04/2023",
+    "url": "https://www.opec.org/pr-detail/63-03-apr-2023.html"
+   }
+  },
+  {
+   "data": "2023-05-16",
+   "reacao": "2023-05-16",
+   "reacao_incerta": false,
+   "titulo": "Petrobras troca a paridade de importação por estratégia comercial própria",
+   "tema": "petrobras",
+   "confianca": "alta",
+   "fonte": {
+    "nome": "Petrobras, documento na CVM (evento de 16/05/2023)",
+    "url": "https://www.rad.cvm.gov.br/ENET/frmDownloadDocumento.aspx?Tela=ext&descTipo=IPE&CodigoInstituicao=1&numProtocolo=1102903&numSequencia=627632&numVersao=1"
+   }
+  },
+  {
+   "data": "2023-07-28",
+   "reacao": "2023-07-31",
+   "reacao_incerta": false,
+   "titulo": "Petrobras muda a política de dividendos",
+   "tema": "petrobras",
+   "confianca": "media",
+   "fonte": {
+    "nome": "Petrobras, documento na CVM (evento de 28/07/2023)",
+    "url": "https://www.rad.cvm.gov.br/ENET/frmDownloadDocumento.aspx?Tela=ext&descTipo=IPE&CodigoInstituicao=1&numProtocolo=1126766&numSequencia=651495&numVersao=1"
+   }
+  },
+  {
+   "data": "2023-11-30",
+   "reacao": "2023-11-30",
+   "reacao_incerta": false,
+   "titulo": "OPEP+ anuncia cortes voluntários de 2,2 milhões de barris por dia",
+   "tema": "opep",
+   "confianca": "media",
+   "fonte": {
+    "nome": "OPEP, comunicado de 30/11/2023",
+    "url": "https://www.opec.org/pr-detail/39-30-nov-2023.html"
+   }
+  },
+  {
+   "data": "2024-03-07",
+   "reacao": "2024-03-08",
+   "reacao_incerta": false,
+   "titulo": "Conselho da Petrobras não propõe dividendos extraordinários",
+   "tema": "petrobras",
+   "confianca": "alta",
+   "fonte": {
+    "nome": "Petrobras, documento na CVM (evento de 07/03/2024)",
+    "url": "https://www.rad.cvm.gov.br/ENET/frmDownloadDocumento.aspx?Tela=ext&descTipo=IPE&CodigoInstituicao=1&numProtocolo=1204672&numSequencia=729398&numVersao=1"
+   }
+  },
+  {
+   "data": "2024-04-19",
+   "reacao": "2024-04-19",
+   "reacao_incerta": true,
+   "titulo": "Conselho da Petrobras propõe pagar parte dos dividendos extraordinários",
+   "tema": "petrobras",
+   "confianca": "alta",
+   "fonte": {
+    "nome": "Petrobras, documento na CVM (evento de 19/04/2024)",
+    "url": "https://www.rad.cvm.gov.br/ENET/frmDownloadDocumento.aspx?Tela=ext&descTipo=IPE&CodigoInstituicao=1&numProtocolo=1224030&numSequencia=748756&numVersao=2"
+   }
+  },
+  {
+   "data": "2024-05-14",
+   "reacao": "2024-05-15",
+   "reacao_incerta": false,
+   "titulo": "Jean Paul Prates deixa a Petrobras; governo indica Magda Chambriard",
+   "tema": "petrobras",
+   "confianca": "alta",
+   "fonte": {
+    "nome": "Petrobras sobre o Ofício 214/2024 do Ministério de Minas e Energia (14/05/2024)",
+    "url": "https://www.rad.cvm.gov.br/ENET/frmDownloadDocumento.aspx?Tela=ext&descTipo=IPE&CodigoInstituicao=1&numProtocolo=1238316&numSequencia=763042&numVersao=1"
+   }
+  },
+  {
+   "data": "2024-06-02",
+   "reacao": "2024-06-03",
+   "reacao_incerta": false,
+   "titulo": "OPEP+ define a retirada gradual dos cortes voluntários",
+   "tema": "opep",
+   "confianca": "baixa",
+   "fonte": {
+    "nome": "Imprensa (The Astana Times, 03/06/2024), citando o serviço de imprensa da OPEP",
+    "url": "https://astanatimes.com/2024/06/opec-members-extend-voluntary-oil-production-cut-until-september/"
+   }
+  },
+  {
+   "data": "2024-11-21",
+   "reacao": "2024-11-22",
+   "reacao_incerta": false,
+   "titulo": "Petrobras aprova dividendos extraordinários",
+   "tema": "petrobras",
+   "confianca": "media",
+   "fonte": {
+    "nome": "Petrobras, documento na CVM (evento de 21/11/2024)",
+    "url": "https://www.rad.cvm.gov.br/ENET/frmDownloadDocumento.aspx?Tela=ext&descTipo=IPE&CodigoInstituicao=1&numProtocolo=1306715&numSequencia=831441&numVersao=1"
+   }
+  },
+  {
+   "data": "2025-04-03",
+   "reacao": "2025-04-03",
+   "reacao_incerta": false,
+   "titulo": "OPEP+ acelera o aumento da produção",
+   "tema": "opep",
+   "confianca": "media",
+   "fonte": {
+    "nome": "OPEP, comunicado de 03/04/2025",
+    "url": "https://opec.org/pr-detail/557-03-april-2025.html"
+   },
+   "mesmo_pregao": {
+    "com": "a reação às tarifas recíprocas dos EUA (anunciadas em 02/04, depois do fechamento)",
+    "fora": [
+     "brent",
+     "ibov",
+     "dolar"
+    ]
+   }
+  },
+  {
+   "data": "2025-06-12",
+   "reacao": "2025-06-13",
+   "reacao_incerta": false,
+   "titulo": "Israel ataca o Irã (noite de 12/06 em Brasília)",
+   "tema": "guerra",
+   "confianca": "media",
+   "fonte": {
+    "nome": "Imprensa (Jornal de Brasília/Folhapress, 12/06/2025)",
+    "url": "https://jornaldebrasilia.com.br/noticias/mundo/petroleo-dispara-e-dolar-ganha-forca-apos-israel-bombardear-ira/"
+   }
+  },
+  {
+   "data": "2025-06-24",
+   "reacao": "2025-06-24",
+   "reacao_incerta": false,
+   "titulo": "Cessar-fogo entre Israel e Irã é anunciado",
+   "tema": "guerra",
+   "confianca": "media",
+   "fonte": {
+    "nome": "Imprensa (eixos/Estadão Conteúdo, 24/06/2025)",
+    "url": "https://eixos.com.br/petroleo-e-gas/petroleo-volta-a-tombar-caindo-6-porcento-no-fechamento-seguindo-cessar-fogo-entre-israel-e-ira/"
+   }
+  },
+  {
+   "data": "2026-02-28",
+   "reacao": "2026-03-02",
+   "reacao_incerta": false,
+   "titulo": "Guerra de EUA e Israel contra o Irã; o conflito afeta o tráfego em Ormuz",
+   "tema": "guerra",
+   "confianca": "alta",
+   "fonte": {
+    "nome": "Imprensa (g1, 02/03/2026)",
+    "url": "https://g1.globo.com/economia/noticia/2026/03/02/dolar-ibovespa.ghtml"
+   }
+  },
+  {
+   "data": "2026-03-11",
+   "reacao": "2026-03-11",
+   "reacao_incerta": true,
+   "titulo": "Agência Internacional de Energia anuncia liberação recorde de estoques de petróleo",
+   "tema": "guerra",
+   "confianca": "media",
+   "fonte": {
+    "nome": "Agência Internacional de Energia, comunicado de 11/03/2026",
+    "url": "https://iea.org/news/iea-member-countries-to-carry-out-largest-ever-oil-stock-release-amid-market-disruptions-from-middle-east-conflict"
+   }
+  },
+  {
+   "data": "2026-03-12",
+   "reacao": "2026-03-12",
+   "reacao_incerta": false,
+   "titulo": "Medida Provisória 1.340: subvenção ao diesel e imposto de 12% na exportação de petróleo",
+   "tema": "governo",
+   "confianca": "alta",
+   "fonte": {
+    "nome": "Planalto, texto da Medida Provisória 1.340",
+    "url": "https://www.planalto.gov.br/ccivil_03/_ato2023-2026/2026/mpv/mpv1340.htm"
+   }
+  },
+  {
+   "data": "2026-04-07",
+   "reacao": "2026-04-07",
+   "reacao_incerta": false,
+   "titulo": "Medida Provisória 1.349: regime emergencial de abastecimento de combustível",
+   "tema": "governo",
+   "confianca": "alta",
+   "fonte": {
+    "nome": "Planalto, texto da Medida Provisória 1.349",
+    "url": "https://www.planalto.gov.br/ccivil_03/_ato2023-2026/2026/mpv/mpv1349.htm"
+   }
+  },
+  {
+   "data": "2026-04-07",
+   "reacao": "2026-04-08",
+   "reacao_incerta": false,
+   "titulo": "Cessar-fogo entre EUA e Irã",
+   "tema": "guerra",
+   "confianca": "alta",
+   "fonte": {
+    "nome": "Imprensa (g1, 08/04/2026)",
+    "url": "https://g1.globo.com/economia/noticia/2026/04/08/dolar-ibovespa.ghtml"
+   }
+  },
+  {
+   "data": "2026-04-17",
+   "reacao": "2026-04-17",
+   "reacao_incerta": false,
+   "titulo": "Irã declara Ormuz aberto",
+   "tema": "guerra",
+   "confianca": "media",
+   "fonte": {
+    "nome": "Imprensa (CNBC, 21/04/2026)",
+    "url": "https://www.cnbc.com/2026/04/21/oil-price-iran-war-middle-east.html"
+   }
+  },
+  {
+   "data": "2026-04-28",
+   "reacao": "2026-04-28",
+   "reacao_incerta": false,
+   "titulo": "Emirados Árabes anunciam a saída da OPEP e da OPEP+ (a partir de 01/05)",
+   "tema": "opep",
+   "confianca": "media",
+   "fonte": {
+    "nome": "Imprensa (Khaleej Times, 28/04/2026); a nota oficial dos Emirados não foi lida",
+    "url": "https://www.khaleejtimes.com/uae-announces-decision-to-withdraw-from-opec-opec-from-may-1"
+   }
+  },
+  {
+   "data": "2026-10-04",
+   "reacao": "2026-10-05",
+   "reacao_incerta": false,
+   "titulo": "OPEP+ mantém as metas de produção de novembro",
+   "tema": "opep",
+   "confianca": "media",
+   "fonte": {
+    "nome": "Imprensa especializada (Enerdata), citando o comunicado da OPEP+",
+    "url": "https://www.enerdata.net/publications/daily-energy-news/opec-keeps-november-2026-production-targets-unchanged-amid-supply-disruptions.html"
+   },
+   "mesmo_pregao": {
+    "com": "o 1º turno da eleição de 2026",
+    "fora": [
+     "ibov",
+     "dolar"
+    ]
+   }
+  }
+ ],
+ "barril": {
+  "titulo": "Do barril à bomba (fato, com a data de cada número)",
+  "linhas": [
+   {
+    "texto": "A Petrobras vende gasolina e diesel às distribuidoras; elas misturam etanol (na gasolina) ou biodiesel (no diesel), e entram os impostos e as margens de quem distribui e revende.",
+    "fontes": [
+     {
+      "nome": "Petrobras, composição do preço da gasolina",
+      "url": "https://precos.petrobras.com.br/precos-gasolina"
+     },
+     {
+      "nome": "Petrobras, composição do preço do diesel",
+      "url": "https://precos.petrobras.com.br/precos-diesel"
+     }
+    ]
+   },
+   {
+    "texto": "Na gasolina de R$ 6,53 (média de 11 a 17/10/2026), a parte da Petrobras foi de R$ 2,08 (31,9%); o ICMS, de R$ 1,57; o etanol, de R$ 0,99; a distribuição e a revenda, de R$ 1,83; e os tributos federais, de R$ 0,06.",
+    "fontes": [
+     {
+      "nome": "Petrobras, composição do preço da gasolina",
+      "url": "https://precos.petrobras.com.br/precos-gasolina"
+     }
+    ]
+   },
+   {
+    "texto": "No diesel de R$ 7,34 (mesma semana), a parte da Petrobras foi de R$ 2,83 (38,6%).",
+    "fontes": [
+     {
+      "nome": "Petrobras, composição do preço do diesel",
+      "url": "https://precos.petrobras.com.br/precos-diesel"
+     }
+    ]
+   },
+   {
+    "texto": "A gasolina pesa 5,13% no IPCA (setembro de 2026). Em 12 meses até setembro, o diesel subiu 14,35% e a gasolina 5,61%, com IPCA de 4,58%.",
+    "fontes": [
+     {
+      "nome": "IBGE, SIDRA, tabela 7060 (IPCA por item)",
+      "url": "https://apisidra.ibge.gov.br/values/t/7060/n1/all/v/63,66,2265/p/last%201/c315/all"
+     }
+    ]
+   },
+   {
+    "texto": "Quem decide o reajuste é a Petrobras, que é estatal (o controlador é a União): de 2016 a maio de 2023 a referência foi a paridade de importação, e desde 16/05/2023 é uma estratégia comercial própria. Os reajustes não têm data fixa.",
+    "fontes": [
+     {
+      "nome": "Petrobras, fato relevante de 14/10/2016 (política de preços)",
+      "url": "https://www.rad.cvm.gov.br/ENET/frmDownloadDocumento.aspx?Tela=ext&descTipo=IPE&CodigoInstituicao=1&numProtocolo=534336&numSequencia=77084&numVersao=1"
+     },
+     {
+      "nome": "Petrobras, fato relevante de 16/05/2023 (estratégia comercial)",
+      "url": "https://www.rad.cvm.gov.br/ENET/frmDownloadDocumento.aspx?Tela=ext&descTipo=IPE&CodigoInstituicao=1&numProtocolo=1102903&numSequencia=627632&numVersao=1"
+     },
+     {
+      "nome": "CVM, formulário cadastral das companhias abertas (FCA 2026)",
+      "url": "https://dados.cvm.gov.br/dados/CIA_ABERTA/DOC/FCA/DADOS/fca_cia_aberta_2026.zip"
+     }
+    ]
+   }
+  ],
+  "resumo": "Do barril à bomba: na gasolina de R$ 6,53 (média de 11 a 17/10/2026), a parte da Petrobras foi de R$ 2,08 (31,9%); o resto é imposto, etanol e a margem de quem distribui e revende. A gasolina pesa 5,13% na inflação (IPCA).",
+  "limites": [
+   "A composição do preço é de uma semana (11 a 17/10/2026): ela muda a cada reajuste e a cada mudança de imposto."
+  ]
+ }
+}

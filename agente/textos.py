@@ -20,6 +20,16 @@ FECHO = 'Não digo se você deve comprar, quando entrar nem quanto colocar.'
 # D4
 RISCO_DERIVATIVO = ('Em mini-índice, mini-dólar e DI futuro a posição é alavancada: a margem é só garantia, o ajuste '
                     'diário debita ou credita a conta a cada pregão, e a perda pode passar do que você depositou.')
+# D4 em pergunta de cripto, que cita o futuro de bitcoin da B3 (só onde já há cripto: a palavra pede o D5).
+RISCO_DERIVATIVO_CRIPTO = ('No futuro ou na opção de cripto, como no mini-índice, no mini-dólar e no DI futuro, a posição é '
+                           'alavancada: a margem é só garantia, o ajuste diário debita ou credita a conta a cada pregão, e a '
+                           'perda pode passar do que você depositou.')
+
+# Pergunta de preço de cripto: o repertório não tem a cotação (nenhuma fonte grátis permite uso comercial).
+SEM_PRECO_CRIPTO = 'O repertório ainda não mostra o preço do bitcoin: nenhuma fonte gratuita permite uso comercial da cotação.'
+
+# Pergunta de defasagem da gasolina (D8): o repertório não calcula, e isso vai no topo, não só nas limitações.
+SEM_DEFASAGEM = 'O repertório não calcula a defasagem entre o preço da Petrobras e o do mercado internacional.'
 
 # D5
 RISCO_CRIPTO = ('Cripto à vista, em regra, não é valor mobiliário e não tem a proteção da regulação da CVM. Quem regula '
