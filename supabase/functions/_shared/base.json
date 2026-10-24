@@ -1,5 +1,5 @@
 {
- "gerado_em": "2026-10-23T18:20:09-03:00",
+ "gerado_em": "2026-10-23T22:23:59-03:00",
  "textos": {
   "AVISO": "⚠️ Sou uma IA e posso errar. Isto não é recomendação de investimento: a empresa não é analista credenciada na APIMEC nem consultora autorizada pela CVM. Rentabilidade passada não indica rentabilidade futura.",
   "RECUSA": "Não digo se você deve comprar, vender ou esperar, nem para onde o preço vai: isso seria análise ou consultoria. Mostro o que dá para saber hoje, com fonte, para você decidir.",
@@ -9580,7 +9580,7 @@
   "titulo": "O que mostram as pesquisas do 2º turno com registro no TSE informado pelo instituto ou pela imprensa (fato)",
   "linhas": [
    {
-    "texto": "Quais entram: A pesquisa mais recente de cada instituto, nacional, de 2º turno presidencial, com campo terminando entre 13/10/2026 e 21/10/2026, divulgada até a madrugada de 22/10/2026 e com número de registro no TSE citado pela imprensa ou pelo relatório do instituto. O critério não depende do resultado. Não calculo chance de vitória e não uso mercado de previsão como termômetro.",
+    "texto": "Quais entram: A pesquisa mais recente de cada instituto, nacional, de 2º turno presidencial, com campo terminando entre 13/10/2026 e 22/10/2026, divulgada até as 9h de 23/10/2026 e com número de registro no TSE citado pela imprensa ou pelo relatório do instituto e conferido no arquivo de pesquisas registradas do TSE. O critério não depende do resultado. Não calculo chance de vitória e não uso mercado de previsão como termômetro.",
     "fontes": [
      {
       "nome": "Lei 9.504/1997, art. 33 (registro de pesquisa eleitoral)",
@@ -9589,15 +9589,15 @@
     ]
    },
    {
-    "texto": "Nas 16 pesquisas com votos totais, a diferença Flávio Bolsonaro menos Lula vai de −1,8 (Vox Brasil) a +5,0 p.p. (Gerp (Gerp Mercadologia)), com mediana de +2,0 p.p.",
+    "texto": "Nas 17 pesquisas com votos totais, a diferença Flávio Bolsonaro menos Lula vai de −1,1 (Vox Brasil) a +5,0 p.p. (Gerp (Gerp Mercadologia)), com mediana de +2,0 p.p.",
     "fontes": [
      {
       "nome": "Pesquisa Palver, registro BR-04612/2026",
       "url": "https://www.poder360.com.br/poder-pesquisas/flavio-tem-50-contra-48-de-lula-no-2o-turno-diz-pesquisa/"
      },
      {
-      "nome": "Pesquisa Vox Brasil, registro BR-04332/2026",
-      "url": "https://static.poder360.com.br/uploads/2026/10/RELATORIO-VOX-BRASIL-NACIONAL-10-2-TURNO-18-10-2026.pdf"
+      "nome": "Pesquisa Vox Brasil, registro BR-03259/2026",
+      "url": "https://www.poder360.com.br/poder-eleicoes-2026/lula-tem-506-contra-494-de-flavio-em-votos-validos-diz-vox/"
      },
      {
       "nome": "Pesquisa Gerp (Gerp Mercadologia), registro BR-03835/2026",
@@ -9606,6 +9606,51 @@
      {
       "nome": "Cálculo próprio: estudo de evento 2016–2026 sobre as séries oficiais (método no cofre, nota \"Estudo de evento 2016–2026\")",
       "url": ""
+     }
+    ]
+   },
+   {
+    "texto": "Vox Brasil, contratada por: Próprio instituto (Instituto Vox Brasil Opinião e Pesquisas Ltda., recursos próprios); campo de 20/10/2026 a 22/10/2026, registro BR-03259/2026: Flávio Bolsonaro 44,3% e Lula 45,4% dos votos totais, margem de erro de 2,15 p.p.",
+    "fontes": [
+     {
+      "nome": "Pesquisa Vox Brasil, registro BR-03259/2026",
+      "url": "https://www.poder360.com.br/poder-eleicoes-2026/lula-tem-506-contra-494-de-flavio-em-votos-validos-diz-vox/"
+     }
+    ]
+   },
+   {
+    "texto": "Real Time Big Data, contratada por: Próprio instituto (recursos próprios); campo de 19/10/2026 a 22/10/2026, registro BR-09670/2026: Flávio Bolsonaro 49% e Lula 45% dos votos totais, margem de erro de 2 p.p.",
+    "fontes": [
+     {
+      "nome": "Pesquisa Real Time Big Data, registro BR-09670/2026",
+      "url": "https://www.gazetadopovo.com.br/eleicoes/2026/pesquisa-eleitoral-2026/real-time-big-data-presidente-outubro-2026-segundo-turno-2/"
+     }
+    ]
+   },
+   {
+    "texto": "Datafolha, contratada por: Folha de S.Paulo e TV Globo; campo de 20/10/2026 a 22/10/2026, registro BR-09709/2026: Flávio Bolsonaro 47% e Lula 46% dos votos totais, margem de erro de 2 p.p.",
+    "fontes": [
+     {
+      "nome": "Pesquisa Datafolha, registro BR-09709/2026",
+      "url": "https://www.poder360.com.br/poder-eleicoes-2026/flavio-tem-50-dos-votos-validos-contra-50-de-lula-diz-datafolha/"
+     }
+    ]
+   },
+   {
+    "texto": "PoderData (PoderData/Aya), contratada por: Recursos próprios (PoderData, do grupo Poder360); parceria de divulgação com a Aya Bancah; campo de 19/10/2026 a 21/10/2026, registro BR-07926/2026: Flávio Bolsonaro 49% e Lula 48% dos votos totais, margem de erro de 1,6 p.p.",
+    "fontes": [
+     {
+      "nome": "Pesquisa PoderData (PoderData/Aya), registro BR-07926/2026",
+      "url": "https://static.poder360.com.br/uploads/2026/10/Relatorio-PoderData-Eleitoral-21out26-2.pdf"
+     }
+    ]
+   },
+   {
+    "texto": "Indexa (Indexa/Broadcast), contratada por: Agência Estado S.A.; campo de 20/10/2026 a 21/10/2026, registro BR-02348/2026: Flávio Bolsonaro 45,2% e Lula 44,1% dos votos totais, margem de erro de 2,2 p.p.",
+    "fontes": [
+     {
+      "nome": "Pesquisa Indexa (Indexa/Broadcast), registro BR-02348/2026",
+      "url": "https://www.gazetadopovo.com.br/eleicoes/2026/pesquisa-eleitoral-2026/indexa-broadcast-presidente-outubro-2026-segundo-turno-2/"
      }
     ]
    },
@@ -9664,15 +9709,6 @@
     ]
    },
    {
-    "texto": "Real Time Big Data, contratada por: Próprio instituto (recursos próprios); campo de 15/10/2026 a 19/10/2026, registro BR-02952/2026: Flávio Bolsonaro 48% e Lula 45% dos votos totais, margem de erro de 2 p.p.",
-    "fontes": [
-     {
-      "nome": "Pesquisa Real Time Big Data, registro BR-02952/2026",
-      "url": "https://www.poder360.com.br/poder-eleicoes-2026/flavio-tem-48-contra-45-de-lula-diz-real-time-big-data/"
-     }
-    ]
-   },
-   {
     "texto": "Ideia (Meio/Ideia), contratada por: Canal Meio (O Meio); campo de 15/10/2026 a 19/10/2026, registro BR-08251/2026: Flávio Bolsonaro 48% e Lula 46% dos votos totais, margem de erro de 2,5 p.p.",
     "fontes": [
      {
@@ -9691,15 +9727,6 @@
     ]
    },
    {
-    "texto": "PoderData (PoderData/Aya), contratada por: Recursos próprios (PoderData, do grupo Poder360); parceria de divulgação com a Aya Bancah; campo de 16/10/2026 a 18/10/2026, registro BR-02586/2026: Flávio Bolsonaro 52% e Lula 48% dos votos válidos (o total não foi divulgado), margem de erro de 1,8 p.p.",
-    "fontes": [
-     {
-      "nome": "Pesquisa PoderData (PoderData/Aya), registro BR-02586/2026",
-      "url": "https://www.poder360.com.br/poderdata/flavio-reage-e-vai-a-52-contra-48-de-lula-diz-poderdata-aya/"
-     }
-    ]
-   },
-   {
     "texto": "Nexus (BTG/Nexus), contratada por: Banco BTG Pactual; campo de 16/10/2026 a 18/10/2026, registro BR-04499/2026: Flávio Bolsonaro 46,5% e Lula 45,9% dos votos totais, margem de erro de 2 p.p.",
     "fontes": [
      {
@@ -9714,15 +9741,6 @@
      {
       "nome": "Pesquisa AtlasIntel, registro BR-02418/2026",
       "url": "https://www.gazetadopovo.com.br/eleicoes/2026/pesquisa-eleitoral-2026/atlasintel-presidente-outubro-2026-segundo-turno-2/"
-     }
-    ]
-   },
-   {
-    "texto": "Vox Brasil, contratada por: Próprio instituto (Instituto Vox Brasil Opinião e Pesquisas Ltda., recursos próprios); campo de 15/10/2026 a 17/10/2026, registro BR-04332/2026: Flávio Bolsonaro 44,6% e Lula 46,4% dos votos totais, margem de erro de 2,15 p.p.",
-    "fontes": [
-     {
-      "nome": "Pesquisa Vox Brasil, registro BR-04332/2026",
-      "url": "https://static.poder360.com.br/uploads/2026/10/RELATORIO-VOX-BRASIL-NACIONAL-10-2-TURNO-18-10-2026.pdf"
      }
     ]
    },
@@ -9752,30 +9770,13 @@
       "url": "https://static.poder360.com.br/uploads/2026/10/pesquisa-ipespe-17out2026.pdf"
      }
     ]
-   },
-   {
-    "texto": "Indexa (Indexa/Broadcast), contratada por: Agência Estado S.A.; campo de 13/10/2026 a 14/10/2026, registro BR-04629/2026: Flávio Bolsonaro 44% e Lula 42% dos votos totais, margem de erro de 2,2 p.p.",
-    "fontes": [
-     {
-      "nome": "Pesquisa Indexa (Indexa/Broadcast), registro BR-04629/2026",
-      "url": "https://www.gazetadopovo.com.br/eleicoes/2026/pesquisa-eleitoral-2026/indexa-broadcast-presidente-outubro-2026-segundo-turno/"
-     }
-    ]
-   },
-   {
-    "texto": "Datafolha, contratada por: Folha de S.Paulo; campo de 13/10/2026 a 14/10/2026, registro BR-00466/2026: Flávio Bolsonaro 47% e Lula 45% dos votos totais, margem de erro de 2 p.p.",
-    "fontes": [
-     {
-      "nome": "Pesquisa Datafolha, registro BR-00466/2026",
-      "url": "https://www.poder360.com.br/poder-eleicoes-2026/datafolha-confirma-poderdata-aya-e-da-flavio-com-51-e-lula-com-49/"
-     }
-    ]
    }
   ],
-  "resumo": "Nas 16 pesquisas do 2º turno registradas no TSE que divulgaram os votos totais, a diferença vai de Lula 1,8 pontos à frente a Flávio Bolsonaro 5,0 pontos à frente, conforme o instituto; no meio da lista, Flávio Bolsonaro 2,0 pontos à frente. Pesquisa não é previsão.",
+  "resumo": "Nas 17 pesquisas do 2º turno registradas no TSE que divulgaram os votos totais, a diferença vai de Lula 1,1 pontos à frente a Flávio Bolsonaro 5,0 pontos à frente, conforme o instituto; no meio da lista, Flávio Bolsonaro 2,0 pontos à frente. Pesquisa não é previsão.",
   "limites": [
-   "Os números de registro vêm das matérias e dos relatórios dos institutos; não foram conferidos no PesqEle do TSE.",
-   "A rodada do Datafolha prevista para a tarde de 22/10/2026 ainda não tinha saído quando esta base foi montada.",
+   "Os números de registro, as datas e o tamanho da amostra foram conferidos no arquivo de pesquisas eleitorais registradas do TSE (dados abertos, gerado em 23/10/2026). A amostra do TSE é a planejada; a desta base é a realizada, do relatório ou da matéria, e pode diferir em poucas entrevistas.",
+   "Gerp (BR-03835/2026): a imprensa e o Poder360 dão campo de 19 a 21/10/2026; o registro no TSE diz 17 a 20/10/2026. Não achamos o relatório do instituto, e a base mantém as datas divulgadas.",
+   "Rodadas registradas no TSE com divulgação prevista para 23/10/2026 que ainda não tinham saído até as 9h (Ipespe, DataTrends, Veritá, Alfa) ficaram com a rodada anterior.",
    "Pesquisa não é previsão, e o erro já foi para os dois lados: nos 5 turnos medidos, a urna ficou de −2,09 p.p. (2º turno de 2018) a +3,49 p.p. (1º turno de 2026) da média das pesquisas, na margem de Jair ou Flávio Bolsonaro sobre o adversário."
   ]
  },
